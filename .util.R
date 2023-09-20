@@ -26,6 +26,14 @@
 #TOC> ==========================================================================
 
 
+# =    1  Packages  ==========================================
+
+if (!requireNamespace("httr", quietly=TRUE)) {
+  install.packages("httr")
+}
+
+
+
 # =    1  Remote control of ChimeraX  ==========================================
 CXPORT <- 61803
 cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
