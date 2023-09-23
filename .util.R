@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                           Line
 #TOC> ---------------------------------------------------------------
 #TOC>   1        Install missing packages                          33
@@ -26,7 +26,7 @@
 #TOC>   7        Extracting R code from Google docs               251
 #TOC>   8        Reading Google sheets                            321
 #TOC>   9        Plotting amino acids as 2D scatterplot           369
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -64,6 +64,7 @@ t2c <- function(txt) {
 
 # ==   2.2  Initialize generative AI init prompt  ==============================
 
+cat("  Defining AIinit() ...\n")
 AIinit <- function() {
   txt <- "
 You act as an R language tutor and answer my prompts to help me learn R:
