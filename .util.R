@@ -12,29 +12,74 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                           Line
 #TOC> ---------------------------------------------------------------
-#TOC>   1        Remote control of ChimeraX                        29
-#TOC>   2        A progress bar for long-running code             104
-#TOC>   3        Find Keywords in aaindex                         127
-#TOC>   4        A colour palette for amino acids                 165
-#TOC>   5        Extracting R code from Google docs               198
-#TOC>   6        Reading Google sheets                            268
-#TOC>   7        Plotting amino acids as 2D scatterplot           315
-#TOC>
+#TOC>   1        Install missing packages                          33
+#TOC>   2        Generative AI                                     49
+#TOC>   2.1        t2c - write text to clipboard                   51
+#TOC>   2.2        Initialize generative AI init prompt            65
+#TOC>   3        Remote control of ChimeraX                        82
+#TOC>   4        A progress bar for long-running code             157
+#TOC>   5        Find Keywords in aaindex                         180
+#TOC>   6        A colour palette for amino acids                 218
+#TOC>   7        Extracting R code from Google docs               251
+#TOC>   8        Reading Google sheets                            321
+#TOC>   9        Plotting amino acids as 2D scatterplot           369
+#TOC> 
 #TOC> ==========================================================================
 
 
-# =    1  Packages  ==========================================
+# =    1  Install missing packages  ============================================
 
 if (!requireNamespace("httr", quietly=TRUE)) {
-  install.packages("httr")
+  utils::install.packages("httr")
+}
+
+if (!requireNamespace("seqinr", quietly=TRUE)) {
+  utils::install.packages("seqinr")
+  library(seqinr)  # need to use library() since we load data from the package
+}
+
+if (!requireNamespace("clipr", quietly=TRUE)) {
+  utils::install.packages("clipr")
 }
 
 
+# =    2  Generative AI  =======================================================
 
-# =    1  Remote control of ChimeraX  ==========================================
+# ==   2.1  t2c - write text to clipboard  =====================================
+cat("  Defining t2c() ...\n")
+t2c <- function(txt) {
+  # Send txt to the clipboard
+  if (! clipr::clipr_available()) {
+    stop("The clipr:: package is not available. This must be fixed.")
+  }
+  clipr::write_clip(txt)
+  return(invisible(NULL))
+}
+
+# Usage:
+# t2c("This string was written to the clipboard by t2c().")
+
+# ==   2.2  Initialize generative AI init prompt  ==============================
+
+AIinit <- function() {
+  txt <- "
+You act as an R language tutor and answer my prompts to help me learn R:
+* You write Ⓡ as the last character of any response to show that the response is complete.
+* You keep in mind that I am a programming beginner and you explain syntax and concepts.
+* You break down algorithms into clear steps.
+* You avoid using packages when a base R function can be written.
+* You do not use tidyverse functions.
+* When you must use special packages, you write code as package::function() and do not use library(package) if possible.
+* You use dataFrame[ , col] notation, not dataFrame[[col]] if possible.
+Please confirm with one word. Then we begin.
+  "
+  t2c(txt)
+}
+
+# =    3  Remote control of ChimeraX  ==========================================
 CXPORT <- 61803
 cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
 
@@ -109,7 +154,7 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 }
 
 
-# =    2  A progress bar for long-running code  ================================
+# =    4  A progress bar for long-running code  ================================
 
 cat("  Defining pBar() ...\n")
 pBar <- function(i, l, nCh = 50) {
@@ -132,7 +177,7 @@ pBar <- function(i, l, nCh = 50) {
   }
 }
 
-# =    3  Find Keywords in aaindex  ============================================
+# =    5  Find Keywords in aaindex  ============================================
 
 cat("  Defining grepAAindex() ...\n")
 
@@ -170,7 +215,7 @@ grepAAindex <- function(key, el = "D") {
 
 
 
-# =    4  A colour palette for amino acids  ====================================
+# =    6  A colour palette for amino acids  ====================================
 
 cat("  Defining AACOLS ...\n")
 
@@ -203,7 +248,7 @@ AACOLS <- gsub("$", "AA", AACOLS)  # Make the colors 33% transparent
 # barplot(rep(1, 20), col = AACOLS, names.arg = names(AACOLS), cex.names=0.5)
 
 
-# =    5  Extracting R code from Google docs  ==================================
+# =    7  Extracting R code from Google docs  ==================================
 
 cat("  Defining fetchGoogleDocRCode ...\n")
 
@@ -273,7 +318,7 @@ if (FALSE) {
 
 
 
-# =    6  Reading Google sheets  ===============================================
+# =    8  Reading Google sheets  ===============================================
 
 cat("  Defining read.gsheet() ...\n")
 
@@ -321,7 +366,7 @@ read.gsheet <- function(URL, sheet, ...) {
  # Z <- read.gsheet(X, Y)
 
 
-# =    7  Plotting amino acids as 2D scatterplot  ==============================
+# =    9  Plotting amino acids as 2D scatterplot  ==============================
 
 cat("  Reading Google sheet AADAT ...\n")
 
