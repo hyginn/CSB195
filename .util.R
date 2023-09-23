@@ -12,21 +12,21 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                           Line
 #TOC> ---------------------------------------------------------------
 #TOC>   1        Install missing packages                          33
 #TOC>   2        Generative AI                                     49
 #TOC>   2.1        t2c - write text to clipboard                   51
 #TOC>   2.2        Initialize generative AI init prompt            65
-#TOC>   3        Remote control of ChimeraX                        82
-#TOC>   4        A progress bar for long-running code             157
-#TOC>   5        Find Keywords in aaindex                         180
-#TOC>   6        A colour palette for amino acids                 218
-#TOC>   7        Extracting R code from Google docs               251
-#TOC>   8        Reading Google sheets                            321
-#TOC>   9        Plotting amino acids as 2D scatterplot           369
-#TOC>
+#TOC>   3        Remote control of ChimeraX                        97
+#TOC>   4        A progress bar for long-running code             172
+#TOC>   5        Find Keywords in aaindex                         206
+#TOC>   6        A colour palette for amino acids                 245
+#TOC>   7        Extracting R code from Google docs               285
+#TOC>   8        Reading Google sheets                            355
+#TOC>   9        Plotting amino acids as 2D scatterplot           403
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -65,20 +65,34 @@ t2c <- function(txt) {
 # ==   2.2  Initialize generative AI init prompt  ==============================
 
 cat("  Defining AIinit() ...\n")
+# This loads a prompt to customize AI behaviour as an R tutor.
+
 AIinit <- function() {
   txt <- "
-You act as an R language tutor and answer my prompts to help me learn R:
-* You write Ⓡ as the last character of any response to show that the response is complete.
-* You keep in mind that I am a programming beginner and you explain syntax and concepts.
-* You break down algorithms into clear steps.
-* You avoid using packages when a base R function can be written.
+I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
+* You write # as the very last character of your response, so I know that the response is complete.
+* You keep in mind that I am a programming beginner and you explain syntax and concepts at a novice level.
+* You are concise.
+* You avoid using packages when a base R function is trivial to write for the purpose.
+* When you must use non-standard packages, you write code as package::function() and do not use library(package) if possible.
 * You do not use tidyverse functions.
-* When you must use special packages, you write code as package::function() and do not use library(package) if possible.
 * You use dataFrame[ , col] notation, not dataFrame[[col]] if possible.
+* When a direct code solution can address the question, simply provide the code - do not assign the result and print it. For example:
+Good:
+path.expand(\"~\")
+
+Poor:
+home_directory <- path.expand(\"~\")
+print(home_directory)
+
 Please confirm with one word. Then we begin.
-  "
+"
   t2c(txt)
 }
+
+# Usage:
+# AIinit()  # ... then paste the clipboard content into an AI prompt.
+
 
 # =    3  Remote control of ChimeraX  ==========================================
 CXPORT <- 61803
@@ -178,6 +192,17 @@ pBar <- function(i, l, nCh = 50) {
   }
 }
 
+# Usage:
+if (FALSE) {
+
+N <- 123
+for (i in 1:N) {
+  pBar(i, N)
+  Sys.sleep(0.05)
+}
+
+}
+
 # =    5  Find Keywords in aaindex  ============================================
 
 cat("  Defining grepAAindex() ...\n")
@@ -202,6 +227,8 @@ grepAAindex <- function(key, el = "D") {
   return(dat[sel])
 }
 
+# Usage:
+#
 # grepAAindex("[Hh]ydroph")
 # idx <- 544
 # aaindex[[idx]]$D
@@ -213,7 +240,6 @@ grepAAindex <- function(key, el = "D") {
 # aaindex[[idx]]$D
 # aaindex[[idx]]$T
 # cat(sprintf("\n%s\t%s", names(aaindex[[idx]]$I), aaindex[[idx]]$I))
-
 
 
 # =    6  A colour palette for amino acids  ====================================
@@ -242,11 +268,18 @@ AACOLS["A"] <- "#9CF7C7" #
 AACOLS["G"] <- "#d2d2d2" # Glycine
 AACOLS["C"] <- "#fff963" # Cysteine
 AACOLS["P"] <- "#edc06d" # Proline
-AACOLS <- gsub("$", "AA", AACOLS)  # Make the colors 33% transparent
-# AACOLS <- gsub("$", "80", AACOLS)  # Make the colors 50% transparent
-# AACOLS <- gsub("$", "55", AACOLS)  # Make the colors 67% transparent
-# AACOLS <- gsub("AA$", "", AACOLS) # Remove transparency
+
+# Usage:
+#   Just use the vector like any named dataset.
 # barplot(rep(1, 20), col = AACOLS, names.arg = names(AACOLS), cex.names=0.5)
+
+# You can use gsub() to add a value for the colours' transparency (alpha
+# channel):
+# AACOLS <- gsub("$", "AA", AACOLS)    # Make the colors 33% transparent
+# AACOLS <- gsub("$", "80", AACOLS)    # Make the colors 50% transparent
+# AACOLS <- gsub("$", "55", AACOLS)    # Make the colors 67% transparent
+# AACOLS <- gsub("..$", "FF", AACOLS)  # Reset the two last digits to "FF"
+                                       #   to remove transparency
 
 
 # =    7  Extracting R code from Google docs  ==================================
