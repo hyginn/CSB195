@@ -447,7 +447,7 @@ abline(h = 0, col = "#D2DAFF")               # ... and horizontal line
 #     new key combo works for you, forward and back.
 #
 #  -  Sometimes we want to compare files with each other, and switching tabs
-#     is not so convenient. You should know that you can UNOCK tabs too, by
+#     is not so convenient. You should know that you can UNDOCK tabs too, by
 #     dragging them out of the main RStudio window. That's very useful. Try
 #     it!
 #
