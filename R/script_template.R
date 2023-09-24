@@ -67,11 +67,13 @@ myFunction <- function(a, b=1) {
 
 
 
+
+
 # ====  TESTS  =================================================================
 # Enter your function tests here...
 if (FALSE) {
-  # Enclose everything that should not be source()'d with this file in a block
-  # that prevents its execution.
+  # This block is never executed. Place all tests and experiments here that
+  # should not be run when this file is source()'ed.
 
 
 
