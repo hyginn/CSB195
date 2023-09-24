@@ -2,7 +2,7 @@
 #
 # CSB195 Class project: utility scripts
 #
-# 2022-09  - 2022-10
+# 2022-09  - 2023-09
 # boris.steipe@utoronto.ca
 #
 # This file is source()d upon startup by .Rprofile
@@ -13,45 +13,56 @@
 
 #TOC> ==========================================================================
 #TOC> 
-#TOC>   Section  Title                                           Line
-#TOC> ---------------------------------------------------------------
-#TOC>   1        Install missing packages                          33
-#TOC>   2        Generative AI                                     49
-#TOC>   2.1        t2c - write text to clipboard                   51
-#TOC>   2.2        Initialize generative AI init prompt            65
-#TOC>   3        Remote control of ChimeraX                        97
-#TOC>   4        A progress bar for long-running code             172
-#TOC>   5        Find Keywords in aaindex                         206
-#TOC>   6        A colour palette for amino acids                 245
-#TOC>   7        Extracting R code from Google docs               285
-#TOC>   8        Reading Google sheets                            355
-#TOC>   9        Plotting amino acids as 2D scatterplot           403
+#TOC>   Section  Title                                            Line
+#TOC> ----------------------------------------------------------------
+#TOC>   01       Install missing packages                           34
+#TOC>   02       Load required libraries                            50
+#TOC>   03       Generative AI                                      57
+#TOC>   03.1       t2c - write text to clipboard                    59
+#TOC>   03.2       Initialize generative AI initial prompt          74
+#TOC>   04       Remote control of ChimeraX                        107
+#TOC>   05       A progress bar for long-running code              183
+#TOC>   06       Find Keywords in aaindex                          219
+#TOC>   07       A colour palette for amino acids                  259
+#TOC>   08       Extracting R code from Google docs                300
+#TOC>   09       Reading Google sheets                             372
+#TOC>   10       Plotting amino acids as 2D scatterplot            422
 #TOC> 
 #TOC> ==========================================================================
 
 
-# =    1  Install missing packages  ============================================
+# =    01  Install missing packages  ===========================================
 
 if (!requireNamespace("httr", quietly=TRUE)) {
   utils::install.packages("httr")
-}
-
-if (!requireNamespace("seqinr", quietly=TRUE)) {
-  utils::install.packages("seqinr")
-  library(seqinr)  # need to use library() since we load data from the package
 }
 
 if (!requireNamespace("clipr", quietly=TRUE)) {
   utils::install.packages("clipr")
 }
 
+if (!requireNamespace("seqinr", quietly=TRUE)) {
+  utils::install.packages("seqinr")
+}
 
-# =    2  Generative AI  =======================================================
 
-# ==   2.1  t2c - write text to clipboard  =====================================
+
+# =    02  Load required libraries  ============================================
+# ... only if we must.
+#
+  library(seqinr)  # need to use library() since we load data from the package
+
+
+
+# =    03  Generative AI  ======================================================
+
+# ==   03.1  t2c - write text to clipboard  ====================================
 cat("  Defining t2c() ...\n")
 t2c <- function(txt) {
-  # Send txt to the clipboard
+  #' Convenience function to send R objects to the clipboard.
+  #' @examples
+    #' t2c("This string was written to the clipboard by t2c().")
+    #'
   if (! clipr::clipr_available()) {
     stop("The clipr:: package is not available. This must be fixed.")
   }
@@ -59,15 +70,16 @@ t2c <- function(txt) {
   return(invisible(NULL))
 }
 
-# Usage:
-# t2c("This string was written to the clipboard by t2c().")
 
-# ==   2.2  Initialize generative AI init prompt  ==============================
+# ==   03.2  Initialize generative AI initial prompt  ==========================
 
 cat("  Defining AIinit() ...\n")
-# This loads a prompt to customize AI behaviour as an R tutor.
 
 AIinit <- function() {
+  #' Loads a prompt to initialize a Generative AI session into the clipboard.
+  #' @usage AIinit()    # then just paste the clipboard contents
+  #'                    # into the AI assistant session.
+
   txt <- "
 I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
 * You write # as the very last character of your response, so I know that the response is complete.
@@ -90,11 +102,9 @@ Please confirm with one word. Then we begin.
   t2c(txt)
 }
 
-# Usage:
-# AIinit()  # ... then paste the clipboard content into an AI prompt.
 
 
-# =    3  Remote control of ChimeraX  ==========================================
+# =    04  Remote control of ChimeraX  =========================================
 CXPORT <- 61803
 cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
 
@@ -169,7 +179,8 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 }
 
 
-# =    4  A progress bar for long-running code  ================================
+
+# =    05  A progress bar for long-running code  ===============================
 
 cat("  Defining pBar() ...\n")
 pBar <- function(i, l, nCh = 50) {
@@ -192,7 +203,7 @@ pBar <- function(i, l, nCh = 50) {
   }
 }
 
-# Usage:
+# Usage example:
 if (FALSE) {
 
 N <- 123
@@ -203,7 +214,9 @@ for (i in 1:N) {
 
 }
 
-# =    5  Find Keywords in aaindex  ============================================
+
+
+# =    06  Find Keywords in aaindex  ===========================================
 
 cat("  Defining grepAAindex() ...\n")
 
@@ -242,7 +255,8 @@ grepAAindex <- function(key, el = "D") {
 # cat(sprintf("\n%s\t%s", names(aaindex[[idx]]$I), aaindex[[idx]]$I))
 
 
-# =    6  A colour palette for amino acids  ====================================
+
+# =    07  A colour palette for amino acids  ===================================
 
 cat("  Defining AACOLS ...\n")
 
@@ -282,7 +296,8 @@ AACOLS["P"] <- "#edc06d" # Proline
                                        #   to remove transparency
 
 
-# =    7  Extracting R code from Google docs  ==================================
+
+# =    08  Extracting R code from Google docs  =================================
 
 cat("  Defining fetchGoogleDocRCode ...\n")
 
@@ -346,13 +361,15 @@ fetchGoogleDocRCode <- function (URL,
 }
 
 if (FALSE) {
+
+  # Usage example:
   fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
 
 }
 
 
 
-# =    8  Reading Google sheets  ===============================================
+# =    09  Reading Google sheets  ==============================================
 
 cat("  Defining read.gsheet() ...\n")
 
@@ -400,7 +417,9 @@ read.gsheet <- function(URL, sheet, ...) {
  # Z <- read.gsheet(X, Y)
 
 
-# =    9  Plotting amino acids as 2D scatterplot  ==============================
+
+
+# =    10  Plotting amino acids as 2D scatterplot  =============================
 
 cat("  Reading Google sheet AADAT ...\n")
 
@@ -443,7 +462,8 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
        pch = aaDat$pch[ord],
        cex = cexVol[ord],
        col = gsub("..$", "FF", aaDat$col[ord]),
-       bg = aaDat$col[ord])
+       bg = aaDat$col[ord],
+       ...)
 
   CEXMIN <- 0.7
   CEXMAX <- 1.3
@@ -456,7 +476,8 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
 # data("aaindex")
 # x <- aaindex[[150]]$I
 # y <- aaindex[[544]]$I
-# plotAA(x, y)
+# plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
+
 
 
 # [END]
