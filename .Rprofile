@@ -2,6 +2,10 @@
 #
 # This file is automatically run when your R project starts up.
 
+# Set a CDN backed CRAN mirror
+options(repos = c(CRAN="https://cloud.r-project.org/"))
+
+# Run initialization scripts
 cat("\n")
 cat("Hello - welcome to the CSB195 class project.\n\n")
 
