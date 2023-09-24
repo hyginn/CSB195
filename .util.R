@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
 #TOC>   01       Install missing packages                           34
@@ -27,7 +27,7 @@
 #TOC>   08       Extracting R code from Google docs                300
 #TOC>   09       Reading Google sheets                             372
 #TOC>   10       Plotting amino acids as 2D scatterplot            422
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -73,12 +73,12 @@ t2c <- function(txt) {
 
 # ==   03.2  Initialize generative AI initial prompt  ==========================
 
-cat("  Defining AIinit() ...\n")
+cat("  Defining gAIinit() ...\n")
 
-AIinit <- function() {
+gAIinit <- function() {
   #' Loads a prompt to initialize a Generative AI session into the clipboard.
-  #' @usage AIinit()    # then just paste the clipboard contents
-  #'                    # into the AI assistant session.
+  #' @usage gAIinit()    # then just paste the clipboard contents
+  #'                     # into the AI assistant session.
 
   txt <- "
 I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
