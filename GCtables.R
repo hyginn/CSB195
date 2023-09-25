@@ -18,7 +18,7 @@
 # ====  PARAMETERS  ============================================================
 # Define and explain all parameters. No "magic numbers" in your code below.
 
-AADAT <- "data/GeneticCode.csv"
+GCDAT <- "data/GeneticCode.csv"
 
 
 # ====  PACKAGES  ==============================================================
@@ -53,7 +53,7 @@ myFunction <- function(a, b=1) {
 # intermediate results.
 
 
-AAdf <- read.csv(AADAT)
+AAdf <- read.csv(GCDAT)
 
 
 
