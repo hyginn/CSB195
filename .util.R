@@ -82,6 +82,7 @@ gAIinit <- function() {
 
   txt <- "
 I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
+
 * You write # as the very last character of your response, so I know that the response is complete.
 * You keep in mind that I am a programming beginner and you explain syntax and concepts at a novice level.
 * You are concise.
