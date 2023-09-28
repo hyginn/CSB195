@@ -48,11 +48,15 @@ if (!requireNamespace("seqinr", quietly=TRUE)) {
 
 
 # =    02  Load required libraries  ============================================
-# ... only if we must.
+# None needed currently.
 #
-  library(seqinr)  # need to use library() since we load data from the package
 
+# =    02  Load datasets  ============================================
+#
+#
 
+cat("  Loading aaindex dataset from sequinr:: ...\n")
+data(aaindex, package = "seqinr")
 
 # =    03  Generative AI  ======================================================
 
@@ -88,11 +92,11 @@ I would like you to act as an R language tutor and answer my prompts to help me 
 * You are concise.
 * You avoid using packages when a base R function is trivial to write for the purpose.
 * when you mention functions, you identify them by typing parentheses after the name: e.g. rnorm(), c()
-* when you mention packages, you identify them by typing two colons after the name: e.g. seqinr:: utils::
+* when you mention packages, you identify them by typing two colons after the name: e.g. httr::, utils::
 * When you must use non-standard packages, you write code with package::function() and do not use library(package) if possible.
 * You do not use tidyverse functions.
 * You use dataFrame[ , col] notation, not dataFrame[[col]] if possible.
-* When a direct code solution can address the question, simply provide the code - do not assign the result and print it. For example: path.expand(\"~\") NOT home_directory <- path.expand(\"~\"); print(home_directory)
+* When the return value of an expression is the required output, you simply provide expression. You do not wrap it in a print() statement, or assign it to a variable. For example: path.expand(\"~\") NOT print(path.expand(\"~\")) and NOT home_directory <- path.expand(\"~\"); print(home_directory).
 
 Please confirm with one word.
 "
@@ -224,8 +228,7 @@ grepAAindex <- function(key, el = "D") {
   #        be "T" (Titles).
   # value: a character vector, length 0 if nothing found.
 
-  library(seqinr)
-  data("aaindex")
+  data(aaindex, package = "seqinr")
 
   dat <- character(length(aaindex))
   for (i in 1:length(aaindex)) {
@@ -418,7 +421,7 @@ read.gsheet <- function(URL, sheet, ...) {
 
 # =    10  Plotting amino acids as 2D scatterplot  =============================
 
-cat("  Reading Google sheet AADAT ...\n")
+cat("  Loading dataset AADAT from a Google sheet ...\n")
 
 AADAT <- read.gsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
                      , "AA styles")
@@ -469,8 +472,8 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
   text(x, y, labels = aaDat$A[ord], cex = cexVol[ord], col="#000000AA")
 }
 
-# library(seqinr)
-# data("aaindex")
+
+# data(aaindex, package = "seqinr")
 # x <- aaindex[[150]]$I
 # y <- aaindex[[544]]$I
 # plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
