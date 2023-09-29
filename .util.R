@@ -12,22 +12,23 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
-#TOC>   01       Install missing packages                           34
-#TOC>   02       Load required libraries                            50
-#TOC>   03       Generative AI                                      57
-#TOC>   03.1       t2c - write text to clipboard                    59
-#TOC>   03.2       Initialize generative AI initial prompt          74
-#TOC>   04       Remote control of ChimeraX                        107
-#TOC>   05       A progress bar for long-running code              183
-#TOC>   06       Find Keywords in aaindex                          219
-#TOC>   07       A colour palette for amino acids                  259
-#TOC>   08       Extracting R code from Google docs                300
-#TOC>   09       Reading Google sheets                             372
-#TOC>   10       Plotting amino acids as 2D scatterplot            422
-#TOC>
+#TOC>   01       Install missing packages                           35
+#TOC>   02       Load required libraries                            51
+#TOC>   03       Load datasets                                      55
+#TOC>   04       Generative AI                                      62
+#TOC>   04.1       t2c - write text to clipboard                    64
+#TOC>   04.2       Initialize generative AI initial prompt          79
+#TOC>   05       Remote control of ChimeraX                        109
+#TOC>   06       A progress bar for long-running code              188
+#TOC>   07       Find Keywords in aaindex                          224
+#TOC>   08       A colour palette for amino acids                  263
+#TOC>   09       Extracting R code from Google docs                304
+#TOC>   10       Reading Google sheets                             376
+#TOC>   11       Plotting amino acids as 2D scatterplot            426
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -51,16 +52,16 @@ if (!requireNamespace("seqinr", quietly=TRUE)) {
 # None needed currently.
 #
 
-# =    02  Load datasets  ============================================
+# =    03  Load datasets  ======================================================
 #
 #
 
 cat("  Loading aaindex dataset from sequinr:: ...\n")
 data(aaindex, package = "seqinr")
 
-# =    03  Generative AI  ======================================================
+# =    04  Generative AI  ======================================================
 
-# ==   03.1  t2c - write text to clipboard  ====================================
+# ==   04.1  t2c - write text to clipboard  ====================================
 cat("  Defining t2c() ...\n")
 t2c <- function(txt) {
   #' Convenience function to send R objects to the clipboard.
@@ -75,7 +76,7 @@ t2c <- function(txt) {
 }
 
 
-# ==   03.2  Initialize generative AI initial prompt  ==========================
+# ==   04.2  Initialize generative AI initial prompt  ==========================
 
 cat("  Defining gAIinit() ...\n")
 
@@ -105,7 +106,7 @@ Please confirm with one word.
 
 
 
-# =    04  Remote control of ChimeraX  =========================================
+# =    05  Remote control of ChimeraX  =========================================
 CXPORT <- 61803
 cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
 
@@ -114,25 +115,28 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
   # send a command to ChimeraX listening on port CXPORT via its REST
   # interface.
   # Parameters:
-  #   cmd      char     a ChimeraX commandline command
-  #   port     int      the portnumber on which ChimeraX is listening
+  #   cmd      char     a ChimeraX command line command
+  #   port     int      the port number on which ChimeraX is listening
   #   quietly  logical  if FALSE, cat() the contents of the response
   #
   # Value:  the reply by ChimeraX, invisibly.
 
-  # (A) construct the base address, port, and command:
+  # (1) construct the base address, port, and command. This is the prefix
+  #     that httr::GET() needs to send the command to the right port on
+  #     the right machine:
   CXREST <- sprintf("http://127.0.0.1:%s/run?", CXPORT)
 
-  # (B) sanitize the user-entered variable cmd to be properly encoded in
-  # a http message. (No blanks, some specially handled characters, ...)
-  # Here we use gsub(), which seeks for a pattern defined in its first
-  # argument, substitutes the contents of the second argument, in the
-  # string that is identified with the third argument.
+  # (2) sanitize the user-entered variable cmd so it can be properly encoded
+  #     in a http message. (No blanks, some specially handled characters, ...)
+  #     Here we use gsub(), which seeks for a pattern defined in its first
+  #     argument, substitutes the contents of the second argument, in the
+  #     string that is identified with the third argument.
   #
-  # Patterns are defined as "regular expressions".
+  #     Patterns are defined as "regular expressions".
   #
   cmd <- gsub("(^\\s+)|(\\s+$)", "", cmd)  # trim whitespace
-  # percent encode reserved characters
+
+  # "percent encode" reserved characters
   cmd <- gsub("%",   "%25", cmd)          #   %
   cmd <- gsub("#",   "%23", cmd)          #   #
   cmd <- gsub("/",   "%2F", cmd)          #   /
@@ -156,7 +160,7 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
   # Combine the base-address and the current contents of cmd ...
   cmd <- paste0(CXREST, "command=", cmd, collapse = "")
 
-  # send the command to ChimeraX, and capture the response ...
+  # send the command to ChimeraX, and capture the response in the variable r:
   r <- httr::GET(cmd)
   # ... the response is a list-object and we can analyze it.
 
@@ -181,7 +185,7 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 
 
 
-# =    05  A progress bar for long-running code  ===============================
+# =    06  A progress bar for long-running code  ===============================
 
 cat("  Defining pBar() ...\n")
 pBar <- function(i, l, nCh = 50) {
@@ -217,7 +221,7 @@ for (i in 1:N) {
 
 
 
-# =    06  Find Keywords in aaindex  ===========================================
+# =    07  Find Keywords in aaindex  ===========================================
 
 cat("  Defining grepAAindex() ...\n")
 
@@ -256,7 +260,7 @@ grepAAindex <- function(key, el = "D") {
 
 
 
-# =    07  A colour palette for amino acids  ===================================
+# =    08  A colour palette for amino acids  ===================================
 
 cat("  Defining AACOLS ...\n")
 
@@ -297,7 +301,7 @@ AACOLS["P"] <- "#edc06d" # Proline
 
 
 
-# =    08  Extracting R code from Google docs  =================================
+# =    09  Extracting R code from Google docs  =================================
 
 cat("  Defining fetchGoogleDocRCode ...\n")
 
@@ -369,7 +373,7 @@ if (FALSE) {
 
 
 
-# =    09  Reading Google sheets  ==============================================
+# =    10  Reading Google sheets  ==============================================
 
 cat("  Defining read.gsheet() ...\n")
 
@@ -419,7 +423,7 @@ read.gsheet <- function(URL, sheet, ...) {
 
 
 
-# =    10  Plotting amino acids as 2D scatterplot  =============================
+# =    11  Plotting amino acids as 2D scatterplot  =============================
 
 cat("  Loading dataset AADAT from a Google sheet ...\n")
 
