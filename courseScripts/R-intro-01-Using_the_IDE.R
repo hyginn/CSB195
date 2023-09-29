@@ -1,4 +1,4 @@
-# tocID <- "R-intro-01-Using_the_IDE.R"
+# tocID <- "courseScripts/R-intro-01-Using_the_IDE.R"
 #
 # Purpose: Get familiar with the IDE. Play with
 #          code. Use a generative AI (gAI) assistant.
@@ -23,10 +23,10 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                         Line
 #TOC> -------------------------------------------------------------
-#TOC>   1        The RStudio layout                              49
+#TOC>   1        The RStudio IDE layout                          49
 #TOC>   2        Executing code                                  81
 #TOC>   2.1        Up-arrow recalls previous commands           114
 #TOC>   2.2        History tab                                  133
@@ -38,7 +38,7 @@
 #TOC>   5        Quit, and restart where you left off           370
 #TOC>   6        Shortcuts and autocomplete                     388
 #TOC>   7        Summary                                        455
-#TOC>
+#TOC> 
 #TOC> ==========================================================================
 
 
