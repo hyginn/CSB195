@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
 #TOC>   01       Install missing packages                           35
@@ -28,7 +28,7 @@
 #TOC>   09       Extracting R code from Google docs                304
 #TOC>   10       Reading Google sheets                             376
 #TOC>   11       Plotting amino acids as 2D scatterplot            426
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -375,9 +375,9 @@ if (FALSE) {
 
 # =    10  Reading Google sheets  ==============================================
 
-cat("  Defining read.gsheet() ...\n")
+cat("  Defining readGsheet() ...\n")
 
-read.gsheet <- function(URL, sheet, ...) {
+readGsheet <- function(URL, sheet, ...) {
   # Read a sheet from a Google shets URL.
   # URL: the URL of the Google sheets spreadsheet. Note: the document must
   #      have been opened to read for everyone with the URL.
@@ -418,7 +418,7 @@ read.gsheet <- function(URL, sheet, ...) {
 
  # X <- "https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
  # Y <- "AA styles"
- # Z <- read.gsheet(X, Y)
+ # Z <- readGsheet(X, Y)
 
 
 
@@ -427,7 +427,7 @@ read.gsheet <- function(URL, sheet, ...) {
 
 cat("  Loading dataset AADAT from a Google sheet ...\n")
 
-AADAT <- read.gsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
+AADAT <- readGsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
                      , "AA styles")
 
 cat("  Defining plotAA() ...\n")
@@ -482,6 +482,8 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
 # y <- aaindex[[544]]$I
 # plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
 
+
+tmp <- readGsheet("https://docs.google.com/spreadsheets/d/1h13j-j43bYsaUZCRtZIrq3Z37OzlsWZLg3MCuTcGCVA/edit?usp=sharing", sheet = "Curation table")
 
 
 # [END]
