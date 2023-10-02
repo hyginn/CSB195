@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
 #TOC>   01       Install missing packages                           35
@@ -27,8 +27,8 @@
 #TOC>   08       A colour palette for amino acids                  263
 #TOC>   09       Extracting R code from Google docs                304
 #TOC>   10       Reading Google sheets                             376
-#TOC>   11       Plotting amino acids as 2D scatterplot            426
-#TOC>
+#TOC>   11       Plotting amino acids as 2D scatterplot            449
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -378,12 +378,12 @@ if (FALSE) {
 cat("  Defining readGsheet() ...\n")
 
 readGsheet <- function(URL, sheet, ...) {
-  # Read a sheet from a Google shets URL.
-  # URL: the URL of the Google sheets spreadsheet. Note: the document must
-  #      have been opened to read for everyone with the URL.
+  # Read a sheet from a Google sheets URL to a spreadsheet file.
+  # URL: the URL of file location. Note: the document must have permissions
+  #      set for everyone with the link to be allowed to read.
   # sheet: the name of the sheet
-  # ... : other arguments that are passed to read.csv()
-  # value: a dataframe
+  # ... : other arguments that are passed to utils::read.csv()
+  # value: a data frame
 
   # We assume the URL was received from the sheet's sharing button, thus
   # we parse out only the ID
@@ -392,15 +392,27 @@ readGsheet <- function(URL, sheet, ...) {
 
   # make a retrieval URL
   URL <- sprintf("https://docs.google.com/spreadsheets/d/%s%s%s",
-               ID,
-               "/gviz/tq?tqx=out:csv&sheet=",
-               gsub(" ", "+", sheet))
+                   ID,
+                   "/gviz/tq?tqx=out:csv&sheet=",
+                   gsub(" ", "+", sheet))
 
   # the GET() function from httr will get the data.
   response <- httr::GET(URL)
-  if (!httr::status_code(response) == 200) {
+  if (httr::status_code(response) != 200) {
     stop(sprintf("Server status code was \"%s\".",
                  as.character(httr::status_code(response))))
+  }
+
+  # Check whether reading the sheet returned "text/csv". Otherwise it may
+  # not be a spreadsheet, or we are getting a sign-in page (i.e. a permissions
+  # error).
+  if (! grepl("text/csv", response$headers$`content-type`) ) {
+    stop("
+  Request did not return \"text/csv\" content. This could mean:
+    -  Sheet access was denied and we got a sign-in page. Check permissions.
+       The sheet needs to readable by \"everyone with the link\".
+    -  The URL does not lead to a spreadsheet. Check it.
+    -  Something else happened. Check what the URL actually retrieves.")
   }
 
   x <-as.character(response)
@@ -416,10 +428,21 @@ readGsheet <- function(URL, sheet, ...) {
 
 }
 
- # X <- "https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
- # Y <- "AA styles"
- # Z <- readGsheet(X, Y)
+# Test
+if (false) {
+  # This should work ...
+  x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "AA styles"
+  z <- readGsheet(x, y)
 
+  # This should fail (permissions) ...
+  x <- "1E4GHlgRlTU5Z1FdglNF5T_eR4-Guzkukq99stl35_I0"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "GC.csv"
+  z <- readGsheet(x, y)
+
+}
 
 
 
@@ -481,9 +504,6 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
 # x <- aaindex[[150]]$I
 # y <- aaindex[[544]]$I
 # plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
-
-
-tmp <- readGsheet("https://docs.google.com/spreadsheets/d/1h13j-j43bYsaUZCRtZIrq3Z37OzlsWZLg3MCuTcGCVA/edit?usp=sharing", sheet = "Curation table")
 
 
 # [END]
