@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
 #TOC>   01       Install missing packages                           35
@@ -28,7 +28,7 @@
 #TOC>   09       Extracting R code from Google docs                304
 #TOC>   10       Reading Google sheets                             376
 #TOC>   11       Plotting amino acids as 2D scatterplot            449
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -451,7 +451,7 @@ if (false) {
 cat("  Loading dataset AADAT from a Google sheet ...\n")
 
 AADAT <- readGsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
-                     , "AA styles")
+                     , "Data")
 
 cat("  Defining plotAA() ...\n")
 
