@@ -30,6 +30,7 @@
 # Output:  a scalar distance in a feature space between the amino acids
 #
 # ToDo:   Code cleanup: make sure the file is safe-to source and defines
+#         the aaSim() function upon source()'ing.
 #
 # Notes:  This script will contain BOTH the code for the function development
 #         and the actual function definition. Thus all relevant information
