@@ -1,28 +1,30 @@
 # tocID <- "aaSim.R"
 #
-# Purpose: define a function to compute a pairwise similarity for
+# Purpose: define a function to compute a pairwise similarity score for
 #          amino acids.
+#
 # Version: 0.2
-# Date:    2023-10-02
+# Date:    2023-10
 # Author:  boris.steipe@utoronto.ca; CSB195 2023 Class; ChatGPT-4
 #
 # Versions:
 #   0.2    Implemented much of the pseudocode in co-development
 #          with ChatGPT 4. This happened in two parts.
-#            Part 1 is here - It covers the inital prompt, and ends up
-#            with a claned and validated dataset of amino acid
+#            Part 1 is here - It covers the initial prompt, and ends up
+#            with a cleaned and validated dataset of amino acid
 #            property indices.
 #            https://chat.openai.com/share/0cbd454e-2fa3-40e8-89d5-0e3f88a427b7
 #
 #            Part 2 is here - It analyzes the data, transforms it with
 #            PCA, defines a distance function, and then leads into
-#            Exlporatory Data Analyis. In the end, we discovered some non-
+#            Exploratory Data Analysis. In the end, we discovered some non-
 #            obvious things about biology.
 #            https://chat.openai.com/share/330a27ba-c40c-4d40-b8c3-ad96439c0764
 #
-#   0.1.1  Pseudocode format update. Use structuring keywords. Separate
+#   0.1.1  Pseudocode format update. Use structuring keywords. Separate out
 #          function definition from function use.
 #   0.1    First workflow pseudocode co-developed with ChatGPT-4
+#          https://chat.openai.com/share/44ebd17d-6e74-4bb0-8ed2-5d15cff78828
 #
 # Input:   a vector with two amino acid one-letter codes
 # Output:  a scalar distance in a feature space between the amino acids
