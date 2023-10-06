@@ -384,7 +384,7 @@ library(Rtsne)
 set.seed(123)  # Set seed for reproducibility
 tsneResults <- Rtsne(aaFeatureSpace,
                      dims=2,
-                     perplexity=5,
+                     perplexity=5,            # was: 10 (default)
                      check_duplicates=FALSE)
 
 # Plot the t-SNE results
