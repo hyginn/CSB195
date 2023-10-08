@@ -429,7 +429,7 @@ readGsheet <- function(URL, sheet, ...) {
 }
 
 # Test
-if (false) {
+if (FALSE) {
   # This should work ...
   x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
   x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
