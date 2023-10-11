@@ -457,7 +457,7 @@ if (FALSE) {
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 
-GCdf <- read.csv("data/GeneticCode.csv")
+GCdf <- utils::read.csv("data/GeneticCode.csv")
 
 
 
