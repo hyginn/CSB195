@@ -15,19 +15,21 @@
 #TOC>
 #TOC>   Section  Title                                            Line
 #TOC> ----------------------------------------------------------------
-#TOC>   01       Install missing packages                           35
-#TOC>   02       Load required libraries                            51
-#TOC>   03       Load datasets                                      55
-#TOC>   04       Generative AI                                      62
-#TOC>   04.1       t2c - write text to clipboard                    64
-#TOC>   04.2       Initialize generative AI initial prompt          79
-#TOC>   05       Remote control of ChimeraX                        109
-#TOC>   06       A progress bar for long-running code              188
-#TOC>   07       Find Keywords in aaindex                          224
-#TOC>   08       A colour palette for amino acids                  263
-#TOC>   09       Extracting R code from Google docs                304
-#TOC>   10       Reading Google sheets                             376
-#TOC>   11       Plotting amino acids as 2D scatterplot            449
+#TOC>   01       Install missing packages                           37
+#TOC>   02       Load required libraries                            53
+#TOC>   03       Load datasets                                      57
+#TOC>   04       Generative AI                                      64
+#TOC>   04.1       t2c - write text to clipboard                    66
+#TOC>   04.2       Initialize generative AI initial prompt          82
+#TOC>   05       Remote control of ChimeraX                        112
+#TOC>   06       A progress bar for long-running code              190
+#TOC>   07       Find Keywords in aaindex                          226
+#TOC>   08       A colour palette for amino acids                  265
+#TOC>   09       Extracting R code from Google docs                306
+#TOC>   10       Reading Google sheets                             379
+#TOC>   11       Load the genetic code into a data frame           452
+#TOC>   12       Load an amino acid dataset                        460
+#TOC>   13       Plotting amino acids as 2D scatterplot            469
 #TOC>
 #TOC> ==========================================================================
 
@@ -40,6 +42,10 @@ if (!requireNamespace("httr", quietly=TRUE)) {
 
 if (!requireNamespace("clipr", quietly=TRUE)) {
   utils::install.packages("clipr")
+}
+
+if (!requireNamespace("stringr", quietly=TRUE)) {
+  utils::install.packages("stringr")
 }
 
 if (!requireNamespace("seqinr", quietly=TRUE)) {
@@ -74,6 +80,7 @@ t2c <- function(txt) {
   clipr::write_clip(txt)
   return(invisible(NULL))
 }
+
 
 
 # ==   04.2  Initialize generative AI initial prompt  ==========================
@@ -180,7 +187,6 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 
   return(invisible(reply))         # return the reply  but do not also
                                    # print it.
-
 }
 
 
@@ -306,8 +312,8 @@ AACOLS["P"] <- "#edc06d" # Proline
 cat("  Defining fetchGoogleDocRCode ...\n")
 
 fetchGoogleDocRCode <- function (URL,
-                                 delimB = "^# begin code",
-                                 delimE = "^# end code",
+                                 delimB = "^\\s*# begin code",
+                                 delimE = "^\\s*# end code",
                                  myExt = ".R") {
 
   # Retrieve text from a Google doc, subset to a delimited range, write to
@@ -364,9 +370,10 @@ fetchGoogleDocRCode <- function (URL,
   return(invisible(NULL))              # return nothing
 }
 
+
+# Usage example:
 if (FALSE) {
 
-  # Usage example:
   fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
 
 }
@@ -428,7 +435,7 @@ readGsheet <- function(URL, sheet, ...) {
 
 }
 
-# Test
+# Usage example
 if (FALSE) {
   # This should work ...
   x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
@@ -446,12 +453,24 @@ if (FALSE) {
 
 
 
-# =    11  Plotting amino acids as 2D scatterplot  =============================
+# =    11  Load the genetic code into a data frame  ============================
+
+cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
+
+GCdf <- read.csv("data/GeneticCode.csv")
+
+
+
+# =    12  Load an amino acid dataset  =========================================
 
 cat("  Loading dataset AADAT from a Google sheet ...\n")
 
 AADAT <- readGsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
-                     , "Data")
+                    , "Data")
+
+
+
+# =    13  Plotting amino acids as 2D scatterplot  =============================
 
 cat("  Defining plotAA() ...\n")
 
@@ -499,11 +518,16 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
   text(x, y, labels = aaDat$A[ord], cex = cexVol[ord], col="#000000AA")
 }
 
+# Usage example
+if (FALSE) {
 
-# data(aaindex, package = "seqinr")
-# x <- aaindex[[150]]$I
-# y <- aaindex[[544]]$I
-# plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
+  data(aaindex, package = "seqinr")
+  x <- aaindex[[150]]$I
+  y <- aaindex[[544]]$I
+  plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
+
+}
+
 
 
 # [END]
