@@ -63,7 +63,7 @@ if (!requireNamespace("seqinr", quietly=TRUE)) {
 #
 
 cat("  Loading aaindex dataset from sequinr:: ...\n")
-data(aaindex, package = "seqinr")
+utils::data(aaindex, package = "seqinr")
 
 # =    04  Generative AI  ======================================================
 
