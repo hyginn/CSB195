@@ -48,7 +48,7 @@ G,T,C,GTC,Valine,Val,V
 G,T,G,GTG,Valine,Val,V
 G,T,T,GTT,Valine,Val,V
 T,A,A,TAA,*,*,*
-T,A,C,TAC,Serine,Ser,S
+T,A,C,TAC,Tyrosine,Tyr,Y
 T,A,G,TAG,*,*,*
 T,A,T,TAT,Tyr,Tyr,Y
 T,C,A,TCA,Serine,Ser,S
