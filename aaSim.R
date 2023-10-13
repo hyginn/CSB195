@@ -354,7 +354,6 @@ computeDistanceMatrix <- function(spaceSubset) {
 }
 
 # Create a series of heatmaps
-par(mfrow=c(3,5))  # Set up a 3x5 plotting grid
 
 for(i in 1:14) {
   distanceMatrixSubset <- computeDistanceMatrix(aaFeatureSpace[, 1:i, drop=FALSE])
