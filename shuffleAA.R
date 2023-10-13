@@ -85,7 +85,7 @@ sort(table(GCdf$A), decreasing = TRUE)
 sort(unique(GCdf$A))
 
 
-# A different approach to get for the same result would have been:
+# A different approach to get the same result would have been:
 myAA <- sort(names(table(GCdf$A)))
 cat(myAA)
 
