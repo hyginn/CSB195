@@ -3,11 +3,17 @@
 # Purpose: define a function to compute a pairwise similarity score for
 #          amino acids.
 #
-# Version: 0.2
+# Version: 0.3
 # Date:    2023-10
 # Author:  boris.steipe@utoronto.ca; CSB195 2023 Class; ChatGPT-4
 #
 # Versions:
+#   0.3    Scale dimensions of the aaFeatureSpace according to the variance
+#          of the principal components. Previously they all had the same
+#          mean of 0 and sd() of 0.229 ... but that gives inappropriately high
+#          weights to the higher-order PC's. The old feature space is in
+#          "data/aaFeatureSpace.1.0.RData". The new (improved) feature
+#          space is in "data/aaFeatureSpace.2.0.RData".
 #   0.2    Implemented much of the pseudocode in co-development
 #          with ChatGPT 4. This happened in two parts.
 #            Part 1 is here - It covers the initial prompt, and ends up
@@ -71,8 +77,6 @@ A2Aaa <- function(a) {
 
 
 # ====  PROCESS  ===============================================================
-
-
 
 # OBJECTIVE: To compute pairwise amino acid similarity from
 #   distance in a feature space
@@ -223,8 +227,43 @@ aaFeatureSpace <- idxPCA$rotation[, 1:numPCsToRetain]
 rownames(aaFeatureSpace) <- rownames(idxPCA$rotation)
 colnames(aaFeatureSpace) <- paste0("PC", 1:numPCsToRetain)
 str(aaFeatureSpace)  # inspect
-save(aaFeatureSpace, file = "data/aaFeatureSpace.1.0.RData")
-# load("data/aaFeatureSpace.1.0.RData")  # This would reload the save()'d object
+
+# Let's look at the numerical distribution of values.
+for (i in 1:14) {
+  print(mean(aaFeatureSpace[, i]))
+}
+# All the means are "zero" (or at least very, very, very close to zero).
+
+for (i in 1:14) {
+  print(sd(aaFeatureSpace[, i]))
+}
+# All the standard deviations are 0.229. But that's actually not good. If the
+# values of the higher PCs are distributed the same as those of the first or
+# second PCs, then we give them an inappropriately large contribution
+# to the distance calculation. We should re-scale the columns according
+# to each PCs contribution to the total variance.
+
+# We can get the variances from idxPCA$sdev - the variances are the squares
+# of the standard deviations:
+
+idxPCA$sdev[1:14]    # The standard deviations
+idxPCA$sdev[1:14]^2  # The variances
+
+# To scale the PCs that make up the dimensions of our feature space, we can
+# simply multiply them by the variances. (Remember, the standard deviations of
+# the PCs are already all the same. If the standard deviations would have been
+# different, we would have divided by the standard deviation first.)
+
+# Here we go:
+for (i in 1:14) {
+  aaFeatureSpace[, i] <- aaFeatureSpace[, i] * ( idxPCA$sdev[i]^2 )
+}
+
+# Save the resulting feature space so we don't have to re-compute it when
+# we need it:
+save(aaFeatureSpace, file = "data/aaFeatureSpace.2.0.RData")
+
+# load("data/aaFeatureSpace.2.0.RData")  # This would reload the save()'d object
 
 #       VAU: Validate PCA Components
 #         DUJ: Validation - Compute correlations with existing indices to
