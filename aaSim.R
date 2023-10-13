@@ -224,7 +224,7 @@ rownames(aaFeatureSpace) <- rownames(idxPCA$rotation)
 colnames(aaFeatureSpace) <- paste0("PC", 1:numPCsToRetain)
 str(aaFeatureSpace)  # inspect
 save(aaFeatureSpace, file = "data/aaFeatureSpace.1.0.RData")
-# load("aaFeatureSpace.RData")  # This would reload the feature space data
+# load("data/aaFeatureSpace.1.0.RData")  # This would reload the save()'d object
 
 #       VAU: Validate PCA Components
 #         DUJ: Validation - Compute correlations with existing indices to
