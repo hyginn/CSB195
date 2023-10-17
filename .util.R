@@ -2,7 +2,7 @@
 #
 # CSB195 Class project: utility scripts
 #
-# 2022-09  - 2023-09
+# 2022-09  - 2023-10
 # boris.steipe@utoronto.ca
 #
 # This file is source()d upon startup by .Rprofile
@@ -13,23 +13,24 @@
 
 #TOC> ==========================================================================
 #TOC>
-#TOC>   Section  Title                                            Line
-#TOC> ----------------------------------------------------------------
-#TOC>   01       Install missing packages                           37
-#TOC>   02       Load required libraries                            53
-#TOC>   03       Load datasets                                      57
-#TOC>   04       Generative AI                                      64
-#TOC>   04.1       t2c - write text to clipboard                    66
-#TOC>   04.2       Initialize generative AI initial prompt          82
-#TOC>   05       Remote control of ChimeraX                        112
-#TOC>   06       A progress bar for long-running code              190
-#TOC>   07       Find Keywords in aaindex                          226
-#TOC>   08       A colour palette for amino acids                  265
-#TOC>   09       Extracting R code from Google docs                306
-#TOC>   10       Reading Google sheets                             379
-#TOC>   11       Load the genetic code into a data frame           452
-#TOC>   12       Load an amino acid dataset                        460
-#TOC>   13       Plotting amino acids as 2D scatterplot            469
+#TOC>   Section  Title                                               Line
+#TOC> -------------------------------------------------------------------
+#TOC>   01       Install missing packages                              38
+#TOC>   02       Load required libraries                               58
+#TOC>   03       Load datasets                                         62
+#TOC>   04       Generative AI                                         69
+#TOC>   04.1       t2c - write text to clipboard                       71
+#TOC>   04.2       Initialize generative AI initial prompt             87
+#TOC>   05       Remote control of ChimeraX                           117
+#TOC>   06       A progress bar for long-running code                 195
+#TOC>   07       Find Keywords in aaindex                             231
+#TOC>   08       A colour palette for amino acids                     270
+#TOC>   09       Extracting R code from Google docs                   311
+#TOC>   10       Reading Google sheets                                384
+#TOC>   11       Load the genetic code into a data frame              457
+#TOC>   12       Load an amino acid dataset                           465
+#TOC>   13       Convert one-letter symbols to three-letter           480
+#TOC>   14       Plotting amino acids as 2D scatterplot               542
 #TOC>
 #TOC> ==========================================================================
 
@@ -463,20 +464,88 @@ GCdf <- utils::read.csv("data/GeneticCode.csv")
 
 # =    12  Load an amino acid dataset  =========================================
 
-cat("  Loading dataset AADAT from a Google sheet ...\n")
+cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
 
-AADAT <- readGsheet("https://docs.google.com/spreadsheets/d/1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o/edit?usp=sharing"
-                    , "Data")
+URL <- paste(c("https://docs.google.com/spreadsheets/d/",
+               "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o",
+               "/edit?usp=sharing"),
+             collapse = "")
+sheet <- "Data"
+
+AADAT <- readGsheet(URL, sheet)
+rownames(AADAT) <- AADAT$A
 
 
 
-# =    13  Plotting amino acids as 2D scatterplot  =============================
+# =    13  Convert one-letter symbols to three-letter  =========================
+
+cat("  Defining a2Aaa ...\n")
+
+a2Aaa <- function(aa, m = "symbol") {
+  # aa:   a vector of amino acid one letter or three letter symbols
+  #       to be converted
+  # mode: "symbol" - convert input to IUPAC symbol
+  #       "full" - convert input to full length IUPAC name
+  # Note: Whereas IUPAC uses Aspartic acid and Glutamic acid, we always use
+  #       the names of the ionized forms aspartate and glutamate.
+  #
+  #       IUPAC uses capitalized names in their table, but lowercase
+  #       in text. We use lower-case throughout for names, upper case
+  #       for one-letter symbols, title case for three-letter symbols.
+  #
+  #       If your input is well controlled and your code needs to be
+  #       fast, use the following idioms directly:
+  #       (Assuming your variable name is x)
+  #       x <- AADAT$A[match(x, AADAT$Aaa)]   # for three-to-one conversion
+  #       x <- AADAT[x, "Aaa"]                # for one-to-three conversion
+
+  stopifnot (m %in% c("symbol", "full") )
+
+  results <- character(length(aa))
+
+  if (all(nchar(aa) == 1)) {
+    source <- "A"
+    target <- ifelse(m == "symbol", "Aaa", "nam")
+  } else if (all(nchar(aa) == 3)) {
+    source <- "Aaa"
+    target <- ifelse(m == "symbol", "A", "nam")
+  } else {
+    stop(sprintf("Input must be one-letter or three-letter symbols."))
+  }
+
+  results <- AADAT[match(aa, AADAT[ , source]), target]
+
+  if (any(is.na(results))) {
+    iNA <- which(is.na(results))[1]
+    stop(sprintf("Symbol %i (\"%s\") is not in AADAT.",
+                 iNA,
+                 aa[iNA]))
+  }
+
+  return(results)
+
+}
+
+if (FALSE) {
+
+  a2Aaa("")                              # Error
+  a2Aaa("Q")                             # "Gln"
+  a2Aaa("Leu")                           # "L"
+  a2Aaa("K", m = "full")                 # "lysine"
+  a2Aaa("Phe", m = "full")               # "phenylalanine"
+  a2Aaa(c("K", "L", "H"))                # "Lys" "Leu" "His"
+  a2Aaa(c("Trp", "Tyr", "Qrk", "Ala"))   # Error
+}
+
+
+
+# =    14  Plotting amino acids as 2D scatterplot  =============================
 
 cat("  Defining plotAA() ...\n")
 
 plotAA <- function(x, y, aaDat = AADAT, ...) {
   # Plot amino acids in 2D
-  # x, y: numeric vectors named vectors as Aaa three letter code. They can be
+  # x, y: numeric vectors named vectors as Aaa three letter symbol. They can be
   #       passed in any order, but the order must be the same for x and y
   # ... : other arguments that are passed to plot()
   # aaDat: a dataframe with plotting properties.
@@ -485,7 +554,7 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
 
   o <- names(x)
   if (! all(o %in% aaDat$Aaa)) {
-    stop("Names of first vector do not match three-letter codes.")
+    stop("Names of first vector do not match three-letter symbols.")
   }
   if (! all(o %in% names(y))) {
     stop("Names of first and second vector do not match.")
