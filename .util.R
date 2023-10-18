@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   01       Install missing packages                              38
@@ -31,7 +31,7 @@
 #TOC>   12       Load an amino acid dataset                           465
 #TOC>   13       Convert one-letter symbols to three-letter           480
 #TOC>   14       Plotting amino acids as 2D scatterplot               542
-#TOC>
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -479,9 +479,9 @@ rownames(AADAT) <- AADAT$A
 
 # =    13  Convert one-letter symbols to three-letter  =========================
 
-cat("  Defining a2Aaa ...\n")
+cat("  Defining A2Aaa ...\n")
 
-a2Aaa <- function(aa, m = "symbol") {
+A2Aaa <- function(aa, m = "symbol") {
   # aa:   a vector of amino acid one letter or three letter symbols
   #       to be converted
   # mode: "symbol" - convert input to IUPAC symbol
@@ -528,13 +528,13 @@ a2Aaa <- function(aa, m = "symbol") {
 
 if (FALSE) {
 
-  a2Aaa("")                              # Error
-  a2Aaa("Q")                             # "Gln"
-  a2Aaa("Leu")                           # "L"
-  a2Aaa("K", m = "full")                 # "lysine"
-  a2Aaa("Phe", m = "full")               # "phenylalanine"
-  a2Aaa(c("K", "L", "H"))                # "Lys" "Leu" "His"
-  a2Aaa(c("Trp", "Tyr", "Qrk", "Ala"))   # Error
+  A2Aaa("")                              # Error
+  A2Aaa("Q")                             # "Gln"
+  A2Aaa("Leu")                           # "L"
+  A2Aaa("K", m = "full")                 # "lysine"
+  A2Aaa("Phe", m = "full")               # "phenylalanine"
+  A2Aaa(c("K", "L", "H"))                # "Lys" "Leu" "His"
+  A2Aaa(c("Trp", "Tyr", "Qrk", "Ala"))   # Error
 }
 
 
