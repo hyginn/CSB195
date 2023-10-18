@@ -40,31 +40,32 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                                  Line
 #TOC> ----------------------------------------------------------------------
-#TOC>   1        INTRODUCTION                                             59
+#TOC>   1        INTRODUCTION                                             60
 #TOC>   2        FUNCTIONS                                                73
 #TOC>   3        FIRST STEPS                                             106
 #TOC>   4        EXPLORATIONS                                            171
 #TOC>   4.1        First exploration. Step through the rules ...         174
-#TOC>   4.2        Digression: Fibonacci words                           253
-#TOC>   4.3        Four classes                                          282
-#TOC>   4.3.1          Digression: initializations                       307
-#TOC>   5        EVERY SINGLE CA                                         338
-#TOC>   6        LONG EVOLUTIONS                                         360
-#TOC>
+#TOC>   4.2        Digression: Fibonacci words                           250
+#TOC>   4.3        Four classes                                          279
+#TOC>   4.3.1          Digression: initializations                       304
+#TOC>   5        EVERY SINGLE CA                                         335
+#TOC>   6        LONG EVOLUTIONS                                         357
+#TOC> 
 #TOC> ==========================================================================
 
 
 # =    1  INTRODUCTION  ========================================================
 
-# Taking a perspective on "life" as a process of choice (and computation), we introduce models that are able to **sense** the
-# environment and make decisions, they perform - in the simplest, most
-# fundamental way - information processing. The simplest such model consists of
-# a single "cell" in a one-dimensional world, which can sense the state of its
-# left and right neighbour, and then decide how its own state will change
-# according to a compact set of rules.
+# Taking a perspective on "life" as a process of choice (and computation), we
+# introduce models that are able to **sense** the environment and make
+# decisions, they perform - in the simplest, most fundamental way - information
+# processing. The simplest such model consists of a single "cell" in a
+# one-dimensional world, which can sense the state of its left and right
+# neighbour, and then decide how its own state will change according to a
+# compact set of rules.
 
 # Such systems are called "Cellular Automata" (CA).
 
@@ -214,9 +215,7 @@ plotFigure("CA.6", iRule = 86, nx = 300, ny = 500)
 plotFigure("CA.6", iRule = 110, nx = 300, ny = 500)
 
 # Stephen Wolfram surmised in 1984 that CAs would fall into four different
-# classes, depending on their long-term behaviour. And interestingly, these
-# classes are related to ideas we have already encountered with our
-# Lotka-Volterra equations.
+# classes, depending on their long-term behaviour.
 
 # Class I CAs    converge from almost any initial state to a single point
 #                in state-space. Rules 4, 8, 36 ... are examples.
@@ -229,12 +228,11 @@ plotFigure("CA.6", iRule = 4, nx = 300, ny = 500)
 
 plotFigure("CA.6", iRule = 1, nx = 300, ny = 500)
 
-# Class III CAs: exhibit aperiodic, or "chaotic" behavior over time. Like the
-#                Lotka-Volterra systems with 3 coupled equations, they may
-#                appear similar at various times in their trajectory,
-#                but they are never exactly the same. Frequently, these have
-#                a fractal geometry.  Rules 18, 45, 60, 75, 86 and 105 are
-#                striking examples.
+# Class III CAs: exhibit aperiodic, or "chaotic" behavior over time. Such
+#                systems may appear similar at various times
+#                in their trajectory, but they are never exactly the same.
+#               Frequently, these have a fractal geometry. Rules 18, 45, 60,
+#               75, 86 and 105 are  striking examples.
 #
 plotFigure("CA.6", iRule = 18, nx = 300, ny = 500)
 
@@ -303,7 +301,7 @@ plotFigure("CA.8", iRule = 110,
            nx = 233, ny = 233, vInit = "fib")
 
 
-# ===   4.3.1  Digression: initializations
+# ===   4.3.1  Digression: initializations                  
 
 # Nb. the code I wrote for this exploration can generate a number of different
 # initializations:
@@ -320,7 +318,7 @@ plotFigure("CA.8", iRule=110, nx=233, ny=233, vInit = c(0,0,0,0,1,1,1,1)   )
 # a repeated vector, but created from a string
 plotFigure("CA.8", iRule=110, nx=233, ny=233, vInit = c("01001110000011111111"))
 
-# random
+# random: a floating point number that defines the fraction of coloured cells.
 plotFigure("CA.8", iRule=110, nx=233, ny=233, vInit = 0.5)
 
 # random with p(0) != p(1)
