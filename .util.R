@@ -30,7 +30,7 @@
 #TOC>   11       Load the genetic code into a data frame              457
 #TOC>   12       Load an amino acid dataset                           465
 #TOC>   13       Convert one-letter symbols to three-letter           480
-#TOC>   14       Plotting amino acids as 2D scatterplot               542
+#TOC>   14       Plotting amino acids as 2D scatterplot               545
 #TOC> 
 #TOC> ==========================================================================
 
@@ -496,28 +496,30 @@ A2Aaa <- function(aa, m = "symbol") {
   #       If your input is well controlled and your code needs to be
   #       fast, use the following idioms directly:
   #       (Assuming your variable name is x)
-  #       x <- AADAT$A[match(x, AADAT$Aaa)]   # for three-to-one conversion
-  #       x <- AADAT[x, "Aaa"]                # for one-to-three conversion
+  #       Initialize: DAT <- GCdf[! duplicated(GCdf$A), c("A", "Aaa")]
+  #       x <- DAT$A[match(x, DAT$Aaa)]   # for three-to-one conversion
+  #       x <- DAT[x, "Aaa"]                # for one-to-three conversion
 
-  stopifnot (m %in% c("symbol", "full") )
+  stopifnot(m %in% c("symbol", "full"))
 
+  DAT <- GCdf[! duplicated(GCdf$A), c("A", "Aaa", "Name")]
   results <- character(length(aa))
 
   if (all(nchar(aa) == 1)) {
     source <- "A"
-    target <- ifelse(m == "symbol", "Aaa", "nam")
+    target <- ifelse(m == "symbol", "Aaa", "Name")
   } else if (all(nchar(aa) == 3)) {
     source <- "Aaa"
-    target <- ifelse(m == "symbol", "A", "nam")
+    target <- ifelse(m == "symbol", "A", "Name")
   } else {
     stop(sprintf("Input must be one-letter or three-letter symbols."))
   }
 
-  results <- AADAT[match(aa, AADAT[ , source]), target]
+  results <- DAT[match(aa, DAT[ , source]), target]
 
   if (any(is.na(results))) {
     iNA <- which(is.na(results))[1]
-    stop(sprintf("Symbol %i (\"%s\") is not in AADAT.",
+    stop(sprintf("Symbol %i (\"%s\") is not in the symbol table.",
                  iNA,
                  aa[iNA]))
   }
@@ -531,6 +533,7 @@ if (FALSE) {
   A2Aaa("")                              # Error
   A2Aaa("Q")                             # "Gln"
   A2Aaa("Leu")                           # "L"
+  A2Aaa("*")                             # "***"
   A2Aaa("K", m = "full")                 # "lysine"
   A2Aaa("Phe", m = "full")               # "phenylalanine"
   A2Aaa(c("K", "L", "H"))                # "Lys" "Leu" "His"
