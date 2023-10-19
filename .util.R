@@ -5,14 +5,14 @@
 # 2022-09  - 2023-10
 # boris.steipe@utoronto.ca
 #
-# This file is source()d upon startup by .Rprofile
+# This file is source()'d upon startup by .Rprofile
 #
 # ==============================================================================
 #
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   01       Install missing packages                              38
@@ -30,8 +30,8 @@
 #TOC>   11       Load the genetic code into a data frame              457
 #TOC>   12       Load an amino acid dataset                           465
 #TOC>   13       Convert one-letter symbols to three-letter           480
-#TOC>   14       Plotting amino acids as 2D scatterplot               545
-#TOC> 
+#TOC>   14       Plotting amino acids as 2D scatterplot               563
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -481,11 +481,14 @@ rownames(AADAT) <- AADAT$A
 
 cat("  Defining A2Aaa ...\n")
 
-A2Aaa <- function(aa, m = "symbol") {
-  # aa:   a vector of amino acid one letter or three letter symbols
-  #       to be converted
-  # mode: "symbol" - convert input to IUPAC symbol
-  #       "full" - convert input to full length IUPAC name
+A2Aaa <- function(aa, out = ifelse(nchar(aa[1]) == 3, "A", "Aaa") ) {
+  # aa:   a vector of amino acid one letter or three letter symbols,
+  #       or IUPAC names, to be converted.
+  # out:  default: convert three-letter symbols to one-letter,
+  #          everything else to three-letter.
+  #       "A"    - convert all input to IUPAC one letter symbols
+  #       "Aaa"  - convert all input to IUPAC three letter symbols
+  #       "Name" - convert all input to IUPAC  name
   # Note: Whereas IUPAC uses Aspartic acid and Glutamic acid, we always use
   #       the names of the ionized forms aspartate and glutamate.
   #
@@ -500,22 +503,31 @@ A2Aaa <- function(aa, m = "symbol") {
   #       x <- DAT$A[match(x, DAT$Aaa)]   # for three-to-one conversion
   #       x <- DAT[x, "Aaa"]                # for one-to-three conversion
 
-  stopifnot(m %in% c("symbol", "full"))
+  stopifnot(out %in% c("A", "Aaa", "Name"))
 
   DAT <- GCdf[! duplicated(GCdf$A), c("A", "Aaa", "Name")]
   results <- character(length(aa))
 
   if (all(nchar(aa) == 1)) {
     source <- "A"
-    target <- ifelse(m == "symbol", "Aaa", "Name")
   } else if (all(nchar(aa) == 3)) {
     source <- "Aaa"
-    target <- ifelse(m == "symbol", "A", "Name")
   } else {
-    stop(sprintf("Input must be one-letter or three-letter symbols."))
+    source <- "Name"
   }
+  target <- out
 
-  results <- DAT[match(aa, DAT[ , source]), target]
+  results <- DAT[match(aa, DAT[ , "A"]), target]
+
+  sel <- is.na(results)
+  if (any(sel)) {    # repeat for Aaa
+    results[sel] <- DAT[match(aa[sel], DAT[ , "Aaa"]), target]
+
+    sel <- is.na(results)
+    if (any(sel)) {  # repeat for Name
+      results[sel] <- DAT[match(aa[sel], DAT[ , "Name"]), target]
+    }
+  }
 
   if (any(is.na(results))) {
     iNA <- which(is.na(results))[1]
@@ -534,10 +546,16 @@ if (FALSE) {
   A2Aaa("Q")                             # "Gln"
   A2Aaa("Leu")                           # "L"
   A2Aaa("*")                             # "***"
-  A2Aaa("K", m = "full")                 # "lysine"
-  A2Aaa("Phe", m = "full")               # "phenylalanine"
+  A2Aaa("K", out = "Name")               # "lysine"
+  A2Aaa("Phe", out = "Name")             # "phenylalanine"
+  A2Aaa("tyrosine")                      # "Tyr"
+  A2Aaa("tyrosine", out = "A")           # "Y"
   A2Aaa(c("K", "L", "H"))                # "Lys" "Leu" "His"
+  A2Aaa(c("K", "L", "H"), out = "A")     # "K" "L" "H"
+  A2Aaa(c("Trp", "Y", "alanine", "Q"))   # "W" "Y" "A" "Q"
   A2Aaa(c("Trp", "Tyr", "Qrk", "Ala"))   # Error
+  A2Aaa(c("Quackophane"))                # Error
+
 }
 
 
