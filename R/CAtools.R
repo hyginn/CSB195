@@ -2,7 +2,7 @@
 #
 # Utilities for Cellular Automata
 #
-# 2022 - 10  -  2022 - 11
+# 2022 - 10  -  2023 - 10
 #
 # Boris Steipe (boris.steipe@utoronto.ca)
 #
