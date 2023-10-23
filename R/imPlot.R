@@ -4,7 +4,12 @@
 # Plot a 2D text image as a rater image, and overlay text
 #
 # Boris Steipe (boris.steipe@utoronto.ca)
-# 2022-10-23
+# 2022-10 - 2023-10
+#
+# Version  1.0
+#
+# Versions
+#          1.0  2022 development
 #
 # ToDo: curves
 #
@@ -115,7 +120,7 @@ imPlot <- function(m, colMap, main, cap, drawGrid) {
 
 imText <- function(txt, charMap, colMap, cexMap, cex = 1.0) {
   #' @title imText()
-  #' @description make a text-plot into an exisiting plot frame of a 2D
+  #' @description make a text-plot into an existing plot frame of a 2D
   #'              text.
   #' @param txt
   #' @param charMap Convert the input characters to output characters
@@ -123,7 +128,7 @@ imText <- function(txt, charMap, colMap, cexMap, cex = 1.0) {
   #'                as they are. Characters in input that are not included
   #'                here are left as they are.
   #' @param colMap  Plot the characters in the color specified. Default #000000.
-  #' @param cex     Global chharacter expansion value (cex). Default 1.0.
+  #' @param cex     Global character expansion value (cex). Default 1.0.
   #' @param cexMap  Plot the characters in the size specified. Default 1.0.
   #'                Values override cex.
   #'
