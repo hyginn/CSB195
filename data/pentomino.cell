@@ -1,0 +1,9 @@
+! pentomino
+! When the Game of Life was first
+! introduced around 1970, this was
+! proposed as the smallest pattern
+! for which the outcome was unknown.
+! (via http://www.radicaleye.com/lifepage/patterns/contents.html)
+.OO
+OO.
+.O.
