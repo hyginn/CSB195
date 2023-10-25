@@ -10,7 +10,7 @@
 # Version:  1.2
 #
 # Versions:
-#           1.2   Changed logic of the next-step computation to allow non-
+#           1.2   Changed logic of the next-step computation to support non-
 #                 integral rules. Added programming exercises.
 #           1.1.1 Moved src and pattern files to ./R/ resp. ./data/ directories
 #           1.1   Updated, expanded and added examples section
@@ -21,7 +21,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                             Line
 #TOC> -------------------------------------------------
 #TOC>   1        Structures and Functions            44
@@ -34,7 +34,7 @@
 #TOC>   2.3        Max Fill                         190
 #TOC>   2.4        Pentomino                        205
 #TOC>   3        Next ?                             216
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
