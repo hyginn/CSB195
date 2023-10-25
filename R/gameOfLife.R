@@ -21,20 +21,21 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                             Line
 #TOC> -------------------------------------------------
-#TOC>   1        Structures and Functions            44
-#TOC>   1.1        wrap()                            50
-#TOC>   1.2        getFate()                         63
-#TOC>   1.3        runGOL()                          88
-#TOC>   2        Explorations                       144
-#TOC>   2.1        The Glider                       167
-#TOC>   2.2        A Glider-gun                     178
-#TOC>   2.3        Max Fill                         190
-#TOC>   2.4        Pentomino                        205
-#TOC>   3        Next ?                             216
-#TOC>
+#TOC>   1        Structures and Functions            45
+#TOC>   1.1        wrap()                            51
+#TOC>   1.2        getFate()                         64
+#TOC>   1.3        runGOL()                          89
+#TOC>   2        Explorations                       145
+#TOC>   2.1        The Glider                       168
+#TOC>   2.2        A Glider-gun                     179
+#TOC>   2.3        Max Fill                         191
+#TOC>   2.4        Pentomino                        206
+#TOC>   3        Next ?                             217
+#TOC>   4        References and links               259
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -203,7 +204,7 @@ if (FALSE) {
 
 
 # ==   2.4  Pentomino  =========================================================
-  # What is this? A fly speck? a pimple? Five cells of barely nothing? Ah,
+  # What is this? A fly speck? A pimple? Five cells of barely nothing? Ah,
   # but perhaps a sesame seed? Or a riot?
 
   X <- 150; Y <- 150; myWorld <- matrix(integer(X * Y), ncol = X)
@@ -217,28 +218,58 @@ if (FALSE) {
 
   # What's next?
 
-  # 3.1 Look for patterns?
+  # 3.1 Analyze what's happening.
+    # Can you overlay a plot with the current fraction of live cells?
+
+  # 3.2 Look for patterns?
     # There is a lot of literature on that ... common cell formats are .lif and
     # .cell and I have included code that reads them both. Perhaps have a look
     # at the "catagolue" https://catagolue.appspot.com/home with its dictionary
     # and embedded simulations...
 
-  # 3.2 Change the rules?
+  # 3.3 Change the rules?
     # How would probabilistic outcomes change the behaviour? Try it out, the
-    # sample code should make that easy to implement. Just choose
-    # non-integral rule sets.
+    # sample code should make that easy to implement. Just write your
+    # own rL and rD rules:
+    # Example:
+    if (FALSE) {
+      X <- 50
+      Y <- 50
+      p <- 0.2
+      set.seed(2718282)
+      myWorld <- sample(0:1, X * Y, prob=c(1-p, p), replace = TRUE)
+      dim(myWorld) <- c(Y,X)
+      imPlot(myWorld)
+      myL <- c(0, 0.05, 0.98, 0.98, 0.05, 0, 0, 0, 0)
+      myD <- c(0, 0, 0.025, 1.0, 0, 0, 0, 0, 0)
+      runGOL(myWorld, rL = myL, rD = myD, nTick = 1000)
+    }
+    #
 
   # 3.3 Speed up the code?
     # Can the code be significantly faster if we don't consider every cell, but
-    # only every live cell? But how would we do gthat and get the same results?
+    # only every live cell? But how would we do that and get the same results?
 
+  # 3.4 Add interesting behaviour?
+    # What if live cells can move? Random walk? What if they could disperse,
+    # or congregate?
 
-  # How far can one take this? Check out this video!
-  # https://www.youtube.com/watch?v=4lO0iZDzzXk
-  #
+}
+
+# =    4  References and links  ================================================
+
+  # The Wikipedia article is a good introduction:
+  #   https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+
+  # Here is an online simulator: https://playgameoflife.com/
+  #   (Thanks James Han!)
+
+  # How far can one take the original algorithm? Check out this video!
+  #   https://www.youtube.com/watch?v=4lO0iZDzzXk
+
   # Is this a universal computer?
   # (You bet!)
 
-}
+
 
 # [END]
