@@ -1,4 +1,4 @@
-# tocID <- "gameOfLife.R"
+# tocID <- "./R/gameOfLife.R"
 #
 # Demo code
 #
@@ -7,9 +7,11 @@
 # Boris  Steipe (boris.steipe@utoronto.ca)
 #
 #
-# Version:  1.1.1
+# Version:  1.2
 #
 # Versions:
+#           1.2   Changed logic of the next-step computation to allow non-
+#                 integral rules. Added programming exercises.
 #           1.1.1 Moved src and pattern files to ./R/ resp. ./data/ directories
 #           1.1   Updated, expanded and added examples section
 #           1.0   In class demo 2022
@@ -19,19 +21,20 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                             Line
 #TOC> -------------------------------------------------
-#TOC>   1        Structures and Functions            41
-#TOC>   1.1        wrap()                            47
-#TOC>   1.2        runGOL()                          61
-#TOC>   2        Explorations                       107
-#TOC>   2.1        The Glider                       130
-#TOC>   2.2        A Glider-gun                     141
-#TOC>   2.3        Max Fill                         153
-#TOC>   2.4        Pentomino                        168
-#TOC>   3        Next ?                             179
-#TOC>
+#TOC>   1        Structures and Functions            44
+#TOC>   1.1        wrap()                            50
+#TOC>   1.2        getFate()                         63
+#TOC>   1.3        runGOL()                          88
+#TOC>   2        Explorations                       144
+#TOC>   2.1        The Glider                       167
+#TOC>   2.2        A Glider-gun                     178
+#TOC>   2.3        Max Fill                         190
+#TOC>   2.4        Pentomino                        205
+#TOC>   3        Next ?                             216
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -57,10 +60,36 @@ wrap <- function(w) {
   return(w)
 }
 
+# ==   1.2  getFate()  =========================================================
 
-# ==   1.2  runGOL()  ==========================================================
+getFate <- function(cellState, cellNeigh, rL, rD) {
+  # determine the next state of a cell in cellState given the number of
+  # cell neighbors, and the rule set for live and dead cells.
+
+  if (cellState == 1) {
+    ruleSet <- rL
+  } else {
+    ruleSet <- rD
+  }
+
+  pAlive <- ruleSet[cellNeigh + 1]  # get the probability of a cell being
+                                    # alive in the next step, given the number
+                                    # of neighbors it has and the rule set.
+  if (runif(1) < pAlive) {
+    nextState <- 1
+  } else {
+    nextState <- 0
+  }
+  return(nextState)
+
+}
+
+
+# ==   1.3  runGOL()  ==========================================================
 runGOL <- function(w0, rL, rD, nTick = 100, drawGrid = TRUE) {
 
+  # "0" means: "dead in the next step.
+  # "1" means: "alive" in the next step.
   if (missing(rL)) { # Rules what to do with "live" cells
     # Neighbours:    0  1  2  3  4  5  6  7  8
     rL <-          c(0, 0, 1, 1, 0, 0, 0, 0, 0)
@@ -80,14 +109,15 @@ runGOL <- function(w0, rL, rD, nTick = 100, drawGrid = TRUE) {
     for (i in 2:(nrow(w0)-1)) {     # for each actual row
       for (j in 2:(ncol(w0)-1)) {   # for each actual column
 
-        # sum of neighbours in 3 x 3 neighbourhood - self
+        # Compute the number of neighboring cells: the sum of live cells in
+        # the 3 x 3 neighbourhood minus the value of the center cell.
         nNeigh <- sum(w0[(i-1):(i+1), (j-1):(j+1)]) - w0[i, j]
-        # Rules
-        if (w0[i, j] == 1) {   # The cell is alive: apply rL rules
-          w1[i, j] <- rL[nNeigh + 1]
-        } else {               # The cell is dead: apply rD rules
-          w1[i, j] <- rD[nNeigh + 1]
-        }
+
+        # Apply the rules for the next step
+        w1[i, j] <- getFate(cellState = w0[i, j],
+                            cellNeigh = nNeigh,
+                            rL = rL,
+                            rD = rD)
       } # end column
     } # end row
 
@@ -185,19 +215,25 @@ if (FALSE) {
 
 # =    3  Next ?  ==============================================================
 
-  # What's next? Look for patterns?
+  # What's next?
 
-  # There is a lot of literature on that ... common cell formats are .lif and
-  # .cell and I have included code that reads them both. Perhaps have a look
-  # at the "catagolue" https://catagolue.appspot.com/home with its dictionary
-  # and embedded simulations...
+  # 3.1 Look for patterns?
+    # There is a lot of literature on that ... common cell formats are .lif and
+    # .cell and I have included code that reads them both. Perhaps have a look
+    # at the "catagolue" https://catagolue.appspot.com/home with its dictionary
+    # and embedded simulations...
 
-  #
-  # Or change the rules? Probabilistic? Non-integral? The sample code
-  # should make that easy.
-  #
-  #
-  # But how far can one take this? Check out this video!
+  # 3.2 Change the rules?
+    # How would probabilistic outcomes change the behaviour? Try it out, the
+    # sample code should make that easy to implement. Just choose
+    # non-integral rule sets.
+
+  # 3.3 Speed up the code?
+    # Can the code be significantly faster if we don't consider every cell, but
+    # only every live cell? But how would we do gthat and get the same results?
+
+
+  # How far can one take this? Check out this video!
   # https://www.youtube.com/watch?v=4lO0iZDzzXk
   #
   # Is this a universal computer?
