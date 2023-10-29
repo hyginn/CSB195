@@ -12,26 +12,27 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   01       Install missing packages                              38
-#TOC>   02       Load required libraries                               58
-#TOC>   03       Load datasets                                         62
-#TOC>   04       Generative AI                                         69
-#TOC>   04.1       t2c - write text to clipboard                       71
-#TOC>   04.2       Initialize generative AI initial prompt             87
-#TOC>   05       Remote control of ChimeraX                           117
-#TOC>   06       A progress bar for long-running code                 195
-#TOC>   07       Find Keywords in aaindex                             231
-#TOC>   08       A colour palette for amino acids                     270
-#TOC>   09       Extracting R code from Google docs                   311
-#TOC>   10       Reading Google sheets                                384
-#TOC>   11       Load the genetic code into a data frame              457
-#TOC>   12       Load an amino acid dataset                           465
-#TOC>   13       Convert one-letter symbols to three-letter           480
-#TOC>   14       Plotting amino acids as 2D scatterplot               563
-#TOC>
+#TOC>   01       Install missing packages                              39
+#TOC>   02       Load required libraries                               59
+#TOC>   03       Load datasets                                         63
+#TOC>   04       Generative AI                                         70
+#TOC>   04.1       t2c - write text to clipboard                       72
+#TOC>   04.2       Initialize generative AI initial prompt             88
+#TOC>   05       Remote control of ChimeraX                           118
+#TOC>   06       A progress bar for long-running code                 196
+#TOC>   07       Random IDs                                           230
+#TOC>   08       Find Keywords in aaindex                             292
+#TOC>   09       A colour palette for amino acids                     331
+#TOC>   10       Extracting R code from Google docs                   372
+#TOC>   11       Reading Google sheets                                445
+#TOC>   12       Load the genetic code into a data frame              518
+#TOC>   13       Load an amino acid dataset                           526
+#TOC>   14       Convert one-letter symbols to three-letter           541
+#TOC>   15       Plotting amino acids as 2D scatterplot               624
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -226,9 +227,69 @@ for (i in 1:N) {
 
 }
 
+# =    07  Random IDs  =========================================================
+
+cat("  Defining rID() ...\n")
+
+rID <- function(n = 1, l = 5, mode = "alf") {
+  # Create n random IDs of length l, from a choice of alphabets
+  # Modes:
+  #   dec: decimal
+  #   hex: hexadecimal
+  #   let: letters
+  #   alf: alphabetic - LETTERS, letters, 0:9
+  #   asc: printable ASCII except for:
+  #          34: "
+  #          35: #
+  #          39: '
+  #          96: `
+  #         127: DEL
+
+  if (mode == "dec") {          # 0123456789
+    a <- as.character(0:9)
+  } else if (mode == "hex") {   # dec + ABCDEF
+    a <- c(0:9, LETTERS[1:6])
+  } else if (mode == "let") {   # abcdefghijklmnopqrstuvwxyz
+    a <- letters
+  } else if (mode == "LET") {   # ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    a <- LETTERS
+  } else if (mode == "alf") {   # LET + let + dec
+    a <- c(LETTERS, letters, 0:9)
+  } else if (mode == "asc") {   # ASCII characters
+    a <- 32:127                                # printable ASCII range
+    a <- a[! (a %in% c(34, 35, 39, 96, 127))]  # remove problematic characters
+    a <- unlist(strsplit(intToUtf8(a), ""))    # convert to character array
+  } else {
+    stop("Unsupported mode")
+  }
+
+  ids <- character(n)
+  for (i in 1:n) {
+    ids[i] <- paste(sample(a, l, replace = TRUE), collapse = "")
+  }
+  return(ids)
+
+}
+
+# Usage example:
+if (FALSE) {
+
+  rID()
+  rID(l=9, mode = "dec")
+  rID(l=9, mode = "hex")
+  rID(l=9, mode = "let")
+  rID(l=9, mode = "LET")
+  rID(l=9, mode = "alf")
+  rID(l=9, mode = "asc")
+  rID(mode = "qrk")
+  rID(15)
+  barplot(rep(1, 20), col = sprintf("#%s", rID(20, l = 6, mode = "hex")))
+
+}
 
 
-# =    07  Find Keywords in aaindex  ===========================================
+
+# =    08  Find Keywords in aaindex  ===========================================
 
 cat("  Defining grepAAindex() ...\n")
 
@@ -267,7 +328,7 @@ grepAAindex <- function(key, el = "D") {
 
 
 
-# =    08  A colour palette for amino acids  ===================================
+# =    09  A colour palette for amino acids  ===================================
 
 cat("  Defining AACOLS ...\n")
 
@@ -308,7 +369,7 @@ AACOLS["P"] <- "#edc06d" # Proline
 
 
 
-# =    09  Extracting R code from Google docs  =================================
+# =    10  Extracting R code from Google docs  =================================
 
 cat("  Defining fetchGoogleDocRCode ...\n")
 
@@ -381,7 +442,7 @@ if (FALSE) {
 
 
 
-# =    10  Reading Google sheets  ==============================================
+# =    11  Reading Google sheets  ==============================================
 
 cat("  Defining readGsheet() ...\n")
 
@@ -454,7 +515,7 @@ if (FALSE) {
 
 
 
-# =    11  Load the genetic code into a data frame  ============================
+# =    12  Load the genetic code into a data frame  ============================
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 
@@ -462,7 +523,7 @@ GCdf <- utils::read.csv("data/GeneticCode.csv")
 
 
 
-# =    12  Load an amino acid dataset  =========================================
+# =    13  Load an amino acid dataset  =========================================
 
 cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
 
@@ -477,7 +538,7 @@ rownames(AADAT) <- AADAT$A
 
 
 
-# =    13  Convert one-letter symbols to three-letter  =========================
+# =    14  Convert one-letter symbols to three-letter  =========================
 
 cat("  Defining A2Aaa ...\n")
 
@@ -560,7 +621,7 @@ if (FALSE) {
 
 
 
-# =    14  Plotting amino acids as 2D scatterplot  =============================
+# =    15  Plotting amino acids as 2D scatterplot  =============================
 
 cat("  Defining plotAA() ...\n")
 
