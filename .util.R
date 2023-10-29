@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   01       Install missing packages                              39
@@ -32,7 +32,7 @@
 #TOC>   13       Load an amino acid dataset                           526
 #TOC>   14       Convert one-letter symbols to three-letter           541
 #TOC>   15       Plotting amino acids as 2D scatterplot               624
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -233,12 +233,12 @@ cat("  Defining rID() ...\n")
 
 rID <- function(n = 1, l = 5, mode = "alf") {
   # Create n random IDs of length l, from a choice of alphabets
-  # Modes:
-  #   dec: decimal
-  #   hex: hexadecimal
-  #   let: letters
-  #   alf: alphabetic - LETTERS, letters, 0:9
-  #   asc: printable ASCII except for:
+  # Modes:                                         Keyspace for length 5:
+  #   dec: decimal                                 (1.00e+05)
+  #   hex: hexadecimal                             (1.05e+06)
+  #   let: letters                                 (1.19e+07)
+  #   alf: alphabetic - LETTERS, letters, 0:9      (9.16e+08)
+  #   asc: printable ASCII except for:             (5.90e+09)
   #          34: "
   #          35: #
   #          39: '
