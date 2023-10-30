@@ -5,13 +5,15 @@
 #         (Computational Biology Foundations).
 #
 #
-# Version: 1.2
+# Version: 1.3
 # Date:    2020-08 - 2023-10
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.3  Fix faulty double pendulum code. Add better plotting: three panels
+#          in one window, power spectrum analysis, plot legends, explanations.
 #   1.2  Annotate the logistic map operations more. Allow different lengths
-#          and masses for the coupled pendulums.
+#          and masses for the coupled pendulums. Comment the code.
 #   1.1  Generalize to other chaotic systems. Add Henon Map and Double
 #          Pendulum. Start the Neural Network Exploration.
 #   1.0  Logistic map code
@@ -19,31 +21,65 @@
 # ToDo:
 # Notes:
 #
-# Tools to plot the logistic map
-#
 # ==============================================================================
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                                       Line
 #TOC> ---------------------------------------------------------------------------
-#TOC>   1        Introduction                                                  43
-#TOC>   2        The Logistic Map                                              46
-#TOC>   2.1.1          Logistic Map - Supporting functions                    182
-#TOC>   2.2        Visualizing the Logistic Map                               279
-#TOC>   3        The Henon map                                                308
-#TOC>   4        Three-species Lotka-Volterra (in a chaotic regime)           355
-#TOC>   5        The Double Pendulum                                          361
-#TOC>   6        A Neural Network at the Edge of Chaos                        486
-#TOC> 
+#TOC>   1        Required packages                                             44
+#TOC>   2        Introduction                                                  79
+#TOC>   3        The Logistic Map                                              82
+#TOC>   3.1.1          Logistic Map - Supporting functions                    218
+#TOC>   3.2        Visualizing the Logistic Map                               316
+#TOC>   4        The Henon map                                                346
+#TOC>   5        Three-species Lotka-Volterra (in a chaotic regime)           395
+#TOC>   6        The Double Pendulum                                          401
+#TOC>   7        A Neural Network at the Edge of Chaos                        658
+#TOC>
 #TOC> ==========================================================================
 
 
-# =    1  Introduction  ========================================================
+# =    1  Required packages  ===================================================
+
+# Check that required packages have been installed. Install if needed. Get
+# information about the package contents.
+
+# A package to compute ODEs ...
+if (! requireNamespace("deSolve", quietly=TRUE)) {
+  install.packages("deSolve")
+}
+# Package information:
+#  library(help   = deSolve)     # basic information
+#  browseVignettes("deSolve")    # available vignettes
+#  data(package  = "deSolve")    # available datasets
 
 
-# =    2  The Logistic Map  ====================================================
+# A package to support plotting. We need this  to plot lines with a colour
+# gradient which we can't do in base R.
+if (! requireNamespace("plotrix", quietly=TRUE)) {
+  install.packages("plotrix")
+}
+# Package information:
+#  library(help   = plotrix)     # basic information
+#  data(package  = "plotrix")    # available datasets
+
+
+# A package to support plotting 3D plots ...
+if (! requireNamespace("plot3D", quietly = TRUE)) {
+  install.packages("plot3D")
+}
+#  library(help   = plot3D)     # basic information
+#  data(package  = "plot3D")    # available datasets
+
+
+
+
+# =    2  Introduction  ========================================================
+
+
+# =    3  The Logistic Map  ====================================================
 
 # The logistic map is a simple recurrence relation:
 #
@@ -179,7 +215,7 @@ plot(rep(1, length(h$mids)), h$mids, pch = 15, col = myCols)
 # next section where we plot the map.
 
 
-# ===   2.1.1  Logistic Map - Supporting functions               
+# ===   3.1.1  Logistic Map - Supporting functions
 
 logisticIteration <- function(r, xMin, xMax, x, nInit, nRun, nPoints) {
   # Compute one evolution of logistic map equation for a given r at some
@@ -243,17 +279,17 @@ getGrid <- function(i, a, n) {
 }
 
 
-plotLogisticMap <- function(rMin = 2.5,
-                            rMax = 4.0,
-                            xMin = 0.0,
-                            xMax = 1.0,
-                            nR = 300,
-                            nX = 200,
-                            x0 = 0.25,
+plotLogisticMap <- function(rMin  = 2.5,
+                            rMax  = 4.0,
+                            xMin  = 0.0,
+                            xMax  = 1.0,
+                            nR    = 300,
+                            nX    = 200,
+                            x0    = 0.25,
                             nInit = 1000,
-                            nRun = 100000,
-                            pal = c(hcl.colors(63), "#FFFFFF"),
-                            zMin = 0.97) {
+                            nRun  = 100000,
+                            pal   = c(hcl.colors(63), "#FFFFFF"),
+                            zMin  = 0.97) {
   # Plot the logistic map given the parameters
   img <- logisticImage(rMin = rMin, rMax = rMax,
                        xMin = xMin, xMax = xMax,
@@ -276,7 +312,9 @@ plotLogisticMap <- function(rMin = 2.5,
 
 }
 
-# ==   2.2  Visualizing the Logistic Map  ======================================
+
+# ==   3.2  Visualizing the Logistic Map  ======================================
+
 if (FALSE) {
 
   # Low resolution plot of a large domain of r.
@@ -305,7 +343,7 @@ if (FALSE) {
 
 }
 
-# =    3  The Henon map  =======================================================
+# =    4  The Henon map  =======================================================
 
 # The Henon map is another "classical" chaotic system defined by the
 # following _two_ coupled recurrence relations:
@@ -352,13 +390,15 @@ plot(v$x, v$y,
 # widely different points in our sequence of 5,000 iterations.
 
 
-# =    4  Three-species Lotka-Volterra (in a chaotic regime)  ==================
+
+
+# =    5  Three-species Lotka-Volterra (chaotic regime)  ==================
 
 # TBD
 
 
 
-# =    5  The Double Pendulum  =================================================
+# =    6  The Double Pendulum  =================================================
 
 # One simple system with a direct physical interpretation is the double
 # pendulum. The equations governing its motion are a bit more involved, but the
@@ -386,104 +426,235 @@ plot(v$x, v$y,
 #   of the actual heartbeat can be mapped to the simple physical (or
 #   computational) model.
 
-# (Example code originally contributed by ChatGPT-4, refactored for style
-# and clarity, and commented)
+# Note: This example code was originally contributed by ChatGPT-4. The general
+# layout of the input parameters and how to set up the function for the coupled
+# differential equations and solve them with desolve::ode() was entirely correct
+# - and that is very helpful. However, the details of the (complicated)
+# first-order differential equations were wrong, even though they used the right
+# elements of lengths, masses, and angular velocities, and desolve::ode()
+# converged on solutions. The correct equations were taken from
+# https://www.myphysicslab.com/pendulum/double-pendulum-en.html (actual code
+# translated from the Javascript source at
+# https://github.com/myphysicslab/myphysicslab/
+# blob/master/src/sims/pendulum/DoublePendulumSim).
 
 if (! requireNamespace("deSolve")) {  # differential equation solver
   install.packages("deSolve")
 }
 
 doublePendulum <- function(t,        # timepoint
-                           state,    # four numbers: initial conditions
-                           parm) {   # four numbers: lengths and masses
-
-  # This is the function to compute the state of a pendulum at timepoint t
-  # as a coupled differential equation. deSolve::ode() solves this equation
-  # at the requested timepoints to compuite the trajectori for the two
+                           state,    # current values of theta and omega
+                           parm) {   # lenghts and masses
+  # This function to computes the state of a double pendulum at timepoint t
+  # given the two angles from the vertical and angular velocities, and the
+  # parameters for length and mass of both pendulums. deSolve::ode() solves this
+  # equation at the requested timepoints to compute the trajectories for the two
   # pendulums over time.
 
-  g <- 9.81  # (earth standard surface gravitational constant: 9.1 m/s^2)
+  g <- 9.81  # (earth standard surface gravitational constant: 9.81 m/s^2)
 
   # Initial conditions
-  th1 <- state[1]  # angle with the vertical of first pendulum
-  om1 <- state[2]  # angular velocity of first pendulum (rad/sec)
-  th2 <- state[3]
-  om2 <- state[4]
+  th1 <- state["th1"]  # angle with the vertical of first pendulum
+  om1 <- state["om1"]  # angular velocity of first pendulum (rad/sec)
+  th2 <- state["th2"]
+  om2 <- state["om2"]
 
   # Parameters
-  l1 <- parm[1]    # length of first pendulum
-  m1 <- parm[2]    # mass of first pendulum
-  l2 <- parm[3]
-  m2 <- parm[4]
-
-  deltaTheta <- th2 - th1
-  denom1 <- ((m1 + m2) * l1) - (m2 * l1 * cos(deltaTheta)^2)
-  denom2 <- (l2 / l1) * denom1
+  L1 <-   parm[["L1"]]    # length of first pendulum
+  m1 <-   parm[["m1"]]    # mass of first pendulum
+  L2 <-   parm[["L2"]]
+  m2 <-   parm[["m2"]]
 
   dy1 <- om1
-  dy2 <- ((m2 * l2 * w2^2 * sin(deltaTheta) * cos(deltaTheta)
-           + m2 * g * sin(y3) * cos(deltaTheta)
-           + m2 * l2 * w2^2 * sin(deltaTheta)
-           - (m1 + m2) * g * sin(y1))
-          / denom1)
+
+  dy2 <- -g*(2*m1+m2)*sin(th1)
+  dy2 <- dy2 - g*m2*sin(th1-2*th2)
+  dy2 <- dy2 - 2*m2*om2*om2*L2*sin(th1-th2)
+  dy2 <- dy2 - m2*om1*om1*L1*sin(2*(th1-th2))
+  dy2 <- dy2/(L1*(2*m1+m2-m2*cos(2*(th1-th2))))
 
   dy3 <- om2
-  dy4 <- ((-l1 / l2 * w1^2 * sin(deltaTheta) * cos(deltaTheta)
-           + (m1 + m2) * g * sin(y1) * cos(deltaTheta)
-           - (m1 + m2) * l1 * w1^2 * sin(deltaTheta)
-           - (m1 + m2) * g * sin(y3))
-          / denom2)
+
+  dy4 <- (m1+m2)*om1*om1*L1
+  dy4 <- dy4 + g*(m1+m2)*cos(th1)
+  dy4 <- dy4 + m2*om2*om2*L2*cos(th1-th2)
+  dy4 <- dy4*2*sin(th1-th2)
+  dy4 <- dy4/(L2*(2*m1+m2-m2*cos(2*(th1-th2))))
 
   return(list(c(dy1, dy2, dy3, dy4)))
 }
 
+deg2rad <- function(deg) {
+  # convert degrees to radians
+  return((deg / 180) * pi)
+}
+
+N <- 40  # (seconds)
+times <- seq(0, N, length.out = 5000) # 5,000 timepoints from 0 to N seconds
+
 # Initial state: (th1, om1, th2, om2)
-state <- c(pi/2,   # angle from the vertical: 90°
-           0,      # angular velocity zero: pendulum initially at rest
-           pi,     # 180°
-           0)      # ... at rest
+state <- c(th1 = deg2rad( 90),   # angle from the vertical (degrees)
+           om1 = 0,              # angular velocity - zero: pendulum at rest
+           th2 = deg2rad(180),   # 180°
+           om2 = 0)              # ... at rest
 
 # Parameters
-parm <- c(1.8,     # first pendulum: 1.8 meters long ...
-          0.5,     #   ... with a mass of 0.5 kg
-          0.8,     # 0.8m
-          0.4)     # 0.4 kg
+parm <- list(L1   = 1.8,     # first pendulum: 1.8 meters long ...
+             m1   = 0.5,     #   ... with a mass of 0.5 kg
+             L2   = 0.8,     # 0.8m
+             m2   = 0.4)     # 0.4 kg
 
-N <- 100  # (seconds)
-times <- seq(0, N, length.out = 5000) # 5,000 timepoints from 0 to 100 seconds
+# =====================================================
+state <- c(th1 = deg2rad( 5),
+           om1 = 0,
+           th2 = deg2rad(1),
+           om2 = 0)
+
+# Parameters
+parm <- list(L1   = 1.8,
+             m1   = 1.0,
+             L2   = 0.1,
+             m2   = 0.01)
 
 # Solve this
-result <- deSolve::ode(y = state, times = times,func = double_pendulum,
-                       parms = parm, method = "rk4")
+result <- deSolve::ode(y = state,
+                       times = times,
+                       func = doublePendulum,
+                       parms = parm,
+                       method = "rk4")
 
 # Trajectories: Theta over time
-myCols = colorRampPalette(c("#91a6ff", "#D2BED8", "#9f3352"))(N)
-plot(result[, "time"], result[, "1"],
-     type = "l",
-     ylim = c(-90, 90),
-     xlab = "Time (sec)", ylab = "Theta1 , 2 (rad)",
-     main = "Phase Plot of Double Pendulum",
-     col = myCols[1])
-points(result[, "time"], result[, "3"], type = "l", col = myCols[N])
 
-# Position in phase space
-plot(result[, "1"], result[, "3"],
-     xlab = "Theta1", ylab = "Theta2",
-     main = "Phase Space Plot of Double Pendulum",
-     col=myCols)
-rectXY <- c(82, 37, 95, 48)  # Zoom in here
-rect(rectXY[1], rectXY[2], rectXY[3], rectXY[4], lwd = 1.5, border = "#00ddff")
+plotPendulum <- function(res) {
+  # plot of the double pendulum results
+  myCols <- colorRampPalette(
+    c("#6d7c8a","#8d9199","#9c99a1","#a87d86","#c96772"))(nrow(res))
 
-# Zoomed in:
-plot(result[, "1"], result[, "3"],
-     xlim = rectXY[c(1,3)],
-     ylim = rectXY[c(2,4)],
-     xlab = "Theta1", ylab = "Theta2",
-     main = "Phase Plot of Double Pendulum",
-     col=myCols)
+  oPar <- par(mfrow = c(1, 2))
+
+  # Define a layout for the plots: the next three plots go into the
+  # sections defined in the matrix.
+  myMat <- matrix(c(1, 2, 1, 2, 1, 3), ncol=2, byrow = TRUE)
+
+  # Set the layout
+  layout(myMat, widths=c(1,1), heights=c(1,1))
+
+  # First plot: y over time
+  t <- result[, "time"]
+  th1 <- result[, "th1"]  # theta of first pendulum
+  th2 <- result[, "th2"]  # theta of second pendulum
+  plot(t, th1,
+       type = "l",
+       ylim = c(min(c(th1, th2)), max(c(th1, th2))),
+       xlab = "Time (sec)", ylab = "Theta 1 , Theta 2 (rad)",
+       main = "Double Pendulum",
+       col = myCols[1])
+  points(t, th2, type = "l", col = myCols[length(myCols)])
+  legend("bottomright",
+         legend = c("Theta 1", "Theta 2"),
+         lty = 1,
+         bty = "n",
+         col = c(myCols[1], myCols[length(myCols)]))
+
+  # Second plot: phase space
+  th1 <- result[, "th1"]
+  th2 <- result[, "th2"]
+  plot(th1, th2,
+       xlab = "Theta1", ylab = "Theta2",
+       main = "Phase Space Plot of Double Pendulum",
+       type = "n",
+       col = myCols)
+  plotrix::color.scale.lines(th1, th2, col = myCols, lwd = 2)
+  legend("bottomright",
+         legend = c("t = 0",
+                    sprintf("t = %d",
+                            round(result[nrow(result), "time"]))),
+         fill =  c(myCols[1], myCols[length(myCols)]),
+         bty = "n")
+
+  # Third plot: Power Spectra of theta 1 and theta 2
+  # x-axis points are frequencies (discretized to the stated bandwidth)
+  # y-axis values are the "power" of a particular frequency in the time-series,
+  #     i.e. how much a harmonic function of the frequency at the x-axis
+  #     contributes to the time series data.
+  sp1 <- spectrum(th1, log = "no", plot = FALSE)
+  sp2 <- spectrum(th2, log = "no", plot = FALSE)
+  plot(sp1$freq, sp1$spec,
+       xlim=c(0, 50/length(th1)),
+       ylim = c(0, max(c(sp1$spec, sp2$spec))),
+       xlab = sprintf("frequency (bandwith = %.5f)", sp1$bandwidth),
+       ylab = "spectrum",
+       main = "Power Spectrum of Double Pendulum",
+       type = "n")
+  points(sp1$freq, sp1$spec, type ="l", lwd=3, col=myCols[1])
+  points(sp2$freq, sp2$spec, type="l", lwd=1.5, col=myCols[length(myCols)])
+  legend("topright",
+         legend = c("Theta 1", "Theta 2"),
+         lty = 1,
+         bty = "n",
+         col = c(myCols[1], myCols[length(myCols)]))
+
+  par(oPar)
+
+}
+
+N <- 20  # (seconds)
+times <- seq(0, N, length.out = 5000) # 5,000 timepoints from 0 to N seconds
+
+# Initial state: theta (angle) and omega (angular velocity)
+state <- c(th1 = deg2rad( 15), om1 = 0, th2 = deg2rad(2), om2 = 0)
+
+# Pendulum parameters: lengths and masses
+parm <- list(L1 = 1.8, m1 = 1.0, L2 = 0.7, m2 = 0.1)
+
+# Solve this
+result <- deSolve::ode(y = state,
+                       times = times,
+                       func = doublePendulum,
+                       parms = parm,
+                       method = "rk4")
+
+# Plot it (Open a new graphics window with dev.new() and make it large.)
+plotPendulum(result)
 
 
-# =    6  A Neural Network at the Edge of Chaos  ===============================
+# Next
+
+state <- c(th1 = deg2rad( 45), om1 = 0, th2 = deg2rad(30), om2 = 0)
+parm <- list(L1 = 1.6, m1 = 0.6, L2 = 1.2, m2 = 0.4)
+result <- deSolve::ode(y = state,  times = times, func = doublePendulum,
+                       parms = parm, method = "rk4")
+plotPendulum(result)
+
+# Next
+
+state <- c(th1 = deg2rad( 70), om1 = 0, th2 = deg2rad(80), om2 = 0)
+parm <- list(L1 = 1.4, m1 = 0.8, L2 = 1.4, m2 = 0.35)
+result <- deSolve::ode(y = state,  times = times, func = doublePendulum,
+                       parms = parm, method = "rk4")
+plotPendulum(result)
+
+
+# Next
+
+N <- 20  # (seconds)
+times <- seq(0, N, length.out = 5000)
+
+state <- c(th1 = deg2rad( 171), om1 = 0, th2 = deg2rad(98), om2 = 0)
+parm <- list(L1 = 0.87, m1 = 1.15, L2 = 0.92, m2 = 1.33)
+result <- deSolve::ode(y = state,  times = times, func = doublePendulum,
+                       parms = parm, method = "rk4")
+plotPendulum(result)
+
+N <- 200  # (seconds)
+times <- seq(0, N, length.out = 10000)
+result <- deSolve::ode(y = state,  times = times, func = doublePendulum,
+                       parms = parm, method = "rk4")
+plotPendulum(result)
+
+
+
+# =    7  A Neural Network at the Edge of Chaos  ===============================
 
 # Let's design a simple neural network "at the edge of order and chaos".
 # Assume the input is an oscillator (and maybe some directed perturbation).
@@ -495,6 +666,7 @@ plot(result[, "1"], result[, "3"],
 # How ? ...
 #
 
+# = 1. Code glossary
 
 
 
