@@ -12,31 +12,38 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   01       Install missing packages                              39
-#TOC>   02       Load required libraries                               59
-#TOC>   03       Load datasets                                         63
-#TOC>   04       Generative AI                                         70
-#TOC>   04.1       t2c - write text to clipboard                       72
-#TOC>   04.2       Initialize generative AI initial prompt             88
-#TOC>   05       Remote control of ChimeraX                           118
-#TOC>   06       A progress bar for long-running code                 196
-#TOC>   07       Random IDs                                           230
-#TOC>   08       Find Keywords in aaindex                             292
-#TOC>   09       A colour palette for amino acids                     331
-#TOC>   10       Extracting R code from Google docs                   372
-#TOC>   11       Reading Google sheets                                445
-#TOC>   12       Load the genetic code into a data frame              518
-#TOC>   13       Load an amino acid dataset                           526
-#TOC>   14       Convert one-letter symbols to three-letter           541
-#TOC>   15       Plotting amino acids as 2D scatterplot               624
-#TOC>
+#TOC>   1        Install missing packages                              45
+#TOC>   2        Load required libraries                               65
+#TOC>   3        Load datasets                                         69
+#TOC>   4        Generic Utilities                                     76
+#TOC>   4.1        vr - make a row-vector                              79
+#TOC>   4.2        vc - make a column-vector                           96
+#TOC>   4.3        mmScale - min-max Scaling                          113
+#TOC>   4.4        A progress bar for long-running code               125
+#TOC>   4.5        Random IDs                                         161
+#TOC>   5        Generative AI                                        223
+#TOC>   5.1        t2c - write text to clipboard                      227
+#TOC>   5.2        Initialize generative AI initial prompt            245
+#TOC>   6        Remote control of ChimeraX                           275
+#TOC>   7        Bioinformatics Utilities                             356
+#TOC>   7.1        Find Keywords in aaindex                           359
+#TOC>   7.2        A colour palette for amino acids                   398
+#TOC>   7.3        Load the genetic code into a data frame            438
+#TOC>   7.4        Load an amino acid dataset                         446
+#TOC>   7.5        Convert one-letter symbols to three-letter         462
+#TOC>   7.6        Plotting amino acids as 2D scatterplot             546
+#TOC>   8        Working with Google assets                           606
+#TOC>   8.1        Extracting R code from Google docs                 609
+#TOC>   8.2        Reading Google sheets                              682
+#TOC> 
 #TOC> ==========================================================================
 
 
-# =    01  Install missing packages  ===========================================
+# =    1  Install missing packages  ============================================
+#
 
 if (!requireNamespace("httr", quietly=TRUE)) {
   utils::install.packages("httr")
@@ -55,22 +62,173 @@ if (!requireNamespace("seqinr", quietly=TRUE)) {
 }
 
 
-
-# =    02  Load required libraries  ============================================
+# =    2  Load required libraries  =============================================
 # None needed currently.
 #
 
-# =    03  Load datasets  ======================================================
-#
+# =    3  Load datasets  =======================================================
 #
 
 cat("  Loading aaindex dataset from sequinr:: ...\n")
 utils::data(aaindex, package = "seqinr")
 
-# =    04  Generative AI  ======================================================
 
-# ==   04.1  t2c - write text to clipboard  ====================================
+# =    4  Generic Utilities  ===================================================
+#
+
+# ==   4.1  vr - make a row-vector  ============================================
+#
+
+cat("  Defining vr() ...\n")
+vr <- function(v, rowName, colNames) {
+  #' Drop dimension of input vector and make a row-vector. Keep names().
+  #' @examples
+  #' vr(c(1, 1, 2, 3, 5, 8, 13, 21))
+  if (missing(rowName))  { rowName  <- NULL }
+  if (missing(colNames)) { colNames <- names(v) }
+  rr <- matrix(v, nrow = 1)
+  rownames(rr) <- rowName
+  colnames(rr) <- colNames
+  return(rr)
+}
+
+
+# ==   4.2  vc - make a column-vector  =========================================
+#
+
+cat("  Defining vc() ...\n")
+
+vc <- function(v, rowNames, colName) {
+  #' Drop dimension of input vector and make a column-vector. Keep names().
+  #' @examples
+  #' vc(c(1, 1, 2, 3, 5, 8, 13, 21))
+  if (missing(rowNames)) { rowNames <- names(v) }
+  if (missing(colName))  { colName  <- NULL }
+  cc <- matrix(v, ncol = 1)
+  rownames(cc) <- rowNames
+  colnames(cc) <- colName
+  return(cc)
+}
+
+# ==   4.3  mmScale - min-max Scaling  =========================================
+#
+
+cat("  Defining mmScale() ...\n")
+
+mmScale <- function(x) {
+  #' min-max scaling of x. The returned vector has min(x) == 0 and max(x) == 1
+  #' @examples
+  #' summary(mmScale(rnorm(10000)))
+  return((x - min(x)) / (max(x) - min(x)))
+}
+
+# ==   4.4  A progress bar for long-running code  ==============================
+#
+
+cat("  Defining pBar() ...\n")
+
+pBar <- function(i, l, nCh = 50) {
+  # Draw a progress bar in the console
+  # i: the current iteration
+  # l: the total number of iterations
+  # nCh: width of the progress bar
+  ticks <- round(seq(1, l-1, length.out = nCh))
+  if (i < l) {
+    if (any(i == ticks)) {
+      p <- which(i == ticks)[1]  # use only first, in case there are ties
+      p1 <- paste(rep("#", p), collapse = "")
+      p2 <- paste(rep("-", nCh - p), collapse = "")
+      cat(sprintf("\r|%s%s|", p1, p2))
+      flush.console()
+    }
+  }
+  else { # done
+    cat("\n")
+  }
+}
+
+# Usage example:
+if (FALSE) {
+
+  N <- 123
+  for (i in 1:N) {
+    pBar(i, N)
+    Sys.sleep(0.05)
+  }
+
+}
+
+# ==   4.5  Random IDs  ========================================================
+#
+
+cat("  Defining rID() ...\n")
+
+rID <- function(n = 1, l = 5, mode = "alf") {
+  # Create n random IDs of length l, from a choice of alphabets
+  # Modes:                                         Keyspace for length 5:
+  #   dec: decimal                                 (1.00e+05)
+  #   hex: hexadecimal                             (1.05e+06)
+  #   let: letters                                 (1.19e+07)
+  #   alf: alphabetic - LETTERS, letters, 0:9      (9.16e+08)
+  #   asc: printable ASCII except for:             (5.90e+09)
+  #          34: "
+  #          35: #
+  #          39: '
+  #          96: `
+  #         127: DEL
+
+  if (mode == "dec") {          # 0123456789
+    a <- as.character(0:9)
+  } else if (mode == "hex") {   # dec + ABCDEF
+    a <- c(0:9, LETTERS[1:6])
+  } else if (mode == "let") {   # abcdefghijklmnopqrstuvwxyz
+    a <- letters
+  } else if (mode == "LET") {   # ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    a <- LETTERS
+  } else if (mode == "alf") {   # LET + let + dec
+    a <- c(LETTERS, letters, 0:9)
+  } else if (mode == "asc") {   # ASCII characters
+    a <- 32:127                                # printable ASCII range
+    a <- a[! (a %in% c(34, 35, 39, 96, 127))]  # remove problematic characters
+    a <- unlist(strsplit(intToUtf8(a), ""))    # convert to character array
+  } else {
+    stop("Unsupported mode")
+  }
+
+  ids <- character(n)
+  for (i in 1:n) {
+    ids[i] <- paste(sample(a, l, replace = TRUE), collapse = "")
+  }
+  return(ids)
+
+}
+
+# Usage example:
+if (FALSE) {
+
+  rID()
+  rID(l=9, mode = "dec")
+  rID(l=9, mode = "hex")
+  rID(l=9, mode = "let")
+  rID(l=9, mode = "LET")
+  rID(l=9, mode = "alf")
+  rID(l=9, mode = "asc")
+  rID(mode = "qrk")
+  rID(15)
+  barplot(rep(1, 20), col = sprintf("#%s", rID(20, l = 6, mode = "hex")))
+
+}
+
+
+# =    5  Generative AI  =======================================================
+#
+
+
+# ==   5.1  t2c - write text to clipboard  =====================================
+#
+
 cat("  Defining t2c() ...\n")
+
 t2c <- function(txt) {
   #' Convenience function to send R objects to the clipboard.
   #' @examples
@@ -84,8 +242,8 @@ t2c <- function(txt) {
 }
 
 
-
-# ==   04.2  Initialize generative AI initial prompt  ==========================
+# ==   5.2  Initialize generative AI initial prompt  ===========================
+#
 
 cat("  Defining gAIinit() ...\n")
 
@@ -114,12 +272,15 @@ Please confirm with one word.
 }
 
 
+# =    6  Remote control of ChimeraX  ==========================================
+#
 
-# =    05  Remote control of ChimeraX  =========================================
-CXPORT <- 61803
 cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
+CXPORT <- 61803
+
 
 cat("  Defining CX() ...\n")
+
 CX <- function(cmd, port = CXPORT, quietly = FALSE) {
   # send a command to ChimeraX listening on port CXPORT via its REST
   # interface.
@@ -192,104 +353,11 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 }
 
 
+# =    7  Bioinformatics Utilities  ============================================
+#
 
-# =    06  A progress bar for long-running code  ===============================
-
-cat("  Defining pBar() ...\n")
-pBar <- function(i, l, nCh = 50) {
-  # Draw a progress bar in the console
-  # i: the current iteration
-  # l: the total number of iterations
-  # nCh: width of the progress bar
-  ticks <- round(seq(1, l-1, length.out = nCh))
-  if (i < l) {
-    if (any(i == ticks)) {
-      p <- which(i == ticks)[1]  # use only first, in case there are ties
-      p1 <- paste(rep("#", p), collapse = "")
-      p2 <- paste(rep("-", nCh - p), collapse = "")
-      cat(sprintf("\r|%s%s|", p1, p2))
-      flush.console()
-    }
-  }
-  else { # done
-    cat("\n")
-  }
-}
-
-# Usage example:
-if (FALSE) {
-
-N <- 123
-for (i in 1:N) {
-  pBar(i, N)
-  Sys.sleep(0.05)
-}
-
-}
-
-# =    07  Random IDs  =========================================================
-
-cat("  Defining rID() ...\n")
-
-rID <- function(n = 1, l = 5, mode = "alf") {
-  # Create n random IDs of length l, from a choice of alphabets
-  # Modes:                                         Keyspace for length 5:
-  #   dec: decimal                                 (1.00e+05)
-  #   hex: hexadecimal                             (1.05e+06)
-  #   let: letters                                 (1.19e+07)
-  #   alf: alphabetic - LETTERS, letters, 0:9      (9.16e+08)
-  #   asc: printable ASCII except for:             (5.90e+09)
-  #          34: "
-  #          35: #
-  #          39: '
-  #          96: `
-  #         127: DEL
-
-  if (mode == "dec") {          # 0123456789
-    a <- as.character(0:9)
-  } else if (mode == "hex") {   # dec + ABCDEF
-    a <- c(0:9, LETTERS[1:6])
-  } else if (mode == "let") {   # abcdefghijklmnopqrstuvwxyz
-    a <- letters
-  } else if (mode == "LET") {   # ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    a <- LETTERS
-  } else if (mode == "alf") {   # LET + let + dec
-    a <- c(LETTERS, letters, 0:9)
-  } else if (mode == "asc") {   # ASCII characters
-    a <- 32:127                                # printable ASCII range
-    a <- a[! (a %in% c(34, 35, 39, 96, 127))]  # remove problematic characters
-    a <- unlist(strsplit(intToUtf8(a), ""))    # convert to character array
-  } else {
-    stop("Unsupported mode")
-  }
-
-  ids <- character(n)
-  for (i in 1:n) {
-    ids[i] <- paste(sample(a, l, replace = TRUE), collapse = "")
-  }
-  return(ids)
-
-}
-
-# Usage example:
-if (FALSE) {
-
-  rID()
-  rID(l=9, mode = "dec")
-  rID(l=9, mode = "hex")
-  rID(l=9, mode = "let")
-  rID(l=9, mode = "LET")
-  rID(l=9, mode = "alf")
-  rID(l=9, mode = "asc")
-  rID(mode = "qrk")
-  rID(15)
-  barplot(rep(1, 20), col = sprintf("#%s", rID(20, l = 6, mode = "hex")))
-
-}
-
-
-
-# =    08  Find Keywords in aaindex  ===========================================
+# ==   7.1  Find Keywords in aaindex  ==========================================
+#
 
 cat("  Defining grepAAindex() ...\n")
 
@@ -327,8 +395,8 @@ grepAAindex <- function(key, el = "D") {
 # cat(sprintf("\n%s\t%s", names(aaindex[[idx]]$I), aaindex[[idx]]$I))
 
 
-
-# =    09  A colour palette for amino acids  ===================================
+# ==   7.2  A colour palette for amino acids  ==================================
+#
 
 cat("  Defining AACOLS ...\n")
 
@@ -367,163 +435,16 @@ AACOLS["P"] <- "#edc06d" # Proline
 # AACOLS <- gsub("..$", "FF", AACOLS)  # Reset the two last digits to "FF"
                                        #   to remove transparency
 
-
-
-# =    10  Extracting R code from Google docs  =================================
-
-cat("  Defining fetchGoogleDocRCode ...\n")
-
-fetchGoogleDocRCode <- function (URL,
-                                 delimB = "^\\s*# begin code",
-                                 delimE = "^\\s*# end code",
-                                 myExt = ".R") {
-
-  # Retrieve text from a Google doc, subset to a delimited range, write to
-  # a tempfile() with extension ".R", and open it in the RStudio editor.
-  # Parameters:
-  #    URL     chr   URL of a Google doc that is open to share or contained
-  #                  in a shared folder
-  #    delimB  chr   regex pattern for the begin-delimiter
-  #    delimE  chr   regex pattern for the end-delimiter
-  #    myExt  chr   extension of tempfile. Default ".R"
-  # Value:           None. Executed for its side-effect of writing
-  #                  text to tempfile() and opening it in the editor
-  #
-
-  # Parse out the ID
-  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
-
-  # make a retrieval URL
-  URL <- sprintf("https://docs.google.com/document/d/%s%s",
-                 ID,
-                 "/export?format=txt")
-
-  # GET() the data.
-  response <- httr::GET(URL)
-  if (! httr::status_code(response) == 200) {
-    stop(sprintf("Server status code was \"%s\".",
-                 as.character(httr::status_code(response))))
-  }
-
-  s <- as.character(response)
-  s <- strsplit(s, "\r\n")[[1]]   # split into lines, delimited with \r\n
-  iBegin <- grep(delimB, s)       # find the two delimiter indices
-  iEnd   <- grep(delimE, s)
-
-  # Sanity checks
-  if (length(iBegin) == 0) {
-    stop("Begin-delimiter was not found in document.")
-  } else if (length(iEnd) == 0) {
-    stop("End-delimiter was not found in document.")
-  } else if (length(iBegin) > 1) {
-    stop("More than one Begin-delimiter in document.")
-  } else if (length(iEnd) > 1) {
-    stop("More than one End-delimiter in document.")
-  } else if ((iEnd - iBegin) < 2) {
-    stop("Nothing delimited or delimiter tags not correctly ordered.")
-  }
-
-  s <- s[(iBegin+1):(iEnd-1)]          # extract delimited text
-
-  myFile <- tempfile(fileext = ".R")   # get name for temporary file
-  write(s, myFile)                     # write s into temporary file
-  file.edit(myFile)                    # open in editor
-
-  return(invisible(NULL))              # return nothing
-}
-
-
-# Usage example:
-if (FALSE) {
-
-  fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
-
-}
-
-
-
-# =    11  Reading Google sheets  ==============================================
-
-cat("  Defining readGsheet() ...\n")
-
-readGsheet <- function(URL, sheet, ...) {
-  # Read a sheet from a Google sheets URL to a spreadsheet file.
-  # URL: the URL of file location. Note: the document must have permissions
-  #      set for everyone with the link to be allowed to read.
-  # sheet: the name of the sheet
-  # ... : other arguments that are passed to utils::read.csv()
-  # value: a data frame
-
-  # We assume the URL was received from the sheet's sharing button, thus
-  # we parse out only the ID
-
-  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
-
-  # make a retrieval URL
-  URL <- sprintf("https://docs.google.com/spreadsheets/d/%s%s%s",
-                   ID,
-                   "/gviz/tq?tqx=out:csv&sheet=",
-                   gsub(" ", "+", sheet))
-
-  # the GET() function from httr will get the data.
-  response <- httr::GET(URL)
-  if (httr::status_code(response) != 200) {
-    stop(sprintf("Server status code was \"%s\".",
-                 as.character(httr::status_code(response))))
-  }
-
-  # Check whether reading the sheet returned "text/csv". Otherwise it may
-  # not be a spreadsheet, or we are getting a sign-in page (i.e. a permissions
-  # error).
-  if (! grepl("text/csv", response$headers$`content-type`) ) {
-    stop("
-  Request did not return \"text/csv\" content. This could mean:
-    -  Sheet access was denied and we got a sign-in page. Check permissions.
-       The sheet needs to readable by \"everyone with the link\".
-    -  The URL does not lead to a spreadsheet. Check it.
-    -  Something else happened. Check what the URL actually retrieves.")
-  }
-
-  x <-as.character(response)
-  x <- strsplit(x, "\n")[[1]]
-  x[1] <-      gsub("\\\"", "", x[1])
-  cNames <-  strsplit(x[1], ",")[[1]]  # Restore the original names from
-                                       # row 1 so we don't have to use the
-                                       # names that R assigns by default.
-  tbl <- utils::read.csv(text = x)
-  colnames(tbl) <- cNames
-
-  return(tbl)
-
-}
-
-# Usage example
-if (FALSE) {
-  # This should work ...
-  x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
-  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
-  y <- "AA styles"
-  z <- readGsheet(x, y)
-
-  # This should fail (permissions) ...
-  x <- "1E4GHlgRlTU5Z1FdglNF5T_eR4-Guzkukq99stl35_I0"
-  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
-  y <- "GC.csv"
-  z <- readGsheet(x, y)
-
-}
-
-
-
-# =    12  Load the genetic code into a data frame  ============================
+# ==   7.3  Load the genetic code into a data frame  ===========================
+#
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 
 GCdf <- utils::read.csv("data/GeneticCode.csv")
 
 
-
-# =    13  Load an amino acid dataset  =========================================
+# ==   7.4  Load an amino acid dataset  ========================================
+#
 
 cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
 
@@ -538,7 +459,8 @@ rownames(AADAT) <- AADAT$A
 
 
 
-# =    14  Convert one-letter symbols to three-letter  =========================
+# ==   7.5  Convert one-letter symbols to three-letter  ========================
+#
 
 cat("  Defining A2Aaa ...\n")
 
@@ -621,7 +543,8 @@ if (FALSE) {
 
 
 
-# =    15  Plotting amino acids as 2D scatterplot  =============================
+# ==   7.6  Plotting amino acids as 2D scatterplot  ============================
+#
 
 cat("  Defining plotAA() ...\n")
 
@@ -645,7 +568,7 @@ plotAA <- function(x, y, aaDat = AADAT, ...) {
     stop("Order of first and second vector is not the same.")
   }
   ord <- match(o, aaDat$Aaa) # index vector that maps the order of input
-                             # to the order in aaDat
+  # to the order in aaDat
 
   # rescale aaDat$vol between 0.7 and 5
   CEXMIN <- 0.7
@@ -678,6 +601,156 @@ if (FALSE) {
   plotAA(x, y, xlab = aaindex[[150]]$D, ylab = aaindex[[544]]$D)
 
 }
+
+
+# =    8  Working with Google assets  ==========================================
+#
+
+# ==   8.1  Extracting R code from Google docs  ================================
+#
+
+cat("  Defining fetchGoogleDocRCode ...\n")
+
+fetchGoogleDocRCode <- function (URL,
+                                 delimB = "^\\s*# begin code",
+                                 delimE = "^\\s*# end code",
+                                 myExt = ".R") {
+
+  # Retrieve text from a Google doc, subset to a delimited range, write to
+  # a tempfile() with extension ".R", and open it in the RStudio editor.
+  # Parameters:
+  #    URL     chr   URL of a Google doc that is open to share or contained
+  #                  in a shared folder
+  #    delimB  chr   regex pattern for the begin-delimiter
+  #    delimE  chr   regex pattern for the end-delimiter
+  #    myExt  chr   extension of tempfile. Default ".R"
+  # Value:           None. Executed for its side-effect of writing
+  #                  text to tempfile() and opening it in the editor
+  #
+
+  # Parse out the ID
+  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
+
+  # make a retrieval URL
+  URL <- sprintf("https://docs.google.com/document/d/%s%s",
+                 ID,
+                 "/export?format=txt")
+
+  # GET() the data.
+  response <- httr::GET(URL)
+  if (! httr::status_code(response) == 200) {
+    stop(sprintf("Server status code was \"%s\".",
+                 as.character(httr::status_code(response))))
+  }
+
+  s <- as.character(response)
+  s <- strsplit(s, "\r\n")[[1]]   # split into lines, delimited with \r\n
+  iBegin <- grep(delimB, s)       # find the two delimiter indices
+  iEnd   <- grep(delimE, s)
+
+  # Sanity checks
+  if (length(iBegin) == 0) {
+    stop("Begin-delimiter was not found in document.")
+  } else if (length(iEnd) == 0) {
+    stop("End-delimiter was not found in document.")
+  } else if (length(iBegin) > 1) {
+    stop("More than one Begin-delimiter in document.")
+  } else if (length(iEnd) > 1) {
+    stop("More than one End-delimiter in document.")
+  } else if ((iEnd - iBegin) < 2) {
+    stop("Nothing delimited or delimiter tags not correctly ordered.")
+  }
+
+  s <- s[(iBegin+1):(iEnd-1)]          # extract delimited text
+
+  myFile <- tempfile(fileext = ".R")   # get name for temporary file
+  write(s, myFile)                     # write s into temporary file
+  file.edit(myFile)                    # open in editor
+
+  return(invisible(NULL))              # return nothing
+}
+
+
+# Usage example:
+if (FALSE) {
+
+  fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
+
+}
+
+
+# ==   8.2  Reading Google sheets  =============================================
+#
+
+cat("  Defining readGsheet() ...\n")
+
+readGsheet <- function(URL, sheet, ...) {
+  # Read a sheet from a Google sheets URL to a spreadsheet file.
+  # URL: the URL of file location. Note: the document must have permissions
+  #      set for everyone with the link to be allowed to read.
+  # sheet: the name of the sheet
+  # ... : other arguments that are passed to utils::read.csv()
+  # value: a data frame
+
+  # We assume the URL was received from the sheet's sharing button, thus
+  # we parse out only the ID
+
+  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
+
+  # make a retrieval URL
+  URL <- sprintf("https://docs.google.com/spreadsheets/d/%s%s%s",
+                   ID,
+                   "/gviz/tq?tqx=out:csv&sheet=",
+                   gsub(" ", "+", sheet))
+
+  # the GET() function from httr will get the data.
+  response <- httr::GET(URL)
+  if (httr::status_code(response) != 200) {
+    stop(sprintf("Server status code was \"%s\".",
+                 as.character(httr::status_code(response))))
+  }
+
+  # Check whether reading the sheet returned "text/csv". Otherwise it may
+  # not be a spreadsheet, or we are getting a sign-in page (i.e. a permissions
+  # error).
+  if (! grepl("text/csv", response$headers$`content-type`) ) {
+    stop("
+  Request did not return \"text/csv\" content. This could mean:
+    -  Sheet access was denied and we got a sign-in page. Check permissions.
+       The sheet needs to readable by \"everyone with the link\".
+    -  The URL does not lead to a spreadsheet. Check it.
+    -  Something else happened. Check what the URL actually retrieves.")
+  }
+
+  x <-as.character(response)
+  x <- strsplit(x, "\n")[[1]]
+  x[1] <-      gsub("\\\"", "", x[1])
+  cNames <-  strsplit(x[1], ",")[[1]]  # Restore the original names from
+                                       # row 1 so we don't have to use the
+                                       # names that R assigns by default.
+  tbl <- utils::read.csv(text = x, ...)
+  colnames(tbl) <- cNames
+
+  return(tbl)
+
+}
+
+# Usage example
+if (FALSE) {
+  # This should work ...
+  x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "AA styles"
+  z <- readGsheet(x, y)
+
+  # This should fail (permissions) ...
+  x <- "1E4GHlgRlTU5Z1FdglNF5T_eR4-Guzkukq99stl35_I0"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "GC.csv"
+  z <- readGsheet(x, y)
+
+}
+
 
 
 
