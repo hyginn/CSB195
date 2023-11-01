@@ -15,29 +15,30 @@
 #TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   1        Install missing packages                              45
-#TOC>   2        Load required libraries                               65
-#TOC>   3        Load datasets                                         69
-#TOC>   4        Generic Utilities                                     76
-#TOC>   4.1        vr - make a row-vector                              79
-#TOC>   4.2        vc - make a column-vector                           96
-#TOC>   4.3        mmScale - min-max Scaling                          113
-#TOC>   4.4        A progress bar for long-running code               125
-#TOC>   4.5        Random IDs                                         161
-#TOC>   5        Generative AI                                        223
-#TOC>   5.1        t2c - write text to clipboard                      227
-#TOC>   5.2        Initialize generative AI initial prompt            245
-#TOC>   6        Remote control of ChimeraX                           275
-#TOC>   7        Bioinformatics Utilities                             356
-#TOC>   7.1        Find Keywords in aaindex                           359
-#TOC>   7.2        A colour palette for amino acids                   398
-#TOC>   7.3        Load the genetic code into a data frame            438
-#TOC>   7.4        Load an amino acid dataset                         446
-#TOC>   7.5        Convert one-letter symbols to three-letter         462
-#TOC>   7.6        Plotting amino acids as 2D scatterplot             546
-#TOC>   8        Working with Google assets                           606
-#TOC>   8.1        Extracting R code from Google docs                 609
-#TOC>   8.2        Reading Google sheets                              682
+#TOC>   1        Install missing packages                              46
+#TOC>   2        Load required libraries                               66
+#TOC>   3        Load datasets                                         70
+#TOC>   4        Generic Utilities                                     77
+#TOC>   4.1        vr - make a row-vector                              80
+#TOC>   4.2        vc - make a column-vector                           97
+#TOC>   4.3        mmScale - min-max Scaling                          114
+#TOC>   4.4        A progress bar for long-running code               126
+#TOC>   4.5        randSeed - large, random seeds                     162
+#TOC>   4.6        Random IDs                                         193
+#TOC>   5        Generative AI                                        255
+#TOC>   5.1        t2c - write text to clipboard                      259
+#TOC>   5.2        Initialize generative AI initial prompt            277
+#TOC>   6        Remote control of ChimeraX                           307
+#TOC>   7        Bioinformatics Utilities                             388
+#TOC>   7.1        Find Keywords in aaindex                           391
+#TOC>   7.2        A colour palette for amino acids                   430
+#TOC>   7.3        Load the genetic code into a data frame            470
+#TOC>   7.4        Load an amino acid dataset                         478
+#TOC>   7.5        Convert one-letter symbols to three-letter         494
+#TOC>   7.6        Plotting amino acids as 2D scatterplot             578
+#TOC>   8        Working with Google assets                           638
+#TOC>   8.1        Extracting R code from Google docs                 641
+#TOC>   8.2        Reading Google sheets                              714
 #TOC> 
 #TOC> ==========================================================================
 
@@ -158,7 +159,38 @@ if (FALSE) {
 
 }
 
-# ==   4.5  Random IDs  ========================================================
+# ==   4.5  randSeed - large, random seeds  ====================================
+#
+
+cat("  Defining randSeed() ...\n")
+
+randSeed <- function(verbose = TRUE) {
+  #' Return a random, positive integer between 1 and the largest integer that
+  #' can be represented on the system, usually 2,147,483,647. Also print that
+  #' number, if desired.
+  #' @examples
+  #' randSeed()
+  oldSeed <- .Random.seed                      # Save the current state
+  set.seed(NULL)                               # Randomize the PRNG
+  mySeed <- sample(0:.Machine$integer.max, 1)  # Fetch a value
+  .Random.seed <- oldSeed                      # Restore the PRNG
+  if (verbose) { print(sprintf("Seed: %i",     # print the number
+                               mySeed)) }
+  return(mySeed)
+}
+
+if (FALSE) {
+  randSeed()
+  set.seed((x <- randSeed()))  # x gets defined, but the value also gets used
+  sample(0:9)    # This is the result we want to reproduce
+  tmp <- runif(100)   # run the PRNGn for a bit
+  sample(0:9)    # Do we now get a different permutation? Yes.
+  set.seed(x)    # Reset the PRNG seed
+  sample(0:9)    # should be the same as before
+
+}
+
+# ==   4.6  Random IDs  ========================================================
 #
 
 cat("  Defining rID() ...\n")
