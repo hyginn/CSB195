@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              46
@@ -39,7 +39,7 @@
 #TOC>   8        Working with Google assets                           638
 #TOC>   8.1        Extracting R code from Google docs                 641
 #TOC>   8.2        Reading Google sheets                              714
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -304,11 +304,160 @@ Please confirm with one word.
 }
 
 
+# =    8  Working with Google assets  ==========================================
+#
+
+# ==   8.1  Extracting R code from Google docs  ================================
+#
+
+cat("  Defining fetchGoogleDocRCode ...\n")
+
+fetchGoogleDocRCode <- function (URL,
+                                 delimB = "^\\s*# begin code",
+                                 delimE = "^\\s*# end code",
+                                 myExt = ".R") {
+
+  # Retrieve text from a Google doc, subset to a delimited range, write to
+  # a tempfile() with extension ".R", and open it in the RStudio editor.
+  # Parameters:
+  #    URL     chr   URL of a Google doc that is open to share or contained
+  #                  in a shared folder
+  #    delimB  chr   regex pattern for the begin-delimiter
+  #    delimE  chr   regex pattern for the end-delimiter
+  #    myExt  chr   extension of tempfile. Default ".R"
+  # Value:           None. Executed for its side-effect of writing
+  #                  text to tempfile() and opening it in the editor
+  #
+
+  # Parse out the ID
+  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
+
+  # make a retrieval URL
+  URL <- sprintf("https://docs.google.com/document/d/%s%s",
+                 ID,
+                 "/export?format=txt")
+
+  # GET() the data.
+  response <- httr::GET(URL)
+  if (! httr::status_code(response) == 200) {
+    stop(sprintf("Server status code was \"%s\".",
+                 as.character(httr::status_code(response))))
+  }
+
+  s <- as.character(response)
+  s <- strsplit(s, "\r\n")[[1]]   # split into lines, delimited with \r\n
+  iBegin <- grep(delimB, s)       # find the two delimiter indices
+  iEnd   <- grep(delimE, s)
+
+  # Sanity checks
+  if (length(iBegin) == 0) {
+    stop("Begin-delimiter was not found in document.")
+  } else if (length(iEnd) == 0) {
+    stop("End-delimiter was not found in document.")
+  } else if (length(iBegin) > 1) {
+    stop("More than one Begin-delimiter in document.")
+  } else if (length(iEnd) > 1) {
+    stop("More than one End-delimiter in document.")
+  } else if ((iEnd - iBegin) < 2) {
+    stop("Nothing delimited or delimiter tags not correctly ordered.")
+  }
+
+  s <- s[(iBegin+1):(iEnd-1)]          # extract delimited text
+
+  myFile <- tempfile(fileext = ".R")   # get name for temporary file
+  write(s, myFile)                     # write s into temporary file
+  file.edit(myFile)                    # open in editor
+
+  return(invisible(NULL))              # return nothing
+}
+
+
+# Usage example:
+if (FALSE) {
+
+  fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
+
+}
+
+
+# ==   8.2  Reading Google sheets  =============================================
+#
+
+cat("  Defining readGsheet() ...\n")
+
+readGsheet <- function(URL, sheet, ...) {
+  # Read a sheet from a Google sheets URL to a spreadsheet file.
+  # URL: the URL of file location. Note: the document must have permissions
+  #      set for everyone with the link to be allowed to read.
+  # sheet: the name of the sheet
+  # ... : other arguments that are passed to utils::read.csv()
+  # value: a data frame
+
+  # We assume the URL was received from the sheet's sharing button, thus
+  # we parse out only the ID
+
+  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
+
+  # make a retrieval URL
+  URL <- sprintf("https://docs.google.com/spreadsheets/d/%s%s%s",
+                 ID,
+                 "/gviz/tq?tqx=out:csv&sheet=",
+                 gsub(" ", "+", sheet))
+
+  # the GET() function from httr will get the data.
+  response <- httr::GET(URL)
+  if (httr::status_code(response) != 200) {
+    stop(sprintf("Server status code was \"%s\".",
+                 as.character(httr::status_code(response))))
+  }
+
+  # Check whether reading the sheet returned "text/csv". Otherwise it may
+  # not be a spreadsheet, or we are getting a sign-in page (i.e. a permissions
+  # error).
+  if (! grepl("text/csv", response$headers$`content-type`) ) {
+    stop("
+  Request did not return \"text/csv\" content. This could mean:
+    -  Sheet access was denied and we got a sign-in page. Check permissions.
+       The sheet needs to readable by \"everyone with the link\".
+    -  The URL does not lead to a spreadsheet. Check it.
+    -  Something else happened. Check what the URL actually retrieves.")
+  }
+
+  x <-as.character(response)
+  x <- strsplit(x, "\n")[[1]]
+  x[1] <-      gsub("\\\"", "", x[1])
+  cNames <-  strsplit(x[1], ",")[[1]]  # Restore the original names from
+  # row 1 so we don't have to use the
+  # names that R assigns by default.
+  tbl <- utils::read.csv(text = x, ...)
+  colnames(tbl) <- cNames
+
+  return(tbl)
+
+}
+
+# Usage example
+if (FALSE) {
+  # This should work ...
+  x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "AA styles"
+  z <- readGsheet(x, y)
+
+  # This should fail (permissions) ...
+  x <- "1E4GHlgRlTU5Z1FdglNF5T_eR4-Guzkukq99stl35_I0"
+  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
+  y <- "GC.csv"
+  z <- readGsheet(x, y)
+
+}
+
+
 # =    6  Remote control of ChimeraX  ==========================================
 #
 
-cat(sprintf("  Defining ChimeraX port (CXPORT) as %d.\n", CXPORT))
 CXPORT <- 61803
+cat(sprintf("  Defined ChimeraX port (CXPORT) as %d.\n", CXPORT))
 
 
 cat("  Defining CX() ...\n")
@@ -635,153 +784,6 @@ if (FALSE) {
 }
 
 
-# =    8  Working with Google assets  ==========================================
-#
-
-# ==   8.1  Extracting R code from Google docs  ================================
-#
-
-cat("  Defining fetchGoogleDocRCode ...\n")
-
-fetchGoogleDocRCode <- function (URL,
-                                 delimB = "^\\s*# begin code",
-                                 delimE = "^\\s*# end code",
-                                 myExt = ".R") {
-
-  # Retrieve text from a Google doc, subset to a delimited range, write to
-  # a tempfile() with extension ".R", and open it in the RStudio editor.
-  # Parameters:
-  #    URL     chr   URL of a Google doc that is open to share or contained
-  #                  in a shared folder
-  #    delimB  chr   regex pattern for the begin-delimiter
-  #    delimE  chr   regex pattern for the end-delimiter
-  #    myExt  chr   extension of tempfile. Default ".R"
-  # Value:           None. Executed for its side-effect of writing
-  #                  text to tempfile() and opening it in the editor
-  #
-
-  # Parse out the ID
-  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
-
-  # make a retrieval URL
-  URL <- sprintf("https://docs.google.com/document/d/%s%s",
-                 ID,
-                 "/export?format=txt")
-
-  # GET() the data.
-  response <- httr::GET(URL)
-  if (! httr::status_code(response) == 200) {
-    stop(sprintf("Server status code was \"%s\".",
-                 as.character(httr::status_code(response))))
-  }
-
-  s <- as.character(response)
-  s <- strsplit(s, "\r\n")[[1]]   # split into lines, delimited with \r\n
-  iBegin <- grep(delimB, s)       # find the two delimiter indices
-  iEnd   <- grep(delimE, s)
-
-  # Sanity checks
-  if (length(iBegin) == 0) {
-    stop("Begin-delimiter was not found in document.")
-  } else if (length(iEnd) == 0) {
-    stop("End-delimiter was not found in document.")
-  } else if (length(iBegin) > 1) {
-    stop("More than one Begin-delimiter in document.")
-  } else if (length(iEnd) > 1) {
-    stop("More than one End-delimiter in document.")
-  } else if ((iEnd - iBegin) < 2) {
-    stop("Nothing delimited or delimiter tags not correctly ordered.")
-  }
-
-  s <- s[(iBegin+1):(iEnd-1)]          # extract delimited text
-
-  myFile <- tempfile(fileext = ".R")   # get name for temporary file
-  write(s, myFile)                     # write s into temporary file
-  file.edit(myFile)                    # open in editor
-
-  return(invisible(NULL))              # return nothing
-}
-
-
-# Usage example:
-if (FALSE) {
-
-  fetchGoogleDocRCode("https://docs.google.com/document/d/15qUO3WwKZSqK84gNj8XZIrCe6Ih791oFfGTJ82nuM_w/edit?usp=sharing")
-
-}
-
-
-# ==   8.2  Reading Google sheets  =============================================
-#
-
-cat("  Defining readGsheet() ...\n")
-
-readGsheet <- function(URL, sheet, ...) {
-  # Read a sheet from a Google sheets URL to a spreadsheet file.
-  # URL: the URL of file location. Note: the document must have permissions
-  #      set for everyone with the link to be allowed to read.
-  # sheet: the name of the sheet
-  # ... : other arguments that are passed to utils::read.csv()
-  # value: a data frame
-
-  # We assume the URL was received from the sheet's sharing button, thus
-  # we parse out only the ID
-
-  ID <- regmatches(URL, regexec("/d/([^/]+)/", URL))[[1]][2]
-
-  # make a retrieval URL
-  URL <- sprintf("https://docs.google.com/spreadsheets/d/%s%s%s",
-                   ID,
-                   "/gviz/tq?tqx=out:csv&sheet=",
-                   gsub(" ", "+", sheet))
-
-  # the GET() function from httr will get the data.
-  response <- httr::GET(URL)
-  if (httr::status_code(response) != 200) {
-    stop(sprintf("Server status code was \"%s\".",
-                 as.character(httr::status_code(response))))
-  }
-
-  # Check whether reading the sheet returned "text/csv". Otherwise it may
-  # not be a spreadsheet, or we are getting a sign-in page (i.e. a permissions
-  # error).
-  if (! grepl("text/csv", response$headers$`content-type`) ) {
-    stop("
-  Request did not return \"text/csv\" content. This could mean:
-    -  Sheet access was denied and we got a sign-in page. Check permissions.
-       The sheet needs to readable by \"everyone with the link\".
-    -  The URL does not lead to a spreadsheet. Check it.
-    -  Something else happened. Check what the URL actually retrieves.")
-  }
-
-  x <-as.character(response)
-  x <- strsplit(x, "\n")[[1]]
-  x[1] <-      gsub("\\\"", "", x[1])
-  cNames <-  strsplit(x[1], ",")[[1]]  # Restore the original names from
-                                       # row 1 so we don't have to use the
-                                       # names that R assigns by default.
-  tbl <- utils::read.csv(text = x, ...)
-  colnames(tbl) <- cNames
-
-  return(tbl)
-
-}
-
-# Usage example
-if (FALSE) {
-  # This should work ...
-  x <- "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o"
-  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
-  y <- "AA styles"
-  z <- readGsheet(x, y)
-
-  # This should fail (permissions) ...
-  x <- "1E4GHlgRlTU5Z1FdglNF5T_eR4-Guzkukq99stl35_I0"
-  x <- sprintf("https://docs.google.com/spreadsheets/d/%s/edit?usp=sharing", x)
-  y <- "GC.csv"
-  z <- readGsheet(x, y)
-
-}
 
 
 
