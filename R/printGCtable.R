@@ -2,13 +2,15 @@
 #
 # Purpose: Define the function printGCtable() to print alternate tables for
 #          presenting the genetic code.
-# Version: 1.1
-# Date:    2023-09-25
+# Version: 1.2
+# Date:    2023-09 - 2023-11
 # Author:  CSB195 with ChatGPT-4
 #
 #  THIS SCRIPT CAN BE SOURCE()'D WITHOUT SIDE EFFECT TO LOAD THE FUNCTION.
 #
 # Versions:
+#      1.2  Make standard code layout the default. Accept a code vector
+#           as input.
 #      1.1  Change to work with both one-letter and three-letter codes
 #      1.0  Basic running code
 #
@@ -54,33 +56,65 @@ GCDAT <- "data/GeneticCode.csv"
 # ====  FUNCTIONS  =============================================================
 
 # ChatGPT code, unaltered:
-printGCtable <- function(nuc, order, dat, aaColName = "Aaa") {
+printGCtable <- function(nuc = c("T", "C", "G", "A"),
+                         order = c(1, 2, 3),
+                         gc,
+                         dat = GCdf,
+                         aaColName = "Aaa") {
   # Parameters:
-  #   nuc: a permutation of {A, C, G, T} in the order they should appear
-  #        in the table
-  #   order: a permutation of {1, 2, 3} corresponding which nucleotide
-  #        should vary in the tables, rows, columns, and blocks, resspectively
-  #   dat: a data frame with the genetic code: required columns are
-  #        "First", "Second", "Third", "Codon" and the column name for the
-  #        encoded amino acid - either "Aaa" (default) or "A".
+  #   nuc:       a permutation of {A, C, G, T} in the order they should appear
+  #                in the table. Default: T C G A.
+  #   order:     a permutation of {1, 2, 3} corresponding which nucleotide
+  #                should vary in the tables, rows, columns, and blocks,
+  #                respectively. Default: 1 2 3.
+  #   gc:        a genetic code vector with 64 symbols name()'d with the
+  #                64 codons. If missing, the code is taken from "dat".
+  #   dat:       a data frame with the genetic code: required columns are
+  #                "Codon" and the column that is named for the
+  #                encoded amino acid symbol - either "Aaa" (default) or "A".
+  #   aaColName: the column that contains the symbols that are printed
+  #                with their respective codons in the table.
+  #
+  #   Valid parameter combinations reflect three major use cases:
+  #    (a) to print a genetic code vector in the standard table, use:
+  #        printGCtable(v = myGC).
+  #    (b) to print the universal code in a different table, use something
+  #        like  printGCtable(order = 3:1).
 
   # Check input consistency
-  if (length(nuc) != 4 ) {
-    stop("Ensure \"nuc\" has length 4.")
+  if (! all(sort(nuc) == c("A", "C", "G", "T")) ) {
+    stop("\"nuc\" is not a permutation of A C G T.")
   }
-  if (length(order) != 3 || !all(order %in% 1:3)) {
-    stop("Ensure \"order\" has three unique values between 1 and 3.")
+  if (! all(sort(order) == 1:3)) {
+    stop("\"order\" is not a permutation of 1 2 3.")
   }
+
   if (! any(aaColName == colnames(dat))) {
-    stop(sprintf("Columname \"%s\" does not appear in the dataframe \"dat\"",
+    stop(sprintf("aaColName \"%s\" does not appear in the dataframe \"dat\"",
                  aaColName))
   }
 
-  row_pos <- order[1]
-  col_pos <- order[2]
+  # Create gc if missing
+  if (missing(gc)) {
+    gc <- dat[ , aaColName]
+    names(gc) <- dat$codons
+  } else {
+    # Check GC's consistency
+    if (length(gc) != 64 ) {
+      stop("\"gc\" does not contain 64 elements.")
+    }
+    if (! all(sort(names(gc)) == sort(dat$Codon)) ) {
+      stop("\"gc\" is not named with the 64 codons.")
+    }
+    dat[ , aaColName] <- gc    # Overwrite that column with the symbols in the
+                               # input vector
+  }
+
+  row_pos  <- order[1]
+  col_pos  <- order[2]
   cell_pos <- order[3]
 
-  # Define function to extract value based on position
+  # Define helper function to extract value based on position
   extract_val <- function(df_row, pos) {
     if (pos == 1) return(df_row$First)
     if (pos == 2) return(df_row$Second)
@@ -111,8 +145,9 @@ printGCtable <- function(nuc, order, dat, aaColName = "Aaa") {
 #
 
 if (FALSE) {
-  GCdf <- read.csv(GCDAT)
+  if (! exists("GCdf")) { GCdf <- read.csv(GCDAT) }
   printGCtable(nuc = c("A", "C", "G", "T"), order = c(2, 3, 1), dat = GCdf)
+
 
 
 }
@@ -122,9 +157,13 @@ if (FALSE) {
 
 if (FALSE) {
 
-  # Validate:
+  if (! exists("GCDAT")) { GCDAT <- "data/GeneticCode.csv" }
+  if (! exists("GCdf")) { GCdf <- read.csv(GCDAT) }
 
   # This should produce the standard way to print the code:
+  # ... all defaults
+  printGCtable()
+
   # ... three-letter code
   printGCtable(nuc = c("T", "C", "A", "G"), order = c(1, 2, 3), dat = GCdf)
 
@@ -134,7 +173,19 @@ if (FALSE) {
                dat = GCdf,
                aaColName = "A")
 
+  # ... Three letter code, reversed, using defaults:
+  printGCtable(nuc = c("G", "A", "C", "T"),
+               order = c(2, 1, 3))
+
+
+  # ... a shuffled code with all-upper case three-letter symbols, in
+  #     standard order
+  myGC <- toupper(sample(GCdf$Aaa))
+  names(myGC) <- GCdf$Codon
+  printGCtable(gc = myGC)
+
 
 }
+
 
 # [END]
