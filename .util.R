@@ -12,34 +12,36 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   1        Install missing packages                              46
-#TOC>   2        Load required libraries                               66
-#TOC>   3        Load datasets                                         70
-#TOC>   4        Generic Utilities                                     77
-#TOC>   4.1        vr - make a row-vector                              80
-#TOC>   4.2        vc - make a column-vector                           97
-#TOC>   4.3        mmScale - min-max Scaling                          114
-#TOC>   4.4        A progress bar for long-running code               126
-#TOC>   4.5        randSeed - large, random seeds                     162
-#TOC>   4.6        Random IDs                                         193
-#TOC>   5        Generative AI                                        255
-#TOC>   5.1        t2c - write text to clipboard                      259
-#TOC>   5.2        Initialize generative AI initial prompt            277
-#TOC>   6        Remote control of ChimeraX                           307
-#TOC>   7        Bioinformatics Utilities                             388
-#TOC>   7.1        Find Keywords in aaindex                           391
-#TOC>   7.2        A colour palette for amino acids                   430
-#TOC>   7.3        Load the genetic code into a data frame            470
-#TOC>   7.4        Load an amino acid dataset                         478
-#TOC>   7.5        Convert one-letter symbols to three-letter         494
-#TOC>   7.6        Plotting amino acids as 2D scatterplot             578
-#TOC>   8        Working with Google assets                           638
-#TOC>   8.1        Extracting R code from Google docs                 641
-#TOC>   8.2        Reading Google sheets                              714
-#TOC>
+#TOC>   1        Install missing packages                              48
+#TOC>   2        Load required libraries                               68
+#TOC>   3        Load datasets                                         72
+#TOC>   4        Generic Utilities                                     79
+#TOC>   4.1        vr - make a row-vector                              82
+#TOC>   4.2        vc - make a column-vector                           99
+#TOC>   4.3        mmScale - min-max Scaling                          116
+#TOC>   4.4        A progress bar for long-running code               128
+#TOC>   4.5        randSeed - large, random seeds                     164
+#TOC>   4.6        Random IDs                                         195
+#TOC>   5        Generative AI                                        257
+#TOC>   5.1        t2c - write text to clipboard                      261
+#TOC>   5.2        Initialize generative AI initial prompt            279
+#TOC>   6        Working with Google assets                           309
+#TOC>   6.1        Extracting R code from Google docs                 312
+#TOC>   6.2        Reading Google sheets                              385
+#TOC>   7        Remote control of ChimeraX                           458
+#TOC>   8        Bioinformatics Utilities                             539
+#TOC>   8.1        Find Keywords in aaindex                           542
+#TOC>   8.2        A colour palette for amino acids                   581
+#TOC>   8.3        Load the genetic code into a data frame            621
+#TOC>   8.4        Load an amino acid dataset                         629
+#TOC>   8.5        Convert one-letter symbols to three-letter         645
+#TOC>   8.6        Plotting amino acids as 2D scatterplot             729
+#TOC>   9        Plot Utilities                                       788
+#TOC>   9.1        Draw a triangle on an existing plot                790
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -304,10 +306,10 @@ Please confirm with one word.
 }
 
 
-# =    8  Working with Google assets  ==========================================
+# =    6  Working with Google assets  ==========================================
 #
 
-# ==   8.1  Extracting R code from Google docs  ================================
+# ==   6.1  Extracting R code from Google docs  ================================
 #
 
 cat("  Defining fetchGoogleDocRCode ...\n")
@@ -380,7 +382,7 @@ if (FALSE) {
 }
 
 
-# ==   8.2  Reading Google sheets  =============================================
+# ==   6.2  Reading Google sheets  =============================================
 #
 
 cat("  Defining readGsheet() ...\n")
@@ -453,7 +455,7 @@ if (FALSE) {
 }
 
 
-# =    6  Remote control of ChimeraX  ==========================================
+# =    7  Remote control of ChimeraX  ==========================================
 #
 
 CXPORT <- 61803
@@ -534,10 +536,10 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 }
 
 
-# =    7  Bioinformatics Utilities  ============================================
+# =    8  Bioinformatics Utilities  ============================================
 #
 
-# ==   7.1  Find Keywords in aaindex  ==========================================
+# ==   8.1  Find Keywords in aaindex  ==========================================
 #
 
 cat("  Defining grepAAindex() ...\n")
@@ -576,7 +578,7 @@ grepAAindex <- function(key, el = "D") {
 # cat(sprintf("\n%s\t%s", names(aaindex[[idx]]$I), aaindex[[idx]]$I))
 
 
-# ==   7.2  A colour palette for amino acids  ==================================
+# ==   8.2  A colour palette for amino acids  ==================================
 #
 
 cat("  Defining AACOLS ...\n")
@@ -616,7 +618,7 @@ AACOLS["P"] <- "#edc06d" # Proline
 # AACOLS <- gsub("..$", "FF", AACOLS)  # Reset the two last digits to "FF"
                                        #   to remove transparency
 
-# ==   7.3  Load the genetic code into a data frame  ===========================
+# ==   8.3  Load the genetic code into a data frame  ===========================
 #
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
@@ -624,7 +626,7 @@ cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 GCdf <- utils::read.csv("data/GeneticCode.csv")
 
 
-# ==   7.4  Load an amino acid dataset  ========================================
+# ==   8.4  Load an amino acid dataset  ========================================
 #
 
 cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
@@ -640,7 +642,7 @@ rownames(AADAT) <- AADAT$A
 
 
 
-# ==   7.5  Convert one-letter symbols to three-letter  ========================
+# ==   8.5  Convert one-letter symbols to three-letter  ========================
 #
 
 cat("  Defining A2Aaa ...\n")
@@ -724,7 +726,7 @@ if (FALSE) {
 
 
 
-# ==   7.6  Plotting amino acids as 2D scatterplot  ============================
+# ==   8.6  Plotting amino acids as 2D scatterplot  ============================
 #
 
 cat("  Defining plotAA() ...\n")
@@ -783,7 +785,42 @@ if (FALSE) {
 
 }
 
+# =    9  Plot Utilities  ======================================================
 
+# ==   9.1  Draw a triangle on an existing plot  ===============================
+
+
+cat("  Defining triangle() ...\n")
+
+triangle <- function(xT, yT,          # tip coordinates
+                     frac = 0.05,     # size as fraction of x-axis width
+                     asp = 1.5,       # aspect ratio: > 1 for taller triangles
+                     tip = "below",   # tip above or below base?
+                     ...){            # additional parameters for polygon()
+
+  # Adds an equilateral triangle to the current plot. Tip is at (xT, yT).
+  # Side length is frac fraction of x-axis width in user coordinates.
+  # Triangle can point up or down.
+
+
+  usr <- par("usr")                           # Get user coordinates
+  dx <- usr[2] - usr[1]                       # Calculate x-axis range
+  dy <- usr[4] - usr[3]                       # Calculate y-axis range
+  aT <- frac * dx                             # Calculate side length
+  hT <- (sqrt(3) / 2) * aT * (dy / dx) * asp  # Calculate the height
+  ht <- ifelse(tip == "above", -hT, hT)       # Point triangle up or down
+
+  vT <- matrix(nrow = 3, ncol = 2)            # Store three vertex coordinates
+  vT[1,] <- c(xT, yT)                         # Tip (middle)
+  vT[2,] <- c(xT - aT / 2, yT + hT)           # Left
+  vT[3,] <- c(xT + aT / 2, yT + hT)           # Right
+  rownames(vT) <- c("tip", "left", "right")   # Add row names, and
+  colnames(vT) <- c("x", "y")                 # ... column names
+
+  polygon(vT, ...)                            # Draw the triangle
+  return(invisible(vT))                       # Return the vertices
+
+}
 
 
 
