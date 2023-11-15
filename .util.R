@@ -12,36 +12,37 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   1        Install missing packages                              48
-#TOC>   2        Load required libraries                               68
-#TOC>   3        Load datasets                                         72
-#TOC>   4        Generic Utilities                                     79
-#TOC>   4.1        vr - make a row-vector                              82
-#TOC>   4.2        vc - make a column-vector                           99
-#TOC>   4.3        mmScale - min-max Scaling                          116
-#TOC>   4.4        A progress bar for long-running code               128
-#TOC>   4.5        randSeed - large, random seeds                     164
-#TOC>   4.6        Random IDs                                         195
-#TOC>   5        Generative AI                                        257
-#TOC>   5.1        t2c - write text to clipboard                      261
-#TOC>   5.2        Initialize generative AI initial prompt            279
-#TOC>   6        Working with Google assets                           309
-#TOC>   6.1        Extracting R code from Google docs                 312
-#TOC>   6.2        Reading Google sheets                              385
-#TOC>   7        Remote control of ChimeraX                           458
-#TOC>   8        Bioinformatics Utilities                             539
-#TOC>   8.1        Find Keywords in aaindex                           542
-#TOC>   8.2        A colour palette for amino acids                   581
-#TOC>   8.3        Load the genetic code into a data frame            621
-#TOC>   8.4        Load an amino acid dataset                         629
-#TOC>   8.5        Convert one-letter symbols to three-letter         645
-#TOC>   8.6        Plotting amino acids as 2D scatterplot             729
-#TOC>   9        Plot Utilities                                       788
-#TOC>   9.1        Draw a triangle on an existing plot                790
-#TOC> 
+#TOC>   1        Install missing packages                              49
+#TOC>   2        Load required libraries                               69
+#TOC>   3        Load datasets                                         73
+#TOC>   4        Generic Utilities                                     80
+#TOC>   4.1        vr - make a row-vector                              83
+#TOC>   4.2        vc - make a column-vector                          100
+#TOC>   4.3        mmScale - min-max Scaling                          117
+#TOC>   4.4        A progress bar for long-running code               129
+#TOC>   4.5        randSeed - large, random seeds                     165
+#TOC>   4.6        Random IDs                                         196
+#TOC>   5        Generative AI                                        258
+#TOC>   5.1        t2c - write text to clipboard                      262
+#TOC>   5.2        Initialize generative AI initial prompt            280
+#TOC>   6        Working with Google assets                           310
+#TOC>   6.1        Extracting R code from Google docs                 313
+#TOC>   6.2        Reading Google sheets                              386
+#TOC>   7        Remote control of ChimeraX                           459
+#TOC>   8        Bioinformatics Utilities                             540
+#TOC>   8.1        Find Keywords in aaindex                           543
+#TOC>   8.2        A colour palette for amino acids                   582
+#TOC>   8.3        Load the genetic code into a data frame            622
+#TOC>   8.4        Load an amino acid dataset                         630
+#TOC>   8.5        Convert one-letter symbols to three-letter         646
+#TOC>   8.6        Dotplot                                            728
+#TOC>   8.7        Plotting amino acids as 2D scatterplot             845
+#TOC>   9        Plot Utilities                                       904
+#TOC>   9.1        Draw a triangle on an existing plot                906
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -724,9 +725,124 @@ if (FALSE) {
 
 }
 
+# ==   8.6  Dotplot  ===========================================================
+#
 
 
-# ==   8.6  Plotting amino acids as 2D scatterplot  ============================
+dotPlot2 <- function(A, B,        # sequence vectors
+                     f,           # filter
+                     MDM,         # A Mutation Data Matrix
+                     palette,     # a function that returns color values
+                     xlab = "",
+                     ylab = "") {
+  # Purpose:
+  #     Create a dotplot to measure sequence similarity between
+  #     two amino acid sequences
+  # Version:  1.0
+  # Date:     2016-09
+  # Author:   Boris Steipe
+  #
+  # Parameters:
+  #     A, B: vectors that contain no letters that are not found in MDM
+  #     f: filter matrix to weight an average around the neighborhood of
+  #        an amino acid pair. Default to the identity matrix if missing.
+  #        Average over a window of length f if length(f) is 1.
+  #     MDM: A mutation Data matrix. If missing, create one from aaSim()
+  #     palette: rainbow(), cm.colors(), or another function that returns
+  #              a palette of color hexcodes. If missing, make our own
+  #              palette.
+  # Value:
+  #     none. creates a dotplot.
+
+
+  if (missing(f)) {
+    f <- matrix(1) # default
+  } else if (length(f) == 1) {
+    if (! f %% 2) {stop("Sorry: f must be odd.")}
+    w <- f
+    f <- matrix(numeric(w * w), nrow = w)
+    for (i in 1:w) { f[i, i] <- 1 }  # identity matrix
+  }
+
+  if (missing(MDM)) {
+    aa <- c(AADAT$A, "*")
+    MDM <- matrix(numeric(length(aa)^2), nrow = length(aa))
+    for (i in 1:length(aa)) {
+      for (j in 1:length(aa)) {
+        MDM[i,j] <- aaSim(aa[i], aa[j])
+      }
+    }
+    rownames(MDM) <- aa
+    colnames(MDM) <- aa
+  }
+
+
+  if (missing(palette)) {
+    palette <- colorRampPalette(c("#FE333D", # red
+                                  "#F09371",  # orange
+                                  "#CCCCCC",  # grey
+                                  "#D7D7D7",  # grey
+                                  "#E1E1E1",  # grey
+                                  "#ECECEC",  # grey
+                                  "#F6F6F6"), # white
+                                bias = 0.8)
+  }
+  lA <- length(A)
+  lB <- length(B)
+
+  m <- matrix(numeric(lA * lB), nrow = lA, ncol = lB)
+  for (i in 1:lA) {
+    for (j in 1:lB) {
+      m[i, j] <- MDM[A[i], B[j]]
+    }
+  }
+  m2 <- m
+  wr <- floor((dim(f)[1] - 1) / 2)  # half-window size for rows
+  wc <- floor((dim(f)[2] - 1) / 2)  # half-window size for columns
+
+  for (i in (wr + 1):(lA - wr)) {
+    for (j in (wc + 1):(lB - wc)) {
+      # apply the filter to each value in m by weighting and summing
+      # over its wr x wc neighborhood. Put the new value in m2
+      m2[i, j] <- sum(f * m[(i-wr):(i+wr), (j-wc):(j+wc)])
+    }
+  }
+  image(1:lA, 1:lB, m2,
+        col = palette(24),
+        ylim=c(lB,1), xlim=c(1,lA),
+        xlab = xlab,
+        ylab = ylab,
+        axes = FALSE)
+  box()
+
+  # find good values for axis ticks and gridlines
+  steps <- c(1, 2, 5, 10, 20, 50, 100, 200, 500,
+             1000, 2000, 5000, 10000, 20000, 50000)
+  gridStep <- sum(steps < max(lA, lB))
+
+  # draw axes
+  axis(1, at = c(1, seq(steps[gridStep - 3], lA, by=steps[gridStep - 3])))
+  axis(2, at = c(1, seq(steps[gridStep - 3], lB, by=steps[gridStep - 3])))
+  axis(3, at = c(1, seq(steps[gridStep - 3], lA, by=steps[gridStep - 3])))
+  axis(4, at = c(1, seq(steps[gridStep - 2], lB, by=steps[gridStep - 3])))
+
+  # draw grid with thin, transparent lines
+  for (pos in seq(steps[gridStep - 2], lA, by = steps[gridStep - 2])) {
+    abline(v=pos, col = "#FFFFFF44", lwd = 0.5)
+  }
+  for (pos in seq(steps[gridStep - 2], lB, by = steps[gridStep - 2])) {
+    abline(h=pos, col = "#FFFFFF44", lwd = 0.5)
+  }
+
+  return(invisible(m2))
+
+}
+
+
+
+
+
+# ==   8.7  Plotting amino acids as 2D scatterplot  ============================
 #
 
 cat("  Defining plotAA() ...\n")
