@@ -140,8 +140,9 @@ if (FALSE) {
   aaSim("F", "I")   # quite similar
   aaSim("Q", "*")   # quite different
   aaSim("*", "G")   # same as above
+  aaSim("*", "*")   # same as above
 
-  # Sanity check: Find the smallest and largets pairwise distance
+  # Sanity check: Find the smallest and largest pairwise distance
   # recreate the distance matrix
   aa <- unlist(strsplit("ACDEFGHIKLMNPQRSTVWY", ""))
   x <- matrix(numeric(400), nrow = 20)
@@ -153,7 +154,7 @@ if (FALSE) {
   # Print minima and maxima (most and least similar)
   dMin <- min(x[x > 0])  # ignore 0, these are just the identical
   dMax <- max(x[x > 0])  # amino acids
-  for (i in 1:19) {
+  for (i in 1:19) {      # real amino acids only, no stop-codons
     for (j in i:20) {
       if (x[i, j] == dMin) {
         cat(sprintf("min: (%s, %s) = %.3f\n", aa[i], aa[j], x[i, j]))
@@ -165,6 +166,9 @@ if (FALSE) {
   # This may vary with the distance matrix details, but will probably turn out
   # to make (I, V) the minimum distance pair, (I, P) the maximum distance pair.
 
+  x <- as.vector(x[1:19, 1:19])  # collapse the non-stop elements into a vector
+  x <- x[x > 0]                  # remove all zero values
+  summary(x)                     # print the summary
 
 }  # end if (FALSE) ...
 
