@@ -5,11 +5,12 @@
 #            evolution that shaped it.
 #
 #
-# Version: 1.0
+# Version: 1.1
 # Date:    2023-11
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.1  Updated the "RADAR" prompt
 #   1.0  Tutorial version
 #   0.5  First draft of contents. Used material from BIN-SEQA-Composition and
 #          BIN-ALI-Dotplot.
@@ -24,23 +25,23 @@
 #TOC> 
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
-#TOC>   1        Preparation: packages                                     70
-#TOC>   2        Introduction                                              93
-#TOC>   2.01       Terminology:                                            97
-#TOC>   2.02       Sources of Information                                 124
-#TOC>   3        Download and inspect a PPP2R1A sequence                  158
-#TOC>   3.01       Download and save a PPP2R1A sequence                   160
-#TOC>   3.02       Read a sequence from file                              165
-#TOC>   3.03       Analyse a protein sequence                             194
-#TOC>   3.04       Barplot, and side-by-side barplot                      232
-#TOC>   3.05       Plotting ratios                                        267
-#TOC>   3.06       Plotting log ratios                                    285
-#TOC>   3.07       Sort by frequency                                      301
-#TOC>   3.08       Color by amino acid type                               319
-#TOC>   3.09       Dotplot: Sequence comparison                           348
-#TOC>   3.10       Customizing the dotplot                                410
-#TOC>   3.11       Finding repeats in sequences                           473
-#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           480
+#TOC>   1        Preparation: packages                                     71
+#TOC>   2        Introduction                                              94
+#TOC>   2.01       Terminology:                                            98
+#TOC>   2.02       Sources of Information                                 125
+#TOC>   3        Download and inspect a PPP2R1A sequence                  159
+#TOC>   3.01       Download and save a PPP2R1A sequence                   161
+#TOC>   3.02       Read a sequence from file                              166
+#TOC>   3.03       Analyse a protein sequence                             195
+#TOC>   3.04       Barplot, and side-by-side barplot                      233
+#TOC>   3.05       Plotting ratios                                        268
+#TOC>   3.06       Plotting log ratios                                    286
+#TOC>   3.07       Sort by frequency                                      302
+#TOC>   3.08       Color by amino acid type                               320
+#TOC>   3.09       Dotplot: Sequence comparison                           349
+#TOC>   3.10       Customizing the dotplot                                411
+#TOC>   3.11       Finding repeats in sequences                           474
+#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           484
 #TOC> 
 #TOC> ==========================================================================
 
@@ -472,8 +473,11 @@ if (FALSE) {
 
 # ==   3.11  Finding repeats in sequences  =====================================
 
-t2c("I think there may be sequence repeats in the PP2A subunit A sequence. I am working in R - can you figure out how to identify sequence repeats? The sequence is in a Biostrings AA stringset object called \"PPP2R1A\", or alternatively in a single letter symbol vector called vPP2Aa. Thanks!")
+t2c("The protein structure looks like there may be sequence repeats in the PP2A subunit A sequence, of one or two dozen residues in length or so. Could you kindly explain the nature and significance of sequence repeats? \n\nI am working in R - can you figure out how to identify such sequence repeats? The sequence is in a Biostrings AA stringset object called \"PPP2R1A\", or alternatively in a single letter symbol vector called vPP2Aa. I have heard of a utility called \"RADAR\". Is that available for R - or is there an online server? Thanks!")
 
+# You should be given a general overview, and hints how to access the RADAR
+# server at the EBI, among the "tools" they are making available on thier main
+# Web page. Run a RADASR analysis. Look at the results, what do you think?
 
 
 
