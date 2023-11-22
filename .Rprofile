@@ -3,7 +3,9 @@
 # This file is automatically run when your R project starts up.
 
 # Set a CDN backed CRAN mirror
-options(repos = c(CRAN="https://cloud.r-project.org/"))
+# options(repos = c(CRAN="https://cloud.r-project.org/"))
+options(repos = c(CRAN="https://mirror.csclub.uwaterloo.ca/CRAN/"))
+
 
 # Run initialization scripts
 cat("\n")
