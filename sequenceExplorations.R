@@ -5,11 +5,13 @@
 #            evolution that shaped it.
 #
 #
-# Version: 1.4
+# Version: 1.6
 # Date:    2023-11
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.6  Add Sequence Logo
+#   1.5  Add MSA
 #   1.4  Add Superposition induced alignment, UPGMA tree
 #   1.3  Explore 1B3U via ChimeraX scripting (cf. RPR-ChimeraX_remote.R)
 #   1.2  Add RADAR results
@@ -28,34 +30,35 @@
 #TOC> 
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
-#TOC>   1        Preparation: packages                                     85
-#TOC>   1.01       Preparation: Helper functions                          145
-#TOC>   2        Introduction                                             162
-#TOC>   2.01       Terminology:                                           166
-#TOC>   2.02       Sources of Information                                 193
-#TOC>   3        Download and inspect a PPP2R1A sequence                  227
-#TOC>   3.01       Download and save a PPP2R1A sequence                   229
-#TOC>   3.02       Read a sequence from file                              234
-#TOC>   3.03       Analyse a protein sequence                             261
-#TOC>   3.04       Barplot, and side-by-side barplot                      299
-#TOC>   3.05       Plotting ratios                                        337
-#TOC>   3.06       Plotting log ratios                                    358
-#TOC>   3.07       Sort by frequency                                      377
-#TOC>   3.08       Colour by amino acid type                              398
-#TOC>   3.09       Dotplot: Sequence comparison                           430
-#TOC>   3.10       Customizing the dotplot                                492
-#TOC>   3.11       Finding repeats in sequences                           555
-#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           609
-#TOC>   4.01       The trouble with sequence numbers                      663
-#TOC>   4.02       Mapping RADAR repeats to structure                     730
-#TOC>   5        Sequence alignment / Structure superposition             769
-#TOC>   5.01       A multiple structure superposition                     778
-#TOC>   5.01.1         Defining secondary structure boundaries            793
-#TOC>   5.02       Split the chain                                        920
-#TOC>   5.03       Superpositions                                         949
-#TOC>   5.04       Superposition induced alignment (SIA)                 1010
-#TOC>   6        SIA-based phylogenetic tree                             1195
-#TOC>   7        Multiple Sequence alignment                             1226
+#TOC>   1        Preparation: packages                                     88
+#TOC>   1.01       Preparation: Helper functions                          155
+#TOC>   2        Introduction                                             172
+#TOC>   2.01       Terminology:                                           176
+#TOC>   2.02       Sources of Information                                 203
+#TOC>   3        Download and inspect a PPP2R1A sequence                  237
+#TOC>   3.01       Download and save a PPP2R1A sequence                   239
+#TOC>   3.02       Read a sequence from file                              244
+#TOC>   3.03       Analyse a protein sequence                             271
+#TOC>   3.04       Barplot, and side-by-side barplot                      309
+#TOC>   3.05       Plotting ratios                                        347
+#TOC>   3.06       Plotting log ratios                                    368
+#TOC>   3.07       Sort by frequency                                      387
+#TOC>   3.08       Colour by amino acid type                              408
+#TOC>   3.09       Dotplot: Sequence comparison                           440
+#TOC>   3.10       Customizing the dotplot                                502
+#TOC>   3.11       Finding repeats in sequences                           565
+#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           619
+#TOC>   4.01       The trouble with sequence numbers                      673
+#TOC>   4.02       Mapping RADAR repeats to structure                     740
+#TOC>   5        Sequence alignment / Structure superposition             779
+#TOC>   5.01       A multiple structure superposition                     788
+#TOC>   5.01.1         Defining secondary structure boundaries            803
+#TOC>   5.02       Split the chain                                        930
+#TOC>   5.03       Superpositions                                         959
+#TOC>   5.04       Superposition induced alignment (SIA)                 1020
+#TOC>   6        SIA-based phylogenetic tree                             1205
+#TOC>   7        Multiple Sequence alignment                             1236
+#TOC>   8        Sequence Logo                                           1254
 #TOC> 
 #TOC> ==========================================================================
 
@@ -102,6 +105,13 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 if (!requireNamespace("Biostrings", quietly = TRUE)) {
   BiocManager::install("Biostrings")
 }
+
+if (! requireNamespace("msa", quietly=TRUE)) {
+  BiocManager::install("msa")
+}
+# Package information:
+#  library(help=msa)       # basic information
+#  browseVignettes("msa")  # available vignettes
 
 
 # We need the httr:: package for remote control of ChimeraX
@@ -1225,18 +1235,36 @@ if (FALSE) {
 
 # =    7  Multiple Sequence alignment  =========================================
 
+if (FALSE) {
+  t2c("Can you explain why multiple sequence alignments are more informative than individual, pairwise alignments? Also, I have a set of sequences that I go from matching superimposed residues in the PPP2R1A structure. There are fifteen sequence fragments, and I would like to use the Biostrings::msa package to compute an alignment. How should I prepare the sequences, and how should I compute the alignment? Here are the first two of the fifteen fragments:\n\nMDL[1:2]\n[1] \"AAADGDDS-------------LYPIAVLID----ELRN----EDVQLRLN-SI-KKLSTIALALG--------\"\n[2] \"---------------VE-RTRSELLPFLTDTIYD---------EDEVLLA-LA-EQLGTFTTLVGG-------\"\n")
+
+}
+
+PPP2R1Aset <- Biostrings::AAStringSet(gsub("-", "", MDL))
+PPP2R1Amsa <- msa::msa(PPP2R1Aset, method="Muscle")
+
+MSAmatrix <- ape::as.AAbin(as.matrix(PPP2R1Amsa))
+MSAPhyDat <- phangorn::phyDat(MSAmatrix, type = "AA")
+MSAdm <- phangorn::dist.ml(MSAPhyDat)
+MSAtreeUPGMA  <- phangorn::upgma(MSAdm)
+plot(MSAtreeUPGMA, main="UPGMA from MSA")
 
 
 
-
-# ==============================================================================
-
-# To come:
-#  - Multiple sequence alignment
+# =    8  Sequence Logo  =======================================================
 #  - Consensus sequences and sequence logos
 #  - Structural sequence signals of this repeat
 #  - Functional signals of this protein
-#  - ...
+
+if (! requireNamespace("ggseqlogo")) {
+  install.packages("ggseqlogo")
+}
+
+ggseqlogo::ggseqlogo(MDL, seq_type = "aa")
+
+
+
+
 
 
 
