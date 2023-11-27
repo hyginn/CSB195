@@ -18,7 +18,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                  Line
 #TOC> ------------------------------------------------------
 #TOC>   1        Preparation: packages                    55
@@ -26,7 +26,7 @@
 #TOC>   2        Introduction: BLAST                      83
 #TOC>   3        Coverage of the Tree of Life            123
 #TOC>   4        Conservation patterns                   135
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -124,7 +124,9 @@ if (FALSE) {
 
 
 if (FALSE) {
-  # ...
+
+  # https://en.wikipedia.org/wiki/Tree_of_life_(biology)
+  # http://tolweb.org/tree/
 
 
   # Conclusion?
