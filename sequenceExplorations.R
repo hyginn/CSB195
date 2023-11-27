@@ -27,7 +27,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
 #TOC>   1        Preparation: packages                                     88
@@ -59,7 +59,7 @@
 #TOC>   6        SIA-based phylogenetic tree                             1205
 #TOC>   7        Multiple Sequence alignment                             1236
 #TOC>   8        Sequence Logo                                           1254
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -800,7 +800,7 @@ if (FALSE) {
 
 
 
-# ===   5.01.1  Defining secondary structure boundaries       
+# ===   5.01.1  Defining secondary structure boundaries
 
 if (FALSE) {
 
@@ -1169,11 +1169,11 @@ if (FALSE) {
 #1. 1: AAADGDDS-------------LYPIAVLID----ELRN----EDVQLRLN-SI-KKLSTIALALG--------
 #1. 2: ---------------VE-RTRSELLPFLTDTIYD---------EDEVLLA-LA-EQLGTFTTLVGG-------
 #1. 3: ---------------PE-YVHC-LLPPLES----LATV----EETVVRDK-AV-ESLRAISHEHS--------
+#1. 6: ---------------LD-NVKSEIIPMFSN----LASD----EQDSVRLL-AV-EACVNIAQLLPQ-------
 #1. 4: ---------------PS-DLEAHFVPLVKR----LAGG----DWFTSRTS-AC-GLFSVCYPRVS--------
 #1. 5: ----------------SAVK-AELRQYFRN----LCSD----DTPMVRRA-AA-SKLGEFAKVLE--------
-#1. 6: ---------------LD-NVKSEIIPMFSN----LASD----EQDSVRLL-AV-EACVNIAQLLPQ-------
-#1. 7: ----------------E-DLEALVMPTLRQ----AAED----KSWRVRYM-VADK-FTELQKAVG--------
 #1. 8: ---------------PE-ITKTDLVPAFQN----LMKD----CEAEVRAA-AS-HKVKEFCENL--SADCR--
+#1. 7: ----------------E-DLEALVMPTLRQ----AAED----KSWRVRYM-VADK-FTELQKAVG--------
 #1. 9: ---------------EN-VIMSQILPCIKE----LVSD----ANQHVKSA-LASV-IMGLSPILG--------
 #1.10: ---------------KD-NTIEHLLPLFLA----QLKD----ECPEVRLN-IISN-LDCVNEVIG--------
 #1.11: --------IRQ--------LSQSLLPAIVE----LAED----AKWRVRLA-II-EYMPLLAGQL--GV-----
@@ -1243,7 +1243,7 @@ if (FALSE) {
 PPP2R1Aset <- Biostrings::AAStringSet(gsub("-", "", MDL))
 PPP2R1Amsa <- msa::msa(PPP2R1Aset, method="Muscle")
 
-MSAmatrix <- ape::as.AAbin(as.matrix(PPP2R1Amsa))
+MSAmatrix <- ape::as.AAbin(PPP2R1Amsa)
 MSAPhyDat <- phangorn::phyDat(MSAmatrix, type = "AA")
 MSAdm <- phangorn::dist.ml(MSAPhyDat)
 MSAtreeUPGMA  <- phangorn::upgma(MSAdm)
