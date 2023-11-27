@@ -5,11 +5,12 @@
 #            evolution that shaped it.
 #
 #
-# Version: 1.3
+# Version: 1.4
 # Date:    2023-11
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.4  Add Superposition induced alignment, UPGMA tree
 #   1.3  Explore 1B3U via ChimeraX scripting (cf. RPR-ChimeraX_remote.R)
 #   1.2  Add RADAR results
 #   1.1  Updated the "RADAR" prompt
@@ -24,35 +25,38 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
-#TOC>   1        Preparation: packages                                     81
-#TOC>   1.01       Preparation: Helper functions                          122
-#TOC>   2        Introduction                                             139
-#TOC>   2.01       Terminology:                                           143
-#TOC>   2.02       Sources of Information                                 170
-#TOC>   3        Download and inspect a PPP2R1A sequence                  204
-#TOC>   3.01       Download and save a PPP2R1A sequence                   206
-#TOC>   3.02       Read a sequence from file                              211
-#TOC>   3.03       Analyse a protein sequence                             235
-#TOC>   3.04       Barplot, and side-by-side barplot                      273
-#TOC>   3.05       Plotting ratios                                        311
-#TOC>   3.06       Plotting log ratios                                    332
-#TOC>   3.07       Sort by frequency                                      351
-#TOC>   3.08       Colour by amino acid type                              372
-#TOC>   3.09       Dotplot: Sequence comparison                           404
-#TOC>   3.10       Customizing the dotplot                                466
-#TOC>   3.11       Finding repeats in sequences                           529
-#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           583
-#TOC>   4.01       The trouble with sequence numbers                      637
-#TOC>   4.02       Mapping RADAR repeats to structure                     704
-#TOC>   5        Sequence alignment / Structure superposition             743
-#TOC>   5.01       A multiple structure superposition                     752
-#TOC>   5.01.1         Defining secondary structure boundaries            767
-#TOC>   5.02       Split the chain                                        894
-#TOC>   5.03       Superpositions                                         923
-#TOC>
+#TOC>   1        Preparation: packages                                     85
+#TOC>   1.01       Preparation: Helper functions                          145
+#TOC>   2        Introduction                                             162
+#TOC>   2.01       Terminology:                                           166
+#TOC>   2.02       Sources of Information                                 193
+#TOC>   3        Download and inspect a PPP2R1A sequence                  227
+#TOC>   3.01       Download and save a PPP2R1A sequence                   229
+#TOC>   3.02       Read a sequence from file                              234
+#TOC>   3.03       Analyse a protein sequence                             261
+#TOC>   3.04       Barplot, and side-by-side barplot                      299
+#TOC>   3.05       Plotting ratios                                        337
+#TOC>   3.06       Plotting log ratios                                    358
+#TOC>   3.07       Sort by frequency                                      377
+#TOC>   3.08       Colour by amino acid type                              398
+#TOC>   3.09       Dotplot: Sequence comparison                           430
+#TOC>   3.10       Customizing the dotplot                                492
+#TOC>   3.11       Finding repeats in sequences                           555
+#TOC>   4        Find and inspect a PPP2A and PPP2R1A structure           609
+#TOC>   4.01       The trouble with sequence numbers                      663
+#TOC>   4.02       Mapping RADAR repeats to structure                     730
+#TOC>   5        Sequence alignment / Structure superposition             769
+#TOC>   5.01       A multiple structure superposition                     778
+#TOC>   5.01.1         Defining secondary structure boundaries            793
+#TOC>   5.02       Split the chain                                        920
+#TOC>   5.03       Superpositions                                         949
+#TOC>   5.04       Superposition induced alignment (SIA)                 1010
+#TOC>   6        SIA-based phylogenetic tree                             1195
+#TOC>   7        Multiple Sequence alignment                             1226
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -119,11 +123,30 @@ if (! requireNamespace("bio3d", quietly = TRUE)) {
 #  browseVignettes("bio3d")    # available vignettes
 
 
+# Support for phylogenetic computations is in the phangorn package. Installing
+# it also installs its dependency ape :
+if (! requireNamespace("phangorn", quietly = TRUE)) {
+  install.packages("phangorn")
+}
+# Package information:
+#  library(help = phangorn)       # basic information
+#  browseVignettes("phangorn")    # available vignettes
+
+
+# In addition we use functions from the phytools package.
+if (! requireNamespace("phytools", quietly = TRUE)) {
+  install.packages("phytools")
+}
+# Package information:
+#  library(help = phytools)       # basic information
+#  browseVignettes("phytools")    # available vignettes
+
+
 # ==   1.01  Preparation: Helper functions  ====================================
 
 # ... Here is a helper function to highlight specific elements of a ChimeraX
 #  scene.
-#
+
 highlightCX <- function(sel, hl = "#aa5555", bg = "#aaaab5") {
   # Color everything in the scene with the bg colour, then colour sel with the
   # hl colour.
@@ -226,6 +249,9 @@ if (FALSE) {
 
   # Read a FASTA formatted sequence.
   PPP2R1A <- Biostrings::readAAStringSet("./data/PPP2R1A.fa")
+  # This is only a single sequence, so we convert it into a single AAString
+  # object.
+  PPP2R1A <- Biostrings::AAString(as.character(PPP2R1A[1]))
 
   # Turn it into a vector of one-letter symbols:
   (vPP2Aa <- unlist(strsplit(Biostrings::toString(PPP2R1A), "" )))
@@ -374,7 +400,7 @@ text(19.5, yTxt, "Depleted", pos = 2, cex = 0.7)
 if (FALSE) {
 }
 
-# Colour the bars by amino acid type. Use AACOLS , defined in the .utilities.R
+# Colour the bars by amino acid type. Use AACOLS , defined in the .util.R
 # script, or define your own.
 
 barplot(rep(1, 20), names.arg = names(AACOLS), col = AACOLS, cex.names = 0.5)
@@ -692,7 +718,7 @@ if (FALSE) {
   }
 
   # Notice that these indices are not the same? In this case, the difference
-  # is only one residue - but it may be much larger. NEVER asssume that
+  # is only one residue - but it may be much larger. NEVER assume that
   # the same sequence numbers label the same residues, unless you are working
   # from the same source. There is no authoritative reference for sequence
   # numbers! You always have to compare things based on the actual sequence
@@ -764,7 +790,7 @@ if (FALSE) {
 
 
 
-# ===   5.01.1  Defining secondary structure boundaries
+# ===   5.01.1  Defining secondary structure boundaries       
 
 if (FALSE) {
 
@@ -930,12 +956,8 @@ if (FALSE) {
   # is a bit weak, so we raise the relative weight of the sencondary structure
   # component from its default 0.3 to 0.67
 
-  CX("mm #1.2-15 to #1.1 alg sw ssFraction 0.67 showAlignment true")
+  CX("mm #1.2-15 to #1.1 alg sw ssFraction 0.67 verbose false")
   CX("cofr #1.1")
-
-  # Unfortunately, this does not compute a superposition-induced sequence
-  # alignment. We will need to get that with other means. It is one of the
-  # most important tools of structure analysis
 
   # The superposition is not well visualized in the cartoon representation, we
   # should look at actual backbone atoms instead.
@@ -944,6 +966,24 @@ if (FALSE) {
   CX("cartoon hide sel")
   CX("show (sel-residues & backbone) target ab")
   CX("~select")
+
+  # We notice that model 1 is not a good reference, since it contains a twisted
+  # N-terminus.
+  highlightCX("#1.1")
+
+  # A better choice may be model 6:
+  highlightCX("#1.6")
+
+  # ... we quickly redo the superposition:
+  CX("select #1.1-15")
+  CX("show (sel-residues & backbone) target ab")
+  mmResults <- CX("mm #1.1-5,7-15 to #1.6 alg sw ssFraction 0.67 verbose true")
+  CX("cofr #1.6")
+  # This gives us a much tighter superposition.
+
+  # Unfortunately, this does not compute a superposition-induced sequence
+  # alignment. We will need to get that with other means. It is one of the
+  # most important tools of structure analysis. See below.
 
   highlightCX("#1.2,4,13")
   # Fragments 2, 4 and 13 do not align well ... we should suspect an indel in
@@ -959,6 +999,7 @@ if (FALSE) {
   # structural motifs since some backbone turn angles are only accessible to
   # glycine and proline.
 
+  highlightCX("#1.1-15:GLY")
   highlightCX("#1.1-15:PRO")
 
   # Well! Look at that.
@@ -966,12 +1007,231 @@ if (FALSE) {
 
 }
 
+# ==   5.04  Superposition induced alignment (SIA)  ============================
+
+if (FALSE) {
+
+  # To assess conservation patterns, we need to identify residues that are
+  # identical or similar in equivalent positions of the structure. Our
+  # superposition has that information in principle - and there is an
+  # automated approach to getting that information (consider residues
+  # "aligned" if their CA atoms end up within 2 Å in the superposition),
+  # but this is not currently implemented in ChimeraX.
+
+  # So, we need to do this by hand. We stored the results of the matchMaker
+  # superposition and can extract alignments from there:
+
+  mmResults <- unlist(strsplit(mmResults, "\\n"))
+  idx <- grep("^Sequences:", mmResults)
+  for (i in 1:length(idx)) {
+    cat(mmResults[idx[i] + 1], "\n")
+    cat(mmResults[idx[i] + 2], "\n")
+  }
+
+  # The matchMaker results suggest the following paired residues:
+
+  # 1b3u  1	       YPIAVLIDELRNEDVQLRLNSIKKLSTIALALG
+  # 1b3u  2	 VERTRSELLPFLTD.TIYDEDEVLLALAEQLGTFTTLVGG
+  # 1b3u  3	     VHCLLPPLESLATVEETVVRDKAVESLRAISHEHS
+  # 1b3u  4	 PSDLEAHFVPLVKRLAGGDW---FTSRTSACGLFSVCYPR
+  # 1b3u  5	  AVKAELRQYFRNLCSDDTPMVRRAAASKLGEFAKVLE
+  # 1b3u  6	 LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  # 1b3u  7	   LEALVMPTLRQAAEDKSWRVRYMVADKFTELQKA
+  # 1b3u  8	 PEITKTDLVPAFQNLMKDCEAEVRAAASHKVKEFCENLSA
+  # 1b3u  9	 ENVIMSQILPCIKELVSDANQHVKSALASVIMGLSPILG
+  # 1b3u 10	 KDNTIEHLLPLFLAQLKDECPEVRLNIISNLDCVNEVIG
+  # 1b3u 11	 IRQLSQSLLPAIVELAEDAKWRVRLAIIEYMPLLAGQLGV
+  # 1b3u 12	      EKLNSLCMAWLVDHVYAIREAATSNLKKLVEK
+  # 1b3u 13	 KEWAHATIIPKVLAMSGDPN-YLHRMTTLFCINVLSEVCG
+  # 1b3u 14	 QDITTKHMLPTVLRMAGDPVANVRFNVAKSLQKIGPILD
+  # 1b3u 15	 NSTLQSEVKPILEKLTQDQDVDVKYFAQEALTV
+
+  # ... but do we actually agree with that, when we inspect the structures
+  # carefully?
+
+  # A helper function will assist us making that comparison.
+
+  showPairs <- function(i, mode = "CA", ref = 6) {
+    # Using #1.6 as default reference model
+    # modes: CA - Calpha trace only
+    #        BB - full backbone
+    #        SC - side chains too
+    CX("label defaultHeight 0.75")
+    CX("hide")
+    CX(sprintf("select #1.%s", ref))
+    CX("color sequential sel palette #333339:#9999AA") # grey to light
+    CX(sprintf("select #1.%d", i))
+    CX("color sequential sel palette #662946:#B1554D") # mauve to orange
+    CX(sprintf("select #1.%d,%d", ref, i))
+    if (mode == "SC") {
+      CX("show sel target ab")
+    } else if (mode == "BB") {
+      CX("show (sel-residues & backbone) target ab")
+    } else if (mode == "CA") {
+      CX("show (sel-residues & protein&@ca) target ab")
+    } else {
+      stop(sprintf("Unknown mode \"%s\".", mode))
+    }
+    for (j in Annot$MDL$start[ref]:Annot$MDL$end[ref]) {
+      CX(sprintf("label #1.%d:%d text \"%d: %s\"",
+                 ref, j, ref, PPP2R1A[(j+1):(j+1)]))
+    }
+    for (j in Annot$MDL$start[i]:Annot$MDL$end[i]) {
+      CX(sprintf("label #1.%d:%d text \"%d: %s\"",
+                 i, j, i, PPP2R1A[(j+1):(j+1)]))
+    }
+    CX(sprintf("select #1.%d,%d@CA", ref, i))
+    CX("style sel ball")
+    CX("~select")
+    seqStart <- Annot$MDL$start[ref] + 1
+    seqEnd   <- Annot$MDL$end[ref]   + 1
+    cat(sprintf("#1.%2d:   ",ref), as.character(PPP2R1A[seqStart:seqEnd]),"\n")
+    seqStart <- Annot$MDL$start[i] + 1
+    seqEnd   <- Annot$MDL$end[i]   + 1
+    cat(sprintf("#1.%2d:   ", i), as.character(PPP2R1A[seqStart:seqEnd]), "\n")
+  }
+
+  showPairs(1)
+  #1. 6:    --------LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  #1. 1:    AAADGDDS-----LYPIAVLIDELRNEDVQLRLNSIKKLSTIALALG-
+
+  showPairs(2)
+  #1. 6:     LDNVKSEIIPMFSN----LASDEQDSVRLLAVEACVNIAQLLPQ
+  #1. 2:     VERTRSELLPFLTDTIYD-----EDEVLLALAEQLGTFTTLVGG
+  #Realign to model 6 N-terminus
+  CX("mm #1.2:43-58 to #1.6:197-211 alg sw ssFraction 0.67 verbose true")
+  #Realign to consensus
+  CX("mm #1.2 to #1.6 alg sw ssFraction 0.67 verbose true")
+
+  showPairs(3)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  #1. 3:    PEYVHC-LLPPLESLATVEETVVRDKAVESLRAISHEHS-
+
+  showPairs(4)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQ|DSVRLLAVEACVNIAQLLPQ
+  #1. 4:    PSDLEAHFVPLVKRLAGGDW|FTSRTSACGLFSVCYPRVS-
+
+  showPairs(5)
+  #1. 6:    LD-NVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  #1. 5:    -SAVK-AELRQYFRNLCSDDTPMVRRAAASKLGEFAKVLE-
+
+  showPairs(7)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAV-EACVNIAQLLPQ
+  #1. 7:    -EDLEALVMPTLRQAAEDKSWRVRYMVADK-FTELQKAVG-
+
+  showPairs(8)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ-----
+  #1. 8:    PEITKTDLVPAFQNLMKDCEAEVRAAASHKVKEFCENL--SADCR
+
+  showPairs(9)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAV-EACVNIAQLLPQ
+  #1. 9:    ENVIMSQILPCIKELVSDANQHVKSALASV-IMGLSPILG-
+
+  showPairs(10)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAV-EACVNIAQLLPQ
+  #1.10:    KDNTIEHLLPLFLAQLKDECPEVRLNIISN-LDCVNEVIG-
+
+  showPairs(11)
+  #1. 6:    ---LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ--
+  #1.11:    IRQ---LSQSLLPAIVELAEDAKWRVRLAIIEYMPLLAGQL--GV
+
+  showPairs(12)
+  #1. 6:    ----LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  #1.12:    EFFD-----EKLNSLCMAWLVDHVYAIREAATSNLKKLVEKFG-
+
+  showPairs(13)
+  #1. 6:    LDNVKSEIIPMFSNLASD----EQDSVRLL-AVEACVNIAQLLPQ
+  #1.13:    KEWAHATIIPKVLAMSGDPNYL----HR-MTTLFCINVLSEVCG-
+
+  showPairs(14)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ
+  #1.14:    QDITTKHMLPTVLRMAGDPVANVRFNVAKSLQKIGPILD-
+
+  showPairs(15)
+  #1. 6:    LDNVKSEIIPMFSNLASDEQDSVRLLAVEACVNIAQLLPQ--
+  #1.15:    NSTLQSEVKPILEKLTQDQDVDVKYFAQEALTVLS-----LA
+
+  CX("mm #1.13 to #1.2 alg sw ssFraction 0.67 verbose true")
+  showPairs(11, ref = 1)
+  CX("mm #1.13 to #1.6 alg sw ssFraction 0.67 verbose true")
+
+# SIA induced by the structural superposition on model 6
+#1. 1: AAADGDDS-------------LYPIAVLID----ELRN----EDVQLRLN-SI-KKLSTIALALG--------
+#1. 2: ---------------VE-RTRSELLPFLTDTIYD---------EDEVLLA-LA-EQLGTFTTLVGG-------
+#1. 3: ---------------PE-YVHC-LLPPLES----LATV----EETVVRDK-AV-ESLRAISHEHS--------
+#1. 4: ---------------PS-DLEAHFVPLVKR----LAGG----DWFTSRTS-AC-GLFSVCYPRVS--------
+#1. 5: ----------------SAVK-AELRQYFRN----LCSD----DTPMVRRA-AA-SKLGEFAKVLE--------
+#1. 6: ---------------LD-NVKSEIIPMFSN----LASD----EQDSVRLL-AV-EACVNIAQLLPQ-------
+#1. 7: ----------------E-DLEALVMPTLRQ----AAED----KSWRVRYM-VADK-FTELQKAVG--------
+#1. 8: ---------------PE-ITKTDLVPAFQN----LMKD----CEAEVRAA-AS-HKVKEFCENL--SADCR--
+#1. 9: ---------------EN-VIMSQILPCIKE----LVSD----ANQHVKSA-LASV-IMGLSPILG--------
+#1.10: ---------------KD-NTIEHLLPLFLA----QLKD----ECPEVRLN-IISN-LDCVNEVIG--------
+#1.11: --------IRQ--------LSQSLLPAIVE----LAED----AKWRVRLA-II-EYMPLLAGQL--GV-----
+#1.12: -----------EFFD------EKLNSLCMA----WLVD----HVYAIREA-AT-SNLKKLVEKFG--------
+#1.13: ---------------KE-WAHATIIPKVLA----MSGDPNYL----HR-MTTL-FCINVLSEVCG--------
+#1.14: ---------------QD-ITTKHMLPTVLR----MAGD----PVANVRFN-VA-KSLQKIGPILD--------
+#1.15: ---------------NS-TLQSEVKPILEK----LTQD----QDVDVKYF-AQ-EALTVLS----------LA
+
+
+MDL <- character()
+MDL[ 1] <- "AAADGDDS-------------LYPIAVLID----ELRN----EDVQLRLN-SI-KKLSTIALALG--------"
+MDL[ 2] <- "---------------VE-RTRSELLPFLTDTIYD---------EDEVLLA-LA-EQLGTFTTLVGG-------"
+MDL[ 3] <- "---------------PE-YVHC-LLPPLES----LATV----EETVVRDK-AV-ESLRAISHEHS--------"
+MDL[ 4] <- "---------------PS-DLEAHFVPLVKR----LAGG----DWFTSRTS-AC-GLFSVCYPRVS--------"
+MDL[ 5] <- "----------------SAVK-AELRQYFRN----LCSD----DTPMVRRA-AA-SKLGEFAKVLE--------"
+MDL[ 6] <- "---------------LD-NVKSEIIPMFSN----LASD----EQDSVRLL-AV-EACVNIAQLLPQ-------"
+MDL[ 7] <- "----------------E-DLEALVMPTLRQ----AAED----KSWRVRYM-VADK-FTELQKAVG--------"
+MDL[ 8] <- "---------------PE-ITKTDLVPAFQN----LMKD----CEAEVRAA-AS-HKVKEFCENL--SADCR--"
+MDL[ 9] <- "---------------EN-VIMSQILPCIKE----LVSD----ANQHVKSA-LASV-IMGLSPILG--------"
+MDL[10] <- "---------------KD-NTIEHLLPLFLA----QLKD----ECPEVRLN-IISN-LDCVNEVIG--------"
+MDL[11] <- "--------IRQ--------LSQSLLPAIVE----LAED----AKWRVRLA-II-EYMPLLAGQL--GV-----"
+MDL[12] <- "-----------EFFD------EKLNSLCMA----WLVD----HVYAIREA-AT-SNLKKLVEKFG--------"
+MDL[13] <- "---------------KE-WAHATIIPKVLA----MSGDPNYL----HR-MTTL-FCINVLSEVCG--------"
+MDL[14] <- "---------------QD-ITTKHMLPTVLR----MAGD----PVANVRFN-VA-KSLQKIGPILD--------"
+MDL[15] <- "---------------NS-TLQSEVKPILEK----LTQD----QDVDVKYF-AQ-EALTVLS----------LA"
+
+}
+
+# =    6  SIA-based phylogenetic tree  =========================================
+
+if (FALSE) {
+
+  MDLmatrix <- ape::as.AAbin(as.matrix(MDL))
+  mdlPhyDat <- phangorn::phyDat(MDLmatrix, type = "AA")
+  dm <- phangorn::dist.ml(mdlPhyDat)
+  treeUPGMA  <- phangorn::upgma(dm)
+  plot(treeUPGMA, main="UPGMA")
+
+  names(mdlPhyDat) <- treeUPGMA$tip.label
+
+  fit <- phangorn::pml(treeUPGMA, data=mdlPhyDat)
+  fit <- phangorn::optim.pml(fit, optNni=TRUE)
+  plot(fit$tree)
+
+  phytools::plotTree(fit$tree)
+
+
+  myTree <- treeUPGMA
+  myTree <- ape::rotate(myTree, c(16))
+  myTree <- ape::rotate(myTree, c(21))
+  myTree <- ape::rotate(myTree, c(28))
+  myTree <- ape::rotate(myTree, c(27))
+  myTree <- ape::rotate(myTree, c(25))
+  myTree <- ape::rotate(myTree, c(24))
+  myTree <- ape::rotate(myTree, c(26))
+  plot(myTree); ape::nodelabels()
+
+}
+
+# =    7  Multiple Sequence alignment  =========================================
+
+
+
 
 
 # ==============================================================================
 
 # To come:
-#  - Superposition induced sequence alignment
 #  - Multiple sequence alignment
 #  - Consensus sequences and sequence logos
 #  - Structural sequence signals of this repeat
