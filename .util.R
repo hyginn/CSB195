@@ -12,37 +12,38 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   1        Install missing packages                              49
-#TOC>   2        Load required libraries                               69
-#TOC>   3        Load datasets                                         73
-#TOC>   4        Generic Utilities                                     80
-#TOC>   4.1        vr - make a row-vector                              83
-#TOC>   4.2        vc - make a column-vector                          100
-#TOC>   4.3        mmScale - min-max Scaling                          117
-#TOC>   4.4        A progress bar for long-running code               129
-#TOC>   4.5        randSeed - large, random seeds                     165
-#TOC>   4.6        Random IDs                                         196
-#TOC>   5        Generative AI                                        258
-#TOC>   5.1        t2c - write text to clipboard                      262
-#TOC>   5.2        Initialize generative AI initial prompt            280
-#TOC>   6        Working with Google assets                           310
-#TOC>   6.1        Extracting R code from Google docs                 313
-#TOC>   6.2        Reading Google sheets                              386
-#TOC>   7        Remote control of ChimeraX                           459
-#TOC>   8        Bioinformatics Utilities                             540
-#TOC>   8.1        Find Keywords in aaindex                           543
-#TOC>   8.2        A colour palette for amino acids                   582
-#TOC>   8.3        Load the genetic code into a data frame            622
-#TOC>   8.4        Load an amino acid dataset                         630
-#TOC>   8.5        Convert one-letter symbols to three-letter         646
-#TOC>   8.6        Dotplot                                            728
-#TOC>   8.7        Plotting amino acids as 2D scatterplot             845
-#TOC>   9        Plot Utilities                                       904
-#TOC>   9.1        Draw a triangle on an existing plot                906
-#TOC>
+#TOC>   1        Install missing packages                              50
+#TOC>   2        Load required libraries                               70
+#TOC>   3        Load datasets                                         74
+#TOC>   4        Generic Utilities                                     81
+#TOC>   4.1        vr - make a row-vector                              84
+#TOC>   4.2        vc - make a column-vector                          101
+#TOC>   4.3        mmScale - min-max Scaling                          118
+#TOC>   4.4        A progress bar for long-running code               130
+#TOC>   4.5        randSeed - large, random seeds                     166
+#TOC>   4.6        Random IDs                                         197
+#TOC>   5        Generative AI                                        259
+#TOC>   5.1        t2c - write text to clipboard                      263
+#TOC>   5.2        Initialize generative AI initial prompt            281
+#TOC>   6        Working with Google assets                           311
+#TOC>   6.1        Extracting R code from Google docs                 314
+#TOC>   6.2        Reading Google sheets                              387
+#TOC>   7        Remote control of ChimeraX                           460
+#TOC>   8        Bioinformatics Utilities                             541
+#TOC>   8.1        Find Keywords in aaindex                           544
+#TOC>   8.2        A colour palette for amino acids                   583
+#TOC>   8.3        Load the genetic code into a data frame            623
+#TOC>   8.4        Load an amino acid dataset                         631
+#TOC>   8.5        Convert one-letter symbols to three-letter         647
+#TOC>   8.6        Amino acid similarity                              729
+#TOC>   8.7        Dotplot                                            738
+#TOC>   8.8        Plotting amino acids as 2D scatterplot             857
+#TOC>   9        Plot Utilities                                       916
+#TOC>   9.1        Draw a triangle on an existing plot                918
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -725,8 +726,19 @@ if (FALSE) {
 
 }
 
-# ==   8.6  Dotplot  ===========================================================
+# ==   8.6  Amino acid similarity  =============================================
 #
+
+cat("  Defining aaSim() ...\n")
+
+source("./R/aaSim.R")
+
+
+
+# ==   8.7  Dotplot  ===========================================================
+#
+
+cat("  Defining dotPlot2() ...\n")
 
 
 dotPlot2 <- function(A, B,        # sequence vectors
@@ -842,7 +854,7 @@ dotPlot2 <- function(A, B,        # sequence vectors
 
 
 
-# ==   8.7  Plotting amino acids as 2D scatterplot  ============================
+# ==   8.8  Plotting amino acids as 2D scatterplot  ============================
 #
 
 cat("  Defining plotAA() ...\n")
