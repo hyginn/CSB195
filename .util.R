@@ -40,9 +40,9 @@
 #TOC>   8.5        Convert one-letter symbols to three-letter         647
 #TOC>   8.6        Amino acid similarity                              729
 #TOC>   8.7        Dotplot                                            738
-#TOC>   8.8        Plotting amino acids as 2D scatterplot             857
-#TOC>   9        Plot Utilities                                       916
-#TOC>   9.1        Draw a triangle on an existing plot                918
+#TOC>   8.8        Plotting amino acids as 2D scatterplot             858
+#TOC>   9        Plot Utilities                                       917
+#TOC>   9.1        Draw a triangle on an existing plot                919
 #TOC> 
 #TOC> ==========================================================================
 
@@ -824,6 +824,7 @@ dotPlot2 <- function(A, B,        # sequence vectors
         ylim=c(lB,1), xlim=c(1,lA),
         xlab = xlab,
         ylab = ylab,
+        asp = lA/lB,
         axes = FALSE)
   box()
 
