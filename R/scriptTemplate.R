@@ -69,8 +69,8 @@ myFunction <- function(a, b=1) {
 
 
 
-# ====  TESTS  =================================================================
-# Enter your function tests here...
+# ====  VALIDATION AND TESTS  ==================================================
+# Enter validation of your code logic and your function tests here...
 if (FALSE) {
   # This block is never executed. Place all tests and experiments here that
   # should not be run when this file is source()'ed.
