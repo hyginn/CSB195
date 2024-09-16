@@ -1,0 +1,127 @@
+# glossaRy.txt
+#
+# A glossary of operators, language elements, and functions for course
+# R code.
+#
+# boris.steipe@utoronto.ca
+# 2023-10
+#
+# Notes:
+#   Allowed records in this file can be comments, structuring records
+#     or data records.
+#     Comments begin with a hash mark.
+#     Structuring records begin with STR, BEGIN, or END
+#       The STR tag is followed by the tags for each data block, separated
+#         by whitespace. The data blocks must strictly follow this structure.
+#     Each BEGIN tag must have a matching END tag, followed by the name of a
+#       section.
+# ==============================================================================
+
+STR ENT CAT PKG DEF
+
+BEGIN operators
+
+ENT + - * / ^
+CAT arithmetic
+PKG base
+DEF Arithmetic operators. (a^b) is a to the power of b.
+
+ENT %% %/%
+CAT modulus
+PKG base
+DEF (a %% b) gives the remainder of a/b, (a %/% b) is the floored result of a/b.
+
+ENT == != < > <= >=
+CAT relational
+PKG base
+DEF Relational operators.
+
+ENT ! & | && ||
+CAT logical
+PKG base
+DEF Logical operators. Single operators return all results when applied to vectors. Doubled operators return only the first result.
+
+ENT :
+CAT sequence
+PKG base
+DEF Create a sequence between two integers.
+
+ENT %in%
+CAT membership
+PKG base
+DEF Membership operator.
+
+ENT %*%
+CAT matrix
+PKG base
+DEF Matrix multiplication.
+
+ENT = <- <<-
+CAT assignment
+PKG base
+DEF Assignment operators.
+
+ENT ~
+CAT tilde
+PKG base
+DEF The tilde operator relates the left-hand side of a model formula to its right-hand side.
+
+ENT |>
+CAT pipe
+PKG base
+DEF The pipe operator passes the result of the expression on its left into the expression on its right.
+
+ENT [] [[]]
+CAT subsetting
+PKG base
+DEF Subsetting operators retrieve elements from objects.
+
+ENT ()
+CAT grouping
+PKG base
+DEF Parentheses group elements for mathematical expressions and function argument lists.
+
+ENT \"\" ''
+CAT quotes
+PKG base
+DEF Double quotes and single quotes delimit strings.
+
+ENT ``
+CAT verbatim
+PKG base
+DEF Backticks are a special kind of quote that makes a string opaque to the parser. This allows strings to be used in ways that would be illegal under the language syntax rules.
+
+ENT {}
+CAT block
+PKG base
+DEF Curly braces define blocks of code, or combine multiple expressions.
+
+ENT :: :::
+CAT access
+PKG base
+DEF Access exported (::) or non-exported (:::) functions from a package.
+
+ENT $ @
+CAT extraction
+PKG base
+DEF Extract elements by name: $ for list elements or data frame columns; @ for S4 object slots."
+
+ENT ...
+CAT arguments
+PKG base
+DEF A special placeholder to pass varying numbers of arguments into a function."
+
+END operators
+
+BEGIN project
+END project
+
+BEGIN local
+END local
+
+BEGIN base
+END base
+
+
+# [END]
+
