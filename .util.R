@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              50
@@ -43,7 +43,7 @@
 #TOC>   8.8        Plotting amino acids as 2D scatterplot             858
 #TOC>   9        Plot Utilities                                       917
 #TOC>   9.1        Draw a triangle on an existing plot                919
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -634,13 +634,13 @@ GCdf <- utils::read.csv("data/GeneticCode.csv")
 cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
 
 URL <- paste(c("https://docs.google.com/spreadsheets/d/",
-               "1tRCPhaua5cjcH_0DuZOiv8BVbdr_V6miC2JeKiOYj-o",
+               "1R50YeqoplcA-IZ8sFNW9J7JgCzc2WGjTC9-mjPCZ5gY",
                "/edit?usp=sharing"),
              collapse = "")
 sheet <- "Data"
 
 AADAT <- readGsheet(URL, sheet)
-rownames(AADAT) <- AADAT$A
+rownames(AADAT) <- AADAT$Codon
 
 
 
