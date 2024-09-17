@@ -23,7 +23,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                         Line
 #TOC> -------------------------------------------------------------
 #TOC>   1        The RStudio IDE layout                          49
@@ -38,7 +38,7 @@
 #TOC>   5        Quit, and restart where you left off           370
 #TOC>   6        Shortcuts and autocomplete                     388
 #TOC>   7        Summary                                        455
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -94,7 +94,7 @@
 # Open an AI assistant session:
 #
 #  (1) Open a new session with your favorite generative AI assistant (gAI) in
-#      a Web browser window (I use ChatGPT-4, but any gAI should work).
+#      a Web browser window (I use ChatGPT-4o, but any gAI should work).
 #  (2) In the console type: gAIinit() and hit <return>.
 #      This places an initialization command into your clipboard.
 #  (3) In your gAI dialogue, <paste> the command and send it off. A typical
