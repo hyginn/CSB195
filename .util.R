@@ -2,7 +2,7 @@
 #
 # CSB195 Class project: utility scripts
 #
-# 2022-09  - 2023-10
+# 2022-09  - 2024-09
 # boris.steipe@utoronto.ca
 #
 # This file is source()'d upon startup by .Rprofile
@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              50
@@ -28,22 +28,22 @@
 #TOC>   5        Generative AI                                        259
 #TOC>   5.1        t2c - write text to clipboard                      263
 #TOC>   5.2        Initialize generative AI initial prompt            281
-#TOC>   6        Working with Google assets                           311
-#TOC>   6.1        Extracting R code from Google docs                 314
-#TOC>   6.2        Reading Google sheets                              387
-#TOC>   7        Remote control of ChimeraX                           460
-#TOC>   8        Bioinformatics Utilities                             541
-#TOC>   8.1        Find Keywords in aaindex                           544
-#TOC>   8.2        A colour palette for amino acids                   583
-#TOC>   8.3        Load the genetic code into a data frame            623
-#TOC>   8.4        Load an amino acid dataset                         631
-#TOC>   8.5        Convert one-letter symbols to three-letter         647
-#TOC>   8.6        Amino acid similarity                              729
-#TOC>   8.7        Dotplot                                            738
-#TOC>   8.8        Plotting amino acids as 2D scatterplot             858
-#TOC>   9        Plot Utilities                                       917
-#TOC>   9.1        Draw a triangle on an existing plot                919
-#TOC>
+#TOC>   6        Working with Google assets                           312
+#TOC>   6.1        Extracting R code from Google docs                 315
+#TOC>   6.2        Reading Google sheets                              388
+#TOC>   7        Remote control of ChimeraX                           461
+#TOC>   8        Bioinformatics Utilities                             542
+#TOC>   8.1        Find Keywords in aaindex                           545
+#TOC>   8.2        A colour palette for amino acids                   584
+#TOC>   8.3        Load the genetic code into a data frame            624
+#TOC>   8.4        Load an amino acid dataset                         632
+#TOC>   8.5        Convert one-letter symbols to three-letter         648
+#TOC>   8.6        Amino acid similarity                              730
+#TOC>   8.7        Dotplot                                            739
+#TOC>   8.8        Plotting amino acids as 2D scatterplot             859
+#TOC>   9        Plot Utilities                                       918
+#TOC>   9.1        Draw a triangle on an existing plot                920
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -291,7 +291,7 @@ gAIinit <- function() {
   txt <- "
 I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
 
-* You write # as the very last character of your response, so I know that the response is complete.
+* You always write # as the very last character of every response, so I know that the response is complete.
 * You keep in mind that I am a programming beginner and you explain syntax and concepts at a novice level.
 * You are concise.
 * You avoid using packages when a base R function is trivial to write for the purpose.
@@ -301,6 +301,7 @@ I would like you to act as an R language tutor and answer my prompts to help me 
 * You do not use tidyverse functions.
 * You use dataFrame[ , col] notation, not dataFrame[[col]] if possible.
 * When the return value of an expression is the required output, you simply provide the expression. You do not wrap it in a print() statement, or assign it to a variable. For example: path.expand(\"~\") NOT print(path.expand(\"~\")) and NOT home_directory <- path.expand(\"~\"); print(home_directory).
+* My prompts may include comment characters (#  ) at the beginning of lines when I copy them from a script. Please ignore those characters.
 
 Please confirm with one word.
 "
