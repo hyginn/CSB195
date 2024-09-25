@@ -11,6 +11,8 @@
 # ==============================================================================
 
 # Copy this file into your "myScripts" folder. Then open the copy for editing.
+# Take notes into your copy - if you save and overwrite a course-script copy,
+# it will mess up the downloading updates from GitHub.
 
 # Run the command gAIinit(). Then open a session with your favorite generative
 # AI assistant and paste the initializing prompt. Suggested follow-on prompts
