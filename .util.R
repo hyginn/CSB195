@@ -35,14 +35,14 @@
 #TOC>   8        Bioinformatics Utilities                             542
 #TOC>   8.1        Find Keywords in aaindex                           545
 #TOC>   8.2        A colour palette for amino acids                   584
-#TOC>   8.3        Load the genetic code into a data frame            624
-#TOC>   8.4        Load an amino acid dataset                         632
-#TOC>   8.5        Convert one-letter symbols to three-letter         648
-#TOC>   8.6        Amino acid similarity                              730
-#TOC>   8.7        Dotplot                                            739
-#TOC>   8.8        Plotting amino acids as 2D scatterplot             859
-#TOC>   9        Plot Utilities                                       918
-#TOC>   9.1        Draw a triangle on an existing plot                920
+#TOC>   8.3        Load the genetic code into a data frame            626
+#TOC>   8.4        Load an amino acid dataset                         634
+#TOC>   8.5        Convert one-letter symbols to three-letter         650
+#TOC>   8.6        Amino acid similarity                              732
+#TOC>   8.7        Dotplot                                            741
+#TOC>   8.8        Plotting amino acids as 2D scatterplot             861
+#TOC>   9        Plot Utilities                                       920
+#TOC>   9.1        Draw a triangle on an existing plot                922
 #TOC> 
 #TOC> ==========================================================================
 
@@ -587,27 +587,29 @@ grepAAindex <- function(key, el = "D") {
 cat("  Defining AACOLS ...\n")
 
 # A colour palette for amino acid properties
-AACOLS <- character()
-AACOLS["R"] <- "#5770ff" # Positive
-AACOLS["K"] <- "#4785EE" #
-AACOLS["H"] <- "#37a1de" #
-AACOLS["E"] <- "#ff6f59" # Negative
-AACOLS["D"] <- "#ff7391" #
-AACOLS["N"] <- "#C9D4FF" # Hydrophilic
-AACOLS["Q"] <- "#CADFFC" #
-AACOLS["S"] <- "#CBEAF9" #
-AACOLS["T"] <- "#CDF5F7" #
-AACOLS["Y"] <- "#FBFFC9" # Hydrophobic
-AACOLS["W"] <- "#EDFDC8" #
-AACOLS["F"] <- "#DFFCC8" #
-AACOLS["I"] <- "#D2FBC8" #
-AACOLS["L"] <- "#C4FAC7" #
-AACOLS["M"] <- "#B7F9C7" #
-AACOLS["V"] <- "#A9F8C7" #
-AACOLS["A"] <- "#9CF7C7" #
-AACOLS["G"] <- "#d2d2d2" # Glycine
-AACOLS["C"] <- "#fff963" # Cysteine
-AACOLS["P"] <- "#edc06d" # Proline
+AACOLS <- character(20)
+names(AACOLS) <- unlist(strsplit("GPCAVILMFWYHRKQNTSDE", ""))
+
+AACOLS["G"] <- "#B9C2CD" # unique: glycine
+AACOLS["P"] <- "#D4CF82" # unique: proline
+AACOLS["C"] <- "#F1DD38" # unique: cysteine
+AACOLS["A"] <- "#D2DF40" # hydrophobic, small
+AACOLS["V"] <- "#B4E149" # hydrophobic, small
+AACOLS["I"] <- "#96E351" # hydrophobic
+AACOLS["L"] <- "#78E65A" # hydrophobic
+AACOLS["M"] <- "#6DCB6E" # hydrophobic
+AACOLS["F"] <- "#63B182" # hydrophobic
+AACOLS["W"] <- "#599797" # hydrophobic
+AACOLS["Y"] <- "#4F7CAB" # hydrophobic
+AACOLS["H"] <- "#4562BF" # hydrophilic, (+) charge
+AACOLS["R"] <- "#3B48D4" # hydrophilic, (+) charge
+AACOLS["K"] <- "#5F6BD8" # hydrophilic, (+) charge
+AACOLS["Q"] <- "#838FDC" # hydrophilic
+AACOLS["N"] <- "#A8B3E0" # hydrophilic
+AACOLS["T"] <- "#AA90BA" # hydrophilic, small
+AACOLS["S"] <- "#AD6D95" # hydrophilic, small
+AACOLS["D"] <- "#B04B70" # hydrophilic, (-) charge
+AACOLS["E"] <- "#B3294B" # hydrophilic, (-) charge
 
 # Usage:
 #   Just use the vector like any named dataset.
