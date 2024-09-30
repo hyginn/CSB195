@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              50
@@ -43,7 +43,7 @@
 #TOC>   8.8        Plotting amino acids as 2D scatterplot             861
 #TOC>   9        Plot Utilities                                       920
 #TOC>   9.1        Draw a triangle on an existing plot                922
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 

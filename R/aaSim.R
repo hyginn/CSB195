@@ -1,13 +1,15 @@
-# tocID <- "aaSim.R"
+# tocID <- "R/aaSim.R"
 #
 # Purpose: Define a function that computes a pairwise similarity score for
-#          amino acids.
+#          amino acids. This script is source()'d from .util.R
 #
-# Version: 1.0
-# Date:    2023-10
+# Version: 1.1
+# Date:    2024-09-30
 # Author:  boris.steipe@utoronto.ca; CSB195 2023 Class; ChatGPT-4
 #
 # Versions:
+#   1.1    Change procedure to work from AAontology-informed datasets. See
+#          courseScripts/04-aminoAcidSimilarity.R for details.
 #   1.0    Define aaSim() efficiently as a closure.
 #   0.5    Split this into two portions:
 #            - aaSim.R  defines the actual functions for general use.
@@ -27,7 +29,7 @@
 #            property indices.
 #            https://chat.openai.com/share/0cbd454e-2fa3-40e8-89d5-0e3f88a427b7
 #
-#            Part 2 is here - It analyzes the data, transforms it with
+#            Part 2 is this script. It analyzes the data, transforms it with
 #            PCA, defines a distance function, and then leads into
 #            Exploratory Data Analysis. In the end, we discovered some non-
 #            obvious things about biology.
@@ -73,14 +75,21 @@ aaSimConstructor <- function() {
   # === Parameters ==============================
 
   # Feature space:
-  # This file is based on selected AAINDEX indices, curated by CSB195-2023
-  # to remove indices that were considered to be _derived_ from the genetic
-  # code itself. This makes the resulting feature space useable to evaluate
-  # the robustness of the genetic code against point mutations. The indices
-  # were reduced to 14 Principal Components after scaling them, and the
-  # principal components were scaled by multiplying them with their
-  # contribution to the total variance.
-  SPACEFILE <- "data/aaFeatureSpace.2.0.Rds"
+  #
+  # 2023 version
+  # ============
+  # data/aaFeatureSpace.2.0.Rds was based on selected AAINDEX indices, curated
+  # by CSB195-2023 to remove indices that were considered to be _derived_ from
+  # the genetic code itself. This makes the resulting feature space usable to
+  # evaluate the robustness of the genetic code against point mutations. The
+  # indices were reduced to 14 Principal Components after scaling them, and the
+  # principal components were scaled by multiplying them with their contribution
+  # to the total variance.
+  # SPACEFILE <- "data/aaFeatureSpace.2.0.Rds"
+
+  # 2024 version
+  # ============
+  SPACEFILE <- "data/aaFeatureSpace.3.0.Rds"
 
   # Stop codon distance:
   # The distance of an amino acid to a stop codon is STOPDIST times the
