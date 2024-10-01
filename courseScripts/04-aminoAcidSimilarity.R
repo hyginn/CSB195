@@ -5,11 +5,12 @@
 #          acids in a feature spce derived from AAindex indices via their
 #          AAontology categories.
 #
-# Version: 2.0
-# Date:    2024-09
+# Version: 2.1
+# Date:    2024-10
 # Author:  boris.steipe@utoronto.ca; ChatGPT-4 and 4o
 #
 # Versions:
+#   2.1    Some cleanup after class
 #   2.0    Work from AAontology considerations, refactor all code
 #   0.5    Split file into two portions:
 #            - aaSim.R  defines the actual functions for general use.
@@ -57,24 +58,25 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                 Line
 #TOC> -----------------------------------------------------
-#TOC>   1        INITIALIZATIONS                         81
-#TOC>   1.1        Parameters                            83
-#TOC>   1.2        Packages                              89
-#TOC>   2        PREPROCESS THE DATA                     96
-#TOC>   2.1        Read Source Data                      98
-#TOC>   2.2        Scale Raw Values                     112
-#TOC>   2.3        Merge Into Single Data Frame         136
-#TOC>   2.4        Validate                             166
-#TOC>   2.4.1          Validate Scaling                 167
-#TOC>   2.4.2          Check outliers                   171
-#TOC>   2.4.3          Validate merging                 175
+#TOC>   1        INITIALIZATIONS                         83
+#TOC>   1.1        Parameters                            85
+#TOC>   1.2        Packages                              91
+#TOC>   2        PREPROCESS THE DATA                     98
+#TOC>   2.1        Read Source Data                     100
+#TOC>   2.2        Scale Raw Values                     114
+#TOC>   2.3        Merge Into Single Data Frame         138
+#TOC>   2.4        Validate                             168
+#TOC>   2.4.1          Validate Scaling                 169
+#TOC>   2.4.2          Check outliers                   173
+#TOC>   2.4.3          Validate merging                 177
 #TOC>   3        SELECT SCALES                          184
-#TOC>   4        1                                      186
-#TOC>   5        1                                      187
-#TOC>
+#TOC>   4        PCA                                    282
+#TOC>   5        AMINO ACID FEATURE SPACE               322
+#TOC>   6        AMINO ACID SIMILARITY                  392
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -164,15 +166,15 @@ id <- colnames(myScales)[57]       # Pick a random scale_id
 all(myScales[ , id] == aaontology[id, 6:25])
 
 # ==   2.4  Validate  ==========================================================
-# ===   2.4.1  Validate Scaling
+# ===   2.4.1  Validate Scaling            
 #
 # Confirm that all means are zero and all SDs are 1.
 
-# ===   2.4.2  Check outliers
+# ===   2.4.2  Check outliers              
 #
 # Identify any value outside the range (-3, 3)
 
-# ===   2.4.3  Validate merging
+# ===   2.4.3  Validate merging            
 for (i in 2:ncol(myScales)) {
   id <- colnames(myScales)[i]
   stopifnot(all(myScales[ , id] == aaontology[id, 6:25]))
@@ -198,7 +200,8 @@ for (i in 1:nrow(mySubCats)) {
 
 # We select all subcategories that depend on biophysical properties, but
 # not on the propensity for an amino acid to be selected in a specific
-# biological context. That might depend on the code (among other factors).
+# biological context. That might depend on the genetic code (among other
+# factors).
 
 mySubCats$inc[ 1] <- 1    # ASA/Volume : Accessible surface area (ASA)
 mySubCats$inc[ 2] <- 1    # ASA/Volume : Buried
@@ -276,7 +279,7 @@ mySubCats$inc[73] <- 1    # Structure-Activity : Stability (helix-coil)
 mySubCats$inc[74] <- 0    # Structure-Activity : Unclassified (Structure-Activity)
 
 
-# =    4  PCA ==================================================================
+# =    4  PCA  =================================================================
 
 # Prompt:
 #    Please explain PCA for data analysis.
@@ -294,14 +297,17 @@ for (i in 1:nrow(aaontology)) {
   }
 }
 
+# Validate: check all selected subcategories
+# ...
 
-#       Apply Principal Component Analysis (PCA) to the selected data, to
-#       compute components that have reduced dimensions, are orthogonal, and
-#       are ordered by importance (contribution to variance).
-idxPCA <- prcomp(idxScaled, scale. = FALSE)
-#       PYP: Identify the first principal components that capture 95% of
-#         variance as a basis for computing a similarity measure.
-cumulativeProportions <- cumsum(idxPCA$sdev^2) / sum(idxPCA$sdev^2)
+# Apply Principal Component Analysis (PCA) to the selected data, to
+# compute components that have reduced dimensions, are orthogonal, and
+# are ordered by importance (contribution to variance).
+aaPCA <- prcomp(aaontology[sel, 6:25], scale. = FALSE)
+
+# Identify the first principal components that capture 95% of
+# variance as a basis for computing a similarity measure.
+cumulativeProportions <- cumsum(aaPCA$sdev^2) / sum(aaPCA$sdev^2)
 barplot(cumulativeProportions,
         main="Cumulative Proportion of Variance Explained",
         xlab="Principal Component",
@@ -311,21 +317,23 @@ barplot(cumulativeProportions,
         col="lightblue")
 abline(h=0.95, col="red", lty=2)  # A horizontal line to indicate the 95% mark
 
-numPCsToRetain <- which(cumulativeProportions >= 0.95)[1]  # 14
+numPCsToRetain <- which(cumulativeProportions >= 0.95)[1]  # 12
 
-#       JOS: Extract these components into a suitable data structure.
-aaFeatureSpace <- idxPCA$rotation[, 1:numPCsToRetain]
-rownames(aaFeatureSpace) <- rownames(idxPCA$rotation)
+# =    5  AMINO ACID FEATURE SPACE  ============================================
+
+# Extract these components into a suitable data structure.
+aaFeatureSpace <- aaPCA$rotation[, 1:numPCsToRetain]
+rownames(aaFeatureSpace) <- rownames(aaPCA$rotation)
 colnames(aaFeatureSpace) <- paste0("PC", 1:numPCsToRetain)
 str(aaFeatureSpace)  # inspect
 
 # Let's look at the numerical distribution of values.
-for (i in 1:14) {
+for (i in 1:ncol(aaFeatureSpace)) {
   print(mean(aaFeatureSpace[, i]))
 }
 # All the means are "zero" (or at least very, very, very close to zero).
 
-for (i in 1:14) {
+for (i in 1:ncol(aaFeatureSpace)) {
   print(sd(aaFeatureSpace[, i]))
 }
 # All the standard deviations are 0.229. But that's actually not good. If the
@@ -334,11 +342,11 @@ for (i in 1:14) {
 # to the distance calculation. We should re-scale the columns according
 # to each PCs contribution to the total variance.
 
-# We can get the variances from idxPCA$sdev - the variances are the squares
+# We can get the variances from aaPCA$sdev - the variances are the squares
 # of the standard deviations:
 
-idxPCA$sdev[1:14]    # The standard deviations
-idxPCA$sdev[1:14]^2  # The variances
+aaPCA$sdev[1:ncol(aaFeatureSpace)]    # The standard deviations
+aaPCA$sdev[1:ncol(aaFeatureSpace)]^2  # The variances
 
 # To scale the PCs that make up the dimensions of our feature space, we can
 # simply multiply them by the variances. (Remember, the standard deviations of
@@ -346,14 +354,14 @@ idxPCA$sdev[1:14]^2  # The variances
 # different, we would have divided by the standard deviation first.)
 
 # Here we go:
-for (i in 1:14) {
-  aaFeatureSpace[, i] <- aaFeatureSpace[, i] * ( idxPCA$sdev[i]^2 )
+for (i in 1:ncol(aaFeatureSpace)) {
+  aaFeatureSpace[, i] <- aaFeatureSpace[, i] * ( aaPCA$sdev[i]^2 )
 }
 
 # Save the resulting feature space so we don't have to re-compute it when
 # we need it. saveRDS() saves a single R object in a compressed format. It is
 # safer to use than save() (see below).
-saveRDS(aaFeatureSpace, file = "data/aaFeatureSpace.2.0.Rds")
+saveRDS(aaFeatureSpace, file = "data/aaFeatureSpace.3.0.Rds")
 
 # saveRDS() / readRDS() save and _recreate_ single compressed R objects.
 # You can assign them  to a new variable (or the same variable name).
@@ -361,236 +369,99 @@ saveRDS(aaFeatureSpace, file = "data/aaFeatureSpace.2.0.Rds")
 # original name, and overwrites existing objects if you are not careful.
 #
 # Execute this to recreate aaFeatureSpace:
-# aaFeatureSpace <- readRDS("data/aaFeatureSpace.2.0.Rds")
+# aaFeatureSpace <- readRDS("data/aaFeatureSpace.3.0.Rds")
 #
 
-#       VAU: Validate PCA Components
-#         DUJ: Validation - Compute correlations with existing indices to
-#           support biological interpretation of the components.
-# Number of original indices and number of retained PCs
-numIndices <- nrow(idxScaled)
-numPCs <- numPCsToRetain
 
-# Initialize an empty matrix to store the correlations
-corMatrix <- matrix(0, nrow=numIndices, ncol=numPCs)
-rownames(corMatrix) <- rownames(idxScaled)
-colnames(corMatrix) <- colnames(aaFeatureSpace)
+# == MILESTONE: Amino Acid Feature Space =======================================
 
-# Loop to compute correlations
-for (i in 1:numIndices) {
-  for (j in 1:numPCs) {
-    corMatrix[i, j] <- cor(idxScaled[i, ], aaFeatureSpace[, j])
-  }
-}  # The matrix 'corMatrix' now contains the desired correlations
-
-# Find a good correlation of a PC with the index ...
-# For the first PC, get the index with the maximum absolute correlation
-maxIndexForPC1 <- which.max(abs(corMatrix[, 1]))  # column 1
-
-# Retrieve the corresponding row name (index name) and correlation value
-bestIndexName <- rownames(corMatrix)[maxIndexForPC1]
-bestCorrelation <- corMatrix[maxIndexForPC1, 1]
-
-cat("The index most correlated with PC1 is:", bestIndexName,
-    "with a correlation of:", bestCorrelation, "\n")
-
-# Verify with a scatterplot
-# Extract PC1 values and NISK860101 index values
-x <- idxScaled["NISK860101", ]
-y <- aaFeatureSpace[, "PC1"]
-
-# Create a scatterplot
-plot(x, y,
-     main="Scatterplot of PC1 vs NISK860101",
-     xlab="NISK860101 Index Values",
-     ylab="PC1 Values",
-     pch=19,
-     col="skyblue")
-
-# Add a linear regression line for reference
-abline(lm(y ~ x), col="#ff33aa")
+# At this point
+#   - we have taken a large set of biophysical and statistical observations
+#     of amino acids;
+#   - we have scaled them to be numerically comparable among each other;
+#   - we have selected catgories of observations that we believe are independent
+#     of the genetic code itself, and thus can be used to evaluate the
+#     genetic code;
+#   - we have used PCA to remove any sampling bias and correlations between
+#     the various sets of observations;
+#   - we have constructed a "feature space" constructed from the "principal
+#     components" of the dataset, which represents all of the information
+#     contained in the original observations.
 
 
-#         DYS: Validation - Examine a scatterplot of the amino acids
-#           PC1 against PC2
-plot(aaFeatureSpace[, "PC1"], aaFeatureSpace[, "PC2"],
-     main="Scatterplot of PC1 vs PC2",
-     xlab="PC1", ylab="PC2", pch=19, col="blue")
+# =    6  AMINO ACID SIMILARITY  ===============================================
 
-# Adding amino acid labels to the points for clarity
-text(aaFeatureSpace[, "PC1"], aaFeatureSpace[, "PC2"],
-     labels=rownames(aaFeatureSpace), pos=3, cex=0.8)
-
-
-#   YTI: Define "similarity" as the Euclidean distance between the
-#     two input amino acids in the PCA based feature space stored in JOS: .
-#     (Such Euclidean distances in feature space are intuitive to interpret.)
-#     (Alternatives to consider are:
-#       - Average of one-dimensional differences.
-#       - Weighted average of one-dimensional differences if some indices
-#         carry more importance.
-#       - Sum of one-dimensional differences
-#       - Clustering values and assigning categories to pairwse differences
-#       - Cosine similarity
-#       - Any other statistical or machine learning method that can be
-#         applied to vector differences.
-#       )
+# We are now ready to define:
+#
+#    The similarity between two amino acids is the Euclidian distance between
+#    their locations in an amino acid feature space.
+#
+# This maps the diverse properties of amino acids to a single number.
 
 
-# Note: the function below - myAAsim() - which was originally developed in
-# conversation with the AI, has been superseded by aaSim() (defined in
-# ./R/aaSim.R). I have kept it in this file to keep the development process
-# complete.
+# Based on this, I have supplied a function - aaSim() -
+# which computes the actual similarities.
 
-myAAsim <- function(a1, a2, space = aaFeatureSpace) {
-  # a1, a2: amino acid one-letter symbols
+aaSim("Q", "Q") #  0         Identical amino acids: distance is zero.
+aaSim("F", "I") #  0.8016213 Similar amino acids: distance is small.
+aaSim("Q", "F") #  4.763314  Dissimilar amino acids: distance is large.
+aaSim("F", "Q") #  4.763314  Distance between x and y is the same as
+                #              the distance between y and x.
+aaSim("Q", "*") #  8.727359  Distance between any amino acid and a stop
+                #              codon is large.
+aaSim("*", "*") #  0:        Two stop codons: distance is zero.
 
-  # Extract the feature vectors for the two amino acids
-  vector1 <- space[a1, ]
-  vector2 <- space[a2, ]
 
-  # Compute the Euclidean distance
-  distance <- sqrt(sum((vector1 - vector2)^2))
+# You can read the construction of the function in the file R/aaSim.R
 
-  return(distance)
-}
+# Let's do a quick check of which amino acid is the most distinct, and which
+# one is the most "plain vanilla" among the twenty. We develop this from
+# pseudocode:
 
-# Try this:
-myAAsim("M", "W")  # should be "similar"
-myAAsim("I", "D")  # should be "dissimilar"
-myAAsim("Q", "Q")  # should be identical
+# Prompt:
+#    Please explain "pseudocode".
+# --
 
-# Examine heatmap
+#> For each amino acid
+#>   For each of the 19 other amino acids
+#>     Compute the distance of the amino acid pair
+#>   Compute the mean
 
-aminoAcids <- rownames(aaFeatureSpace)
-distanceMatrix <- matrix(0, nrow=length(aminoAcids), ncol=length(aminoAcids))
-rownames(distanceMatrix) <- aminoAcids
-colnames(distanceMatrix) <- aminoAcids
+# We can use the AADAT dataset to get a vector of one-letter codes.
+myA <- sort(unique(AADAT$A))[-1]
+mySims <- numeric(20)  # make a 20-elelment vector of numbers
+names(mySims) <- myA
 
-for(i in 1:length(aminoAcids)) {
-  for(j in 1:length(aminoAcids)) {
-    distanceMatrix[i, j] <- myAAsim(aminoAcids[i], aminoAcids[j])
-  }
-}
 
-heatmap(distanceMatrix, main="Amino Acid Pairwise Distances",
-        Colv=NA, Rowv=NA, scale="none", col=rev(heat.colors(256)),
-        xlab="Amino Acid", ylab="Amino Acid")
-
-# Examine ALL the heatmaps
-# Function to compute distance matrix for a given feature space subset
-computeDistanceMatrix <- function(spaceSubset) {
-  aminoAcids <- rownames(spaceSubset)
-  distanceMatrix <- matrix(0, nrow=length(aminoAcids), ncol=length(aminoAcids))
-  rownames(distanceMatrix) <- aminoAcids
-  colnames(distanceMatrix) <- aminoAcids
-
-  for(i in 1:length(aminoAcids)) {
-    for(j in 1:length(aminoAcids)) {
-      distanceMatrix[i, j] <- myAAsim(aminoAcids[i], aminoAcids[j], spaceSubset)
+#> For each amino acid
+for (thisA in myA) {
+  for (otherA in myA) {
+#>   For each of the 19 other amino acids
+    if (thisA == otherA) {
+      next
     }
+#>     Sum the distance of the amino acid pair
+    mySims[thisA] <- mySims[thisA] + aaSim(thisA, otherA)
   }
-
-  return(distanceMatrix)
+#>   Compute the mean
+  mySims[thisA] <- mySims[thisA] / 19
 }
 
-# Create a series of heatmaps
+(mySims <- sort(mySims) ) # sort the vector and show the results
 
-for(i in 1:14) {
-  distanceMatrixSubset <- computeDistanceMatrix(aaFeatureSpace[, 1:i, drop=FALSE])
-  heatmap(distanceMatrixSubset, main=paste("Distances using PC1 to PC", i),
-          Colv=NA, Rowv=NA, scale="none", col=rev(heat.colors(256)),
-          xlab="Amino Acid", ylab="Amino Acid")
-}
+# The most "distinct" amino acid is "R" (arginine), the most average amino
+# acid is "T" (threonine).
 
-# Do the same thing with dendrogram heatmaps
+# Plot this:
 
-for(i in 1:14) {
-  distanceMatrixSubset <- computeDistanceMatrix(aaFeatureSpace[, 1:i, drop=FALSE])
-
-  # Using heatmap to plot the distance matrix with dendrogram clustering
-  heatmap(distanceMatrixSubset, main=paste("Distances using PC1 to PC", i),
-          Colv=TRUE, Rowv=TRUE, scale="none", col=rev(heat.colors(256)),
-          xlab="Amino Acid", ylab="Amino Acid")
-}
-
-# run t-SNE for more exploration:
-install.packages("Rtsne")
-
-# Load the Rtsne package
-library(Rtsne)
-
-# Apply t-SNE on aaFeatureSpace
-set.seed(123)  # Set seed for reproducibility
-tsneResults <- Rtsne::Rtsne(aaFeatureSpace,
-                     dims=2,
-                     perplexity=5,            # was: 10 (default)
-                     check_duplicates=FALSE)
-
-# Plot the t-SNE results
-plot(tsneResults$Y, t='n', main="t-SNE of aaFeatureSpace", xlab="", ylab="")
-text(tsneResults$Y, labels=rownames(aaFeatureSpace), cex=0.8, col="blue")
+barplot(mySims,
+        main = "Amino Acid Similarity",
+        ylab = "Mean pairwise distances in feature space (AU)",
+        ylim = c(0.0, 3.5),
+        col = AACOLS[names(mySims)],
+        cex.names = 0.5)
 
 
-# === CONTINUE AI CO-DEVELOPED PSEUDOCODE =================
-
-#     DMD: Validate Euclidean Distance computation
-#       FKB: Validation - Inspect a distance matrix, ensure metricity:
-#         - Non-negativity and identity of indiscernibles:
-#           d(a,a) == 0 and d(a,b) >= 0
-#         - Symmetry: d(A, B) == d(B, A)
-#         - Triangle inequality: d(a,b) + d(b,c) ≥ d(a,c)
-
-# PROCESS:
-
-#   YLC: Apply the similarity function
-#     YUC: Accept and validate input
-#       Ensure the input is a vector with exactly two amino acid symbols that
-#       correspond to the labels used for the feature space.
-#       GLI: Represent the two amino acids as a vector in the defined
-#         feature space
-#       DZF: Compute and RETURN the Euclidean distance between those vectors.
-#         The result is the similarity. Lower values are more similar.
-#         A value of 0.0 means: they are identical.
-
-# OUTPUT: similarity of an amino acid pair as a single scalar value
-
-# VALIDATION:
-
-#   LIL: Validation - Construct Valid Test Cases for the full workflow
-#     UTE: Utilize known similarities and dissimilarities between amino acid
-#       pairs for eyeball testing
-#     ESX: Construct synthetic data defining artificial amino acids and
-#       indices, that give known correct results.
-#       XQI: Run tests of the workflow and confirm that the known correct
-#         results are obtained
-
-#   WRF: Validation - Analyze Result Distribution
-#     WKS: Visualize the distribution of similarity scores using histograms
-#     KZL: Obtain statistical summaries of similarity scores to gauge
-#       distribution properties
-
-#   CPZ: Validation - Ensure Biological/Chemical Relevance
-#     AHQ: Check results for logical consistency with biological/chemical
-#       intuitions
-#     WVG: Compare results with known sequence alignment matrices like BLOSUM
-
-#   NAJ: Validation - Visualize and Intuitively Assess Results
-#     AKK: Visualize PCA-transformed data, exploring clusters or patterns
-#       among amino acids
-#     OLX: Create a heatmap of the distance matrix to visually explore amino
-#       acid pair similarities
-
-
-
-# ====  TESTS AND VALIDATION ===================================================
-
-if (FALSE) {
-
-
-
-}
-
-
+# (To follow: interpretation of principal components ...)
 
 # [END]

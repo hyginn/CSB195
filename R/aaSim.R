@@ -96,7 +96,7 @@ aaSimConstructor <- function() {
   # maximum distance in the distance matrix.
   STOPDIST <- 1.5
 
-  # Recreate a 14-dimensional feature space of amino acids
+  # Recreate a 12-dimensional feature space of amino acids
   # (see aminoAcidSimilarity.R for details). Normalize rownames to single
   # letter symbols.
   AASPACE <- readRDS(SPACEFILE)
