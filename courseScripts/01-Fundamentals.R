@@ -1,14 +1,20 @@
 # 01-Fundamentals.R
 #
 # Purpose: Basic concepts of R programming
-# Version: 1.0
-# Date:    2024-09-18
+# Version: 1.1
+# Date:    2024-09-29
 # Author:  boris.steipe@utoronto.ca
+#
+# Versions:
+#   1.1    Cleanup and formatting
+#   1.0    Assigned as task.
 #
 # ToDo:
 # Notes:
 #
 # ==============================================================================
+
+# This is a work-along script.
 
 # Copy this file into your "myScripts" folder. Then open the copy for editing.
 
@@ -19,8 +25,16 @@
 
 # ====  BASIC CONCEPTS  ========================================================
 
-# Prompt:  Please give me a one-sentence definition of "<...>".
+# Study the basic concepts as needed with your AI tutor. Ask more questions
+# if the explanations use ideas or terms you are not familiar with. Don't
+# worry about repeating questions as long as you need: the AI does not judge.
+# :-)
+#
 
+# Prompt:
+# =======
+#    Please give me a one-sentence definition of "<...>".
+# --
 
 # ===   algorithm
 
