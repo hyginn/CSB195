@@ -85,9 +85,9 @@ printGCtable <- function(myGC,
   if (! all(sort(order) == 1:3)) {
     stop("\"order\" is not a permutation of 1 2 3.")
   }
-  if (! any(aaColName == colnames(dat))) {
-    stop(sprintf("aaColName \"%s\" does not appear in the dataframe \"dat\"",
-                 aaColName))
+  if (! any(format == colnames(dat))) {
+    stop(sprintf("format \"%s\" does not appear in the dataframe \"dat\"",
+                 format))
   }
 
   # Load the standard genetic code if myGC is missing
