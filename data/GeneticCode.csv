@@ -31,10 +31,10 @@ C,T,A,CTA,leucine,Leu,L
 C,T,C,CTC,leucine,Leu,L
 C,T,G,CTG,leucine,Leu,L
 C,T,T,CTT,leucine,Leu,L
-G,A,A,GAA,glutamic acid,Glu,E
-G,A,C,GAC,aspartic acid,Asp,D
-G,A,G,GAG,glutamic acid,Glu,E
-G,A,T,GAT,aspartic acid,Asp,D
+G,A,A,GAA,glutamate,Glu,E
+G,A,C,GAC,aspartate,Asp,D
+G,A,G,GAG,glutamate,Glu,E
+G,A,T,GAT,aspartate,Asp,D
 G,C,A,GCA,alanine,Ala,A
 G,C,C,GCC,alanine,Ala,A
 G,C,G,GCG,alanine,Ala,A
