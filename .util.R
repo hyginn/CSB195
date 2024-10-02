@@ -12,38 +12,41 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
-#TOC>   1        Install missing packages                              50
-#TOC>   2        Load required libraries                               70
-#TOC>   3        Load datasets                                         74
-#TOC>   4        Generic Utilities                                     81
-#TOC>   4.1        vr - make a row-vector                              84
-#TOC>   4.2        vc - make a column-vector                          101
-#TOC>   4.3        mmScale - min-max Scaling                          118
-#TOC>   4.4        A progress bar for long-running code               130
-#TOC>   4.5        randSeed - large, random seeds                     166
-#TOC>   4.6        Random IDs                                         197
-#TOC>   5        Generative AI                                        259
-#TOC>   5.1        t2c - write text to clipboard                      263
-#TOC>   5.2        Initialize generative AI initial prompt            281
-#TOC>   6        Working with Google assets                           312
-#TOC>   6.1        Extracting R code from Google docs                 315
-#TOC>   6.2        Reading Google sheets                              388
-#TOC>   7        Remote control of ChimeraX                           461
-#TOC>   8        Bioinformatics Utilities                             542
-#TOC>   8.1        Find Keywords in aaindex                           545
-#TOC>   8.2        A colour palette for amino acids                   584
-#TOC>   8.3        Load the genetic code into a data frame            626
-#TOC>   8.4        Load an amino acid dataset                         634
-#TOC>   8.5        Convert one-letter symbols to three-letter         650
-#TOC>   8.6        Amino acid similarity                              732
-#TOC>   8.7        Dotplot                                            741
-#TOC>   8.8        Plotting amino acids as 2D scatterplot             861
-#TOC>   9        Plot Utilities                                       920
-#TOC>   9.1        Draw a triangle on an existing plot                922
-#TOC>
+#TOC>   1        Install missing packages                              53
+#TOC>   2        Load required libraries                               73
+#TOC>   3        Load datasets                                         77
+#TOC>   4        Generic Utilities                                     84
+#TOC>   4.01       vr - make a row-vector                              87
+#TOC>   4.02       vc - make a column-vector                          104
+#TOC>   4.03       mmScale - min-max Scaling                          121
+#TOC>   4.04       A progress bar for long-running code               133
+#TOC>   4.05       randSeed - large, random seeds                     169
+#TOC>   4.06       Random IDs                                         200
+#TOC>   5        Generative AI                                        262
+#TOC>   5.01       t2c - write text to clipboard                      266
+#TOC>   5.02       Initialize generative AI initial prompt            284
+#TOC>   6        Working with Google assets                           315
+#TOC>   6.01       Extracting R code from Google docs                 318
+#TOC>   6.02       Reading Google sheets                              391
+#TOC>   7        Remote control of ChimeraX                           464
+#TOC>   8        Bioinformatics Utilities                             545
+#TOC>   8.01       Find Keywords in aaindex                           548
+#TOC>   8.02       A colour palette for amino acids                   587
+#TOC>   8.03       Load the standard genetic code                     629
+#TOC>   8.04       Load an amino acid dataset                         638
+#TOC>   8.05       Convert one-letter symbols to three-letter         654
+#TOC>   8.06       Amino acid similarity                              737
+#TOC>   8.07       Create a random genetic code                       744
+#TOC>   8.08       Construct neighbouring codons                      752
+#TOC>   8.09       Print a genetic code in a table                    760
+#TOC>   8.10       Dotplot                                            768
+#TOC>   8.11       Plotting amino acids as 2D scatterplot             888
+#TOC>   9        Plot Utilities                                       947
+#TOC>   9.01       Draw a triangle on an existing plot                949
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -81,7 +84,7 @@ utils::data(aaindex, package = "seqinr")
 # =    4  Generic Utilities  ===================================================
 #
 
-# ==   4.1  vr - make a row-vector  ============================================
+# ==   4.01  vr - make a row-vector  ===========================================
 #
 
 cat("  Defining vr() ...\n")
@@ -98,7 +101,7 @@ vr <- function(v, rowName, colNames) {
 }
 
 
-# ==   4.2  vc - make a column-vector  =========================================
+# ==   4.02  vc - make a column-vector  ========================================
 #
 
 cat("  Defining vc() ...\n")
@@ -115,7 +118,7 @@ vc <- function(v, rowNames, colName) {
   return(cc)
 }
 
-# ==   4.3  mmScale - min-max Scaling  =========================================
+# ==   4.03  mmScale - min-max Scaling  ========================================
 #
 
 cat("  Defining mmScale() ...\n")
@@ -127,7 +130,7 @@ mmScale <- function(x) {
   return((x - min(x)) / (max(x) - min(x)))
 }
 
-# ==   4.4  A progress bar for long-running code  ==============================
+# ==   4.04  A progress bar for long-running code  =============================
 #
 
 cat("  Defining pBar() ...\n")
@@ -163,7 +166,7 @@ if (FALSE) {
 
 }
 
-# ==   4.5  randSeed - large, random seeds  ====================================
+# ==   4.05  randSeed - large, random seeds  ===================================
 #
 
 cat("  Defining randSeed() ...\n")
@@ -194,7 +197,7 @@ if (FALSE) {
 
 }
 
-# ==   4.6  Random IDs  ========================================================
+# ==   4.06  Random IDs  =======================================================
 #
 
 cat("  Defining rID() ...\n")
@@ -260,7 +263,7 @@ if (FALSE) {
 #
 
 
-# ==   5.1  t2c - write text to clipboard  =====================================
+# ==   5.01  t2c - write text to clipboard  ====================================
 #
 
 cat("  Defining t2c() ...\n")
@@ -278,7 +281,7 @@ t2c <- function(txt) {
 }
 
 
-# ==   5.2  Initialize generative AI initial prompt  ===========================
+# ==   5.02  Initialize generative AI initial prompt  ==========================
 #
 
 cat("  Defining gAIinit() ...\n")
@@ -312,7 +315,7 @@ Please confirm with one word.
 # =    6  Working with Google assets  ==========================================
 #
 
-# ==   6.1  Extracting R code from Google docs  ================================
+# ==   6.01  Extracting R code from Google docs  ===============================
 #
 
 cat("  Defining fetchGoogleDocRCode ...\n")
@@ -385,7 +388,7 @@ if (FALSE) {
 }
 
 
-# ==   6.2  Reading Google sheets  =============================================
+# ==   6.02  Reading Google sheets  ============================================
 #
 
 cat("  Defining readGsheet() ...\n")
@@ -542,7 +545,7 @@ CX <- function(cmd, port = CXPORT, quietly = FALSE) {
 # =    8  Bioinformatics Utilities  ============================================
 #
 
-# ==   8.1  Find Keywords in aaindex  ==========================================
+# ==   8.01  Find Keywords in aaindex  =========================================
 #
 
 cat("  Defining grepAAindex() ...\n")
@@ -581,7 +584,7 @@ grepAAindex <- function(key, el = "D") {
 # cat(sprintf("\n%s\t%s", names(aaindex[[idx]]$I), aaindex[[idx]]$I))
 
 
-# ==   8.2  A colour palette for amino acids  ==================================
+# ==   8.02  A colour palette for amino acids  =================================
 #
 
 cat("  Defining AACOLS ...\n")
@@ -623,15 +626,16 @@ AACOLS["E"] <- "#B3294B" # hydrophilic, (-) charge
 # AACOLS <- gsub("..$", "FF", AACOLS)  # Reset the two last digits to "FF"
                                        #   to remove transparency
 
-# ==   8.3  Load the genetic code into a data frame  ===========================
+# ==   8.03  Load the standard genetic code  ===================================
 #
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 
 GCdf <- utils::read.csv("data/GeneticCode.csv")
+rownames(GCdf) <- GCdf$Codon
 
 
-# ==   8.4  Load an amino acid dataset  ========================================
+# ==   8.04  Load an amino acid dataset  =======================================
 #
 
 cat("  Loading reference dataset AADAT from a Google sheet (Course Data) ...\n")
@@ -647,7 +651,7 @@ rownames(AADAT) <- AADAT$Codon
 
 
 
-# ==   8.5  Convert one-letter symbols to three-letter  ========================
+# ==   8.05  Convert one-letter symbols to three-letter  =======================
 #
 
 cat("  Defining A2Aaa ...\n")
@@ -660,8 +664,9 @@ A2Aaa <- function(aa, out = ifelse(nchar(aa[1]) == 3, "A", "Aaa") ) {
   #       "A"    - convert all input to IUPAC one letter symbols
   #       "Aaa"  - convert all input to IUPAC three letter symbols
   #       "Name" - convert all input to IUPAC  name
-  # Note: Whereas IUPAC uses Aspartic acid and Glutamic acid, we always use
-  #       the names of the ionized forms aspartate and glutamate.
+  # Note: Whereas IUPAC uses Aspartic acid and Glutamic acid, we use
+  #       the names of the ionized forms aspartate and glutamate. Thus amino
+  #       acid names are always a single word.
   #
   #       IUPAC uses capitalized names in their table, but lowercase
   #       in text. We use lower-case throughout for names, upper case
@@ -729,16 +734,38 @@ if (FALSE) {
 
 }
 
-# ==   8.6  Amino acid similarity  =============================================
+# ==   8.06  Amino acid similarity  ============================================
 #
 
 cat("  Defining aaSim() ...\n")
 
 source("./R/aaSim.R")
 
+# ==   8.07  Create a random genetic code  =====================================
+#
+
+cat("  Defining rGC() ...\n")
+
+source("./R/rGC.R")
 
 
-# ==   8.7  Dotplot  ===========================================================
+# ==   8.08  Construct neighbouring codons  ====================================
+#
+
+cat("  Defining neighCodons() ...\n")
+
+source("./R/neighCodons.R")
+
+
+# ==   8.09  Print a genetic code in a table  ==================================
+#
+
+cat("  Defining printGCtable() ...\n")
+
+source("./R/printGCtable.R")
+
+
+# ==   8.10  Dotplot  ==========================================================
 #
 
 cat("  Defining dotPlot2() ...\n")
@@ -858,7 +885,7 @@ dotPlot2 <- function(A, B,        # sequence vectors
 
 
 
-# ==   8.8  Plotting amino acids as 2D scatterplot  ============================
+# ==   8.11  Plotting amino acids as 2D scatterplot  ===========================
 #
 
 cat("  Defining plotAA() ...\n")
@@ -919,7 +946,7 @@ if (FALSE) {
 
 # =    9  Plot Utilities  ======================================================
 
-# ==   9.1  Draw a triangle on an existing plot  ===============================
+# ==   9.01  Draw a triangle on an existing plot  ==============================
 
 
 cat("  Defining triangle() ...\n")
