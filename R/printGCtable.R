@@ -92,7 +92,7 @@ printGCtable <- function(myGC,
 
   # Load the standard genetic code if myGC is missing
   if (missing(myGC)) {
-    myGC <- dat[ , aaColName]
+    myGC <- dat[ , format]
     names(myGC) <- dat$Codon
   } else {
     # Check myGC's consistency
@@ -103,9 +103,9 @@ printGCtable <- function(myGC,
       stop("\"myGC\" is not named with the 64 codons.")
     }
     for (i in 1:length(myGC)) {
-      dat[names(myGC)[i], aaColName] <- myGC[i]
+      dat[names(myGC)[i], format] <- myGC[i]
     }
-    # Overwrite column "aaColName" with the symbols in the
+    # Overwrite column "format" with the symbols in the
     # input vector
   }
 
