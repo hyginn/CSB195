@@ -3,12 +3,13 @@
 # Purpose: Summarize rationale and process of performing experiments
 #          on the quality of the Universal Genetic Code.
 #
-# Version: 0.1
+# Version: 1.0
 # Date:    2024-10
 # Author:  boris.steipe@utoronto.ca; ChatGPT-4 and 4o
 #
 # Versions:
-#   0.1    New script with code contributions from
+#   1.0    In class - Tutorial 04
+#   0.1    New script with code contributions from CSB195 2023 project
 #
 # Preconditions:
 #    AADAT and GCdf are defined via .util.R
