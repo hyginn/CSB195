@@ -57,13 +57,7 @@ if (FALSE) {
   inC <- "AAA"
   (nC <- neighCodons(inC))
   length(nC) == 9                              # TRUE if nC has 9 codons.
-  length(unique(nC)) == 9                              # TRUE if nC has 9 codons.
-
-
-  sum(xGC == "*") == 3                         # TRUE if xGC has 3 "*".
-  all(sort(names(xGC)) == sort(GCdf$Codon))    # TRUE if all codons are used.
-  all(sort(table(xGC)) == sort(table(GCdf$A))) # TRUE if symbol counts match.
-
+  length(unique(nC)) == 9                      # TRUE if nC has 9 unique codons.
 
 }
 
