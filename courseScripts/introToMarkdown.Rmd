@@ -1,0 +1,279 @@
+---
+title: "Random Phobias"
+author: "Boris Steipe <boris.steipe@utoronto.ca>"
+date: "2024-10-03"
+output: 
+  html_document:
+#    number_sections: yes
+#    toc: yes
+---
+<!--
+This is a brief, practical introduction to R Markdown.
+
+The text you are reading is enclosed in HTML comment tags, it will be
+hidden in the HTML document that this page produces.
+
+The document is an "R markdown" document (and that's is why it has the
+extension ".Rmd"), and this superb technology allows us to freely mix
+text and code, and share results. 
+
+Introducing Markdown
+====================
+Markdown is a "lightweight" markup language designed to make writing and
+formatting text simple and intuitive. At least simpler and more intuitive
+than HTML. Markdown uses plain text syntax to create rich text elements
+like headings, lists, links, and tables. For example, to make a word bold,
+you simply wrap it in double asterisks like this: **bold**. It is not as 
+versatile and powerful as a markup language like HTML, but it is easy to
+learn and straightforward to read. Moreover, the resulting documents can
+be exported to multiple formats, such as PDF, Word, and HTML.
+
+Markdown and Literate Programming
+=================================
+Literate programming is the idea of weaving narrative text with code to
+produce documents that are both human-readable and executable. And Markdown
+is very suitable for this purpose. This concept is fully realized in
+R Markdown, an extension of Markdown used in R. R Markdown allows you to
+write a single document that contains R code chunks, Markdown-formatted
+text, and outputs such as tables, plots, and formatted results. The 
+R Markdown document (.Rmd) is then rendered using a toolchain that includes
+the knitr and rmarkdown packages in R, which transform the document into a
+final output format, such as HTML, PDF, or Word.
+
+In practice, to create an R Markdown document in R Studio, you start by
+creating a new .Rmd file and using the template that R Studio provides.
+You then intersperse code blocks (enclosed in triple backticks) with
+Markdown text. Finally, when you click the Knit button at the top of the
+script pane, R Studio will execute the code, generate outputs, and merge
+them with your text to produce a final, polished document. This workflow
+makes R Markdown the perfect format for reproducible research, data analysis,
+and reporting, as it ensures your work is documented in a way that others
+can understand, replicate, and build upon.
+
+There are two ways to work with this file:
+
+A: Rendering to HTML
+====================
+Click on the "Knit" button at the top, to run the code contained in this file.
+You will obtain a structured document in HTML format that opens in the
+Web browser that is built into RStudio. 
+
+B: Working Interactively
+========================
+You can change the code in the code "chunks" to try variations interactively.
+In this case you have to have to (a) prepare the environment by clicking on the
+"Run All Chunks Above" icon at the right-hand side of the chunk, (b) make your
+changes, and (c) click on the green right-pointing triangle "Run Current Chunk"
+to execute the changed code.
+
+It is probably best to first render the document (Option A), study the
+rendered result, and then go back to specific points for experimentation
+(Option B) to understand the code better.
+
+-->
+
+```{css, echo = FALSE}
+.striped tr:nth-child(even) {
+  background: #eaf1ff;
+}
+.striped td, .striped th {
+  padding: 5px;
+}
+.meta {
+  font-size: 0.8em;
+  color: #bbbbbb;
+}
+```
+<small>Random Phobias - sample code to introduce R Markdown documents.
+(c) Boris Steipe 2015-2024.</small>
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache.path = 'tmp/')
+```
+
+## Phobias! ##
+We all have some, but we could always use more. How to know them all? With this code we access the [Wikipedia list of phobias](https://en.wikipedia.org/wiki/List_of_phobias), scrape the contents and assemble a dataframe. Then we write a function to retrieve a random phobia, which we can subsequently ponder on - either to delight in the fact that we don't have that fear, or to add to our daily quota of anxieties <small>(like our well-founded [fear of bad programming practice](http://xkcd.com/292/))</small>.
+
+To load the list, we will "screenscrape" the contents of Wikipedia's [List of Phobias](https://en.wikipedia.org/wiki/List_of_phobias). First, we install the `rvest` library and the `xml2` library from CRAN, if we don't have it.
+```{r packages}
+if (! requireNamespace("rvest", quietly=TRUE)) {
+  install.packages("rvest")
+}
+if (! requireNamespace("xml2", quietly=TRUE)) {
+  install.packages("xml2")
+}
+```
+
+`xml2::` handles reading and parsing of documents. The `rvest::` package was designed for screenscraping and has functions to make our life very easy: it accesses the response of an `xml2::` query, looks for all HTML formatted tables, parses them with an XPATH expression and returns them as lists from which we can get data frames.
+
+To keep our code explicit and maintainable, we don't use the `library()` function to load the package contents, but use the `package::function()` idiom instead:
+
+```{r getPageData, cache=TRUE}
+pageSource <- xml2::read_html("https://en.wikipedia.org/wiki/List_of_phobias")
+allTables <- rvest::html_table(pageSource, fill = TRUE)
+```
+
+There are ```r length(allTables)``` tables in the list, but the ones we are interested in are data frames with two columns named `Phobia` and `Condition`.
+
+```{r collateTables, cache=TRUE}
+phobiaTable <- data.frame(Phobia = character(), Condition = character())
+for (i in seq_along(allTables)) {
+  df <- allTables[[i]]
+  if (paste(colnames(df), collapse = " ") == "Phobia Condition") {
+    phobiaTable <- rbind(phobiaTable, df)
+  }
+}
+```
+
+A bit of cleanup is required. 
+
+**First**, we want to remove the Wikipedia References. They are formatted as numbers in square brackets and the function `gsub()` with an appropriate regular expression will get rid of them.
+
+```{r removeReferences, cache=TRUE}
+
+phobiaTable$Phobia <- gsub("\\[\\d+\\]", "", phobiaTable$Phobia)
+phobiaTable$Condition <- gsub("\\[\\d+\\]", "", phobiaTable$Condition)
+```
+
+<small>Regexes can be confusing - here is how `"\\[\\d+\\]"` works:
+
+* `\\[`: Matches a literal opening square bracket `[`.
+* `\\d+`: Matches one or more digits.
+* `\\]`: Matches a literal closing square bracket `]`.
+
+Note that all three elements need to be "escaped", but for different reasons. We need to escape the square brackets because those have a special meaning in regular expressions (they collect "character classes"). But here we want to **remove** their special meaning, so we escape them. However "d" does not have a special meaning - it is just the literal character "d". In our case we have to **give** it a special meaning though, it should match a _digit_, i.e. one of the numerals in 0-9. And we **give** it a special meaning by escaping it. Special meaning characters in regexes are `\^$.| .*?+()[` and `{`. Regexes have a bit of a learning curve ...
+
+And one more thing: in R, we need to double the escape character. R strings use the backslash to indicate special characters (e.g., `\n` for a newline, or `\"` for a literal quotation mark). We need to **remove** this special meaning and send the literal backslash to the regex engine and we do this by doubling the backslash (`\\`).
+
+In short, **the first backslash is for R**, and the **second backslash is for the regex engine**.
+</small>
+
+**Second**, many of the phobias are listed with various synonyms, separated by commas. Let's keep only the first one of those, the `strsplit()` function will break them apart.
+
+```{r removeSynonyms, cache=TRUE}
+for (i in seq_along(phobiaTable$Phobia)) {
+  phobiaTable$Phobia[i] <- strsplit(phobiaTable$Phobia[i], ", ")[[1]][1]
+}
+```
+For each phobia, we split the string on the combo `, `, take the first item of the list that `strsplit()` returns - i.e. `[[1]]` and take only the first element from there.
+
+Done, we collected ```r nrow(phobiaTable)``` phobias. Let's randomly select a few and print them.
+
+
+<p>&nbsp;
+<p>
+
+```{r , ref.label="randRow", echo=FALSE}
+```
+
+**Table**: seven random phobias<br/>
+```{r renderPhobiaTable, echo=FALSE, results='asis'}
+sel <- sample(1:nrow(phobiaTable), 7)
+knitr::kable(phobiaTable[sel, ], table.attr = "class=\"striped\"", format = "html")
+```
+
+<p>&nbsp;
+<p>
+
+## Phobia of the Day ##
+
+To pick a single random phobia from the list, we take a (pseudo) random sample of size 1 from the number of rows in the `phobiaFrame` object. And we can set a "seed" for the random number generator that is derived from other information. Our function thus returns a random row from a matrix or dataframe, and it uses an additional argument: `seed`. This can either be created from todays date (default), or you can use any integer which is then passed to R's `set.seed()` function.
+
+```{r randRow}
+randRow <- function(M, seed = as.integer(format(Sys.Date(), "%y%m%d"))) {
+  # Return a (pseudo) random row from a dataframe M.
+  oldseed <- .Random.seed         # play nice: save the original RNG state ...
+  set.seed(as.integer(seed))      # initialize the RNG
+  r <- M[sample(1:nrow(M), 1), ]  # fetch one random row
+  .Random.seed  <- oldseed        # ... restore the RNG state
+  return(r)
+}
+```
+
+<p>&nbsp;
+<p>
+With this useful tool we can ponder on our favourite phobia of the day. For today, let it be **`r randRow(phobiaTable)[2]`**, the `r randRow(phobiaTable)[1]`.
+
+_`r randRow(phobiaTable)[1]`_! Really!!? Awful.
+
+<p>&nbsp;
+<p>
+
+## The Long and Short of Phobias ##
+
+Finally: let's plot a histogram of phobia name lengths just to illustrate how plots work in Rmarkdown documents. 
+
+```{r preProcess}
+
+# select only phobia names that end with the word "phobia" and that have no blank spaces in the name
+sel <-   grepl(".phobia$", phobiaTable$Phobia) &
+       ! grepl(" ",        phobiaTable$Phobia)
+names <- phobiaTable$Phobia[sel]
+```
+
+We collected ```r length(names)``` names for phobias. Here is a histogram of their lengths.
+
+```{r showHist}
+
+x <- nchar(names)
+pShort <- names[which(x == min(x))[1]]  # pull out the shortest name ...
+pLong  <- names[which(x == max(x))[1]]  # ... and the longest name too.
+hist(x,
+     breaks = 20,
+     xlim = c(0,30),
+     xlab = "name",
+     ylab = "counts",
+     main = "Length of phobia-names",
+     sub = sprintf("Shortest: %s (%d), Longest: %s (%d)",
+                   pShort, nchar(pShort), pLong, nchar(pLong)),
+     cex.sub = 0.8,
+     col ="#aef5ee",
+     )
+abline(v = 6, col = "#A00050")
+text(0, -0.5, "...", pos = 3)
+text(1, -0.5, "p", pos = 3)
+text(2, -0.5, "h", pos = 3)
+text(3, -0.5, "o", pos = 3)
+text(4, -0.5, "b", pos = 3)
+text(5, -0.5, "i", pos = 3)
+text(6, -0.5, "a", pos = 3)
+
+```
+
+That's all.
+
+----
+
+## Further Reading ##
+* [Yihui Xie's R Markdown Book](https://bookdown.org/yihui/rmarkdown/)
+    * Yihui Xie is one of the thought leaders in the community and his work on the knitr and Bookdown packages have tranformed the field. Plus Yihui is a strong champion of free (or open source) software.
+
+### RStudio documentation ###
+* [R Markdown](https://rmarkdown.rstudio.com/index.html)
+* [Syntax Basics](https://rmarkdown.rstudio.com/authoring_basics.html)
+* [R Markdown course](https://rmarkdown.rstudio.com/lesson-1.html)
+
+<p>&nbsp;
+<p>
+
+----
+
+<p>&nbsp;
+<p>
+
+<div class="meta">
+#### Meta ####
+
+* Version 2024.01.0
+* Code derived in part from `RandomPhobia.Rmd` written for the ABC course units.
+
+</div>
+
+
+<!-- [END] -->

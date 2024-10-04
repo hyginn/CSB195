@@ -17,7 +17,7 @@
 #
 # Output:  a vector of its nine neighbouring codons
 #
-# ToDo:
+# ToDo:    write this as a closure for efficiency
 #
 # Notes:
 #

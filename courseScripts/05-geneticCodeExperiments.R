@@ -25,7 +25,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                         Line
 #TOC> -------------------------------------------------------------
 #TOC>   1        INITIALIZATIONS                                 48
@@ -41,7 +41,7 @@
 #TOC>   4.2        The randomized code generator                362
 #TOC>   5        NEIGHBOURING CODONS                            372
 #TOC>   6        EVALUATING THE STANDARD GENETIC CODE           385
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -116,7 +116,7 @@ if (! requireNamespace("Biostrings", quietly = TRUE)) {
 ?Biostrings::getGeneticCode         # See documentation on the help-page
 Biostrings::getGeneticCode("1")     # "1" corresponds to NCBI code 1
 
-# Tthe R/ folder contains a script for a function that prints any genetic code
+# The R/ folder contains a script for a function that prints any genetic code
 # in a standard table format: printGCtable(). It gets loaded from the .util.R
 # script. We can print the standard code with it:
 
@@ -130,7 +130,7 @@ printGCtable(Biostrings::getGeneticCode("1"), format = "Name")
 # The basic function to randomize collections in R is sample(). Without sample()
 # takes a vector of things as input - that's what is being sampled from. Then it
 # takes a number that determines how many elements should be sampled. Another
-# parameter dtermines whether sampling is with replacement, or without
+# parameter determines whether sampling is with replacement, or without
 # replacement. And finally non-equal probabilities can be set for each of the
 # inoput elements. Here are some examples:
 #
@@ -175,7 +175,7 @@ sample(1:6)
 cat(GCdf$A)
 
 
-# ===   4.1.1  Redundancy in the Code              
+# ===   4.1.1  Redundancy in the Code
 
 
 # We can sort the amino acids, for clarity
@@ -222,7 +222,7 @@ sort(table(GCdf$A), decreasing = TRUE)
 # W
 
 
-# ===   4.1.2  The amino acid "alphabet"           
+# ===   4.1.2  The amino acid "alphabet"
 
 # We can extract the amino acid letters from column "A" of GCdf. If we
 # take only the unique ones (no repetitions) we get the "alphabet"
@@ -235,7 +235,7 @@ myAA <- sort(names(table(GCdf$A)))
 cat(myAA)
 
 
-# ===   4.1.3  Codes with the same redundancy      
+# ===   4.1.3  Codes with the same redundancy
 
 # Our goal is to take elements from this alphabet and distribute them so
 # that we have three sets of six of the same amino acids, five sets

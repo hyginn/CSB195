@@ -6,3 +6,5 @@
 dev/*
 instructor/*
 myScripts/*
+courseScripts/*.html
+courseScripts/tmp/*
