@@ -2,7 +2,7 @@
 #
 # CSB195 Class project: utility scripts
 #
-# 2022-09  - 2024-09
+# 2022-09  - 2024-10
 # boris.steipe@utoronto.ca
 #
 # This file is source()'d upon startup by .Rprofile
@@ -12,7 +12,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              53
@@ -46,7 +46,7 @@
 #TOC>   8.11       Plotting amino acids as 2D scatterplot             888
 #TOC>   9        Plot Utilities                                       947
 #TOC>   9.01       Draw a triangle on an existing plot                949
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -67,6 +67,10 @@ if (!requireNamespace("stringr", quietly=TRUE)) {
 
 if (!requireNamespace("seqinr", quietly=TRUE)) {
   utils::install.packages("seqinr")
+}
+
+if (! requireNamespace("here", quietly=TRUE)) {
+  install.packages("here")
 }
 
 
@@ -631,7 +635,7 @@ AACOLS["E"] <- "#B3294B" # hydrophilic, (-) charge
 
 cat("  Loading dataset GCdf from ./data/GeneticCode.csv ...\n")
 
-GCdf <- utils::read.csv("data/GeneticCode.csv")
+GCdf <- utils::read.csv(here::here("data/GeneticCode.csv"))
 rownames(GCdf) <- GCdf$Codon
 
 
@@ -739,14 +743,14 @@ if (FALSE) {
 
 cat("  Defining aaSim() ...\n")
 
-source("./R/aaSim.R")
+source(here::here("./R/aaSim.R"))
 
 # ==   8.07  Create a random genetic code  =====================================
 #
 
 cat("  Defining rGC() ...\n")
 
-source("./R/rGC.R")
+source(here::here("./R/rGC.R"))
 
 
 # ==   8.08  Construct neighbouring codons  ====================================
@@ -754,7 +758,7 @@ source("./R/rGC.R")
 
 cat("  Defining neighCodons() ...\n")
 
-source("./R/neighCodons.R")
+source(here::here("./R/neighCodons.R"))
 
 
 # ==   8.09  Print a genetic code in a table  ==================================
@@ -762,7 +766,7 @@ source("./R/neighCodons.R")
 
 cat("  Defining printGCtable() ...\n")
 
-source("./R/printGCtable.R")
+source(here::here("./R/printGCtable.R"))
 
 
 # ==   8.10  Dotplot  ==========================================================
