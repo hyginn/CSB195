@@ -89,7 +89,10 @@ aaSimConstructor <- function() {
 
   # 2024 version
   # ============
-  SPACEFILE <- "data/aaFeatureSpace.3.0.Rds"
+  if (! requireNamespace("here", quietly=TRUE)) {
+    install.packages("here")
+  }
+  SPACEFILE <- here::here("data/aaFeatureSpace.3.0.Rds")
 
   # Stop codon distance:
   # The distance of an amino acid to a stop codon is STOPDIST times the
