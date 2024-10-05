@@ -23,23 +23,19 @@
 # ====  PACKAGES  ==============================================================
 # Check that required packages have been installed. Install if needed.
 
-if (! requireNamespace("seqinr", quietly=TRUE)) {
-  install.packages("seqinr")
+if (! requireNamespace("here", quietly=TRUE)) {
+  install.packages("here")
 }
-# Package information:
-#  library(help = seqinr)       # basic information
-#  browseVignettes("seqinr")    # available vignettes
-#  data(package = "seqinr")     # available datasets
 
 # Note: use package functions with the :: operator - eg.
-# seqinr::aaa("K")
+# here::here("K")
 
 
 
 # ====  FUNCTIONS  =============================================================
 
 # Define functions or source external files
-source("<myUtilityFunctionsScript.R>")
+source(here::here("<myUtilityFunctionsScript.R>"))
 
 myFunction <- function(a, b=1) {
 	# Purpose:
