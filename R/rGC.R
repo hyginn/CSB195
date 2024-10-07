@@ -4,11 +4,12 @@
 #          redundancy as the standard genetic code, and three stop codons.
 #          This script is source()'d from .util.R
 #
-# Version: 1.1
-# Date:    2024-10-01
+# Version: 1.2
+# Date:    2024-10-07
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.2    support setting a seed
 #   1.1    2024 - standalone and sourced from .util.R
 #   1.0    Written in 2023 as part of sampleSolutionGeneticCode.R
 #
@@ -23,10 +24,18 @@
 # ==============================================================================
 
 
-rGC <- function() {
+rGC <- function(seed) {
   # Returns a random Genetic Code with three stop codons, and the same
   # redundancy as the universal code, but randomly replaced amino
   # acids.
+
+  # Save the original state of the RNG, set a new seed for the RNG,
+  # and restore the original on exit.
+  if (! missing(seed)) {
+    oSeed <- .Random.seed
+    on.exit(assign(".Random.seed", oSeed, envir = globalenv()))
+    set.seed(seed)
+  }
 
   A <- GCdf$A                       # Fetch the single-letter symbols.
   A <- A[A != "*"]                  # Remove the "*" symbols.
@@ -53,7 +62,17 @@ if (FALSE) {
   all(sort(names(xGC)) == sort(GCdf$Codon))    # TRUE if all codons are used.
   all(sort(table(xGC)) == sort(table(GCdf$A))) # TRUE if symbol counts match.
 
-
+  rGC(112358)
+    #    AAA AAC AAG AAT ACA ACC ACG ACT AGA AGC AGG AGT ATA ATC ATG
+    #    "L" "Y" "M" "F" "T" "E" "A" "N" "A" "C" "R" "A" "*" "D" "N"
+    #    ATT CAA CAC CAG CAT CCA CCC CCG CCT CGA CGC CGG CGT CTA CTC
+    #    "W" "K" "M" "G" "E" "K" "D" "D" "N" "S" "D" "H" "W" "N" "V"
+    #    CTG CTT GAA GAC GAG GAT GCA GCC GCG GCT GGA GGC GGG GGT GTA
+    #    "Q" "A" "H" "I" "H" "E" "M" "A" "T" "E" "K" "R" "R" "P" "*"
+    #    GTC GTG GTT TAA TAC TAG TAT TCA TCC TCG TCT TGA TGC TGG TGT
+    #    "S" "*" "S" "F" "A" "E" "S" "I" "Y" "G" "V" "P" "M" "L" "E"
+    #    TTA TTC TTG TTT
+    #    "M" "M" "K" "H"
 }
 
 
