@@ -26,7 +26,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                              Line
 #TOC> ------------------------------------------------------------------
 #TOC>   1        INITIALIZATIONS                                      48
@@ -41,7 +41,7 @@
 #TOC>   5        Significance by integration                         297
 #TOC>   6        Significance by simulation or permutation           307
 #TOC>   7        Finally: The genetic code ...                       430
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -77,7 +77,7 @@ thisCode <- GCdf$A                      # Define the sGC
 names(thisCode) <- rownames(GCdf)
 
 sumDist <- 0                            # Initialize a variable to contain
-                                        # thw sum of distances
+                                        # the sum of distances
 
 for (codonX in names(thisCode)) {       # For each codon in the code
   aaX <- thisCode[codonX]               # ... get the encoded amino acid
@@ -190,7 +190,7 @@ print(x, digits = 22)
 # curve, as a fraction of the whole.
 
 
-# ===   3.2.1  p-value illustrated                      
+# ===   3.2.1  p-value illustrated
 
 # Let's illustrate. First we draw a million random values from our
 # standard, normal distribution:
