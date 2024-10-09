@@ -10,8 +10,8 @@
 #
 # Versions:
 #   1.2.1  Turn restoration of RNG off by default to prevent cycling
-#          the same RNG state in a looped call to the function and
-#          RNG dependent generation of the seed.
+#          the same RNG state in a looped call where generation of the seed
+#          is itself RNG dependent.
 #   1.2    support setting a seed
 #   1.1    2024 - standalone and sourced from .util.R
 #   1.0    Written in 2023 as part of sampleSolutionGeneticCode.R
