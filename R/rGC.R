@@ -81,6 +81,15 @@ if (FALSE) {
     #    "S" "*" "S" "F" "A" "E" "S" "I" "Y" "G" "V" "P" "M" "L" "E"
     #    TTA TTC TTG TTT
     #    "M" "M" "K" "H"
+  for (i in 1:5) {  # Demonstrates RNG cycling
+    x <- rGC(sample(1:.Machine$integer.max, 1), noSideEffects = TRUE)
+    print(x[1:5])
+  }
+  for (i in 1:5) {  # RNG cycling suppressed
+    x <- rGC(sample(1:.Machine$integer.max, 1))
+    print(x[1:5])
+  }
+
 }
 
 
