@@ -1,12 +1,13 @@
 # tocID <- "courseScripts/06-significance.R"
 #
-# Purpose: Evaluating the segnificance of an observation.
+# Purpose: Evaluating the significance of an observation.
 #
 # Version: 1.0
-# Date:    2024-10-07
+# Date:    2024-10-09
 # Author:  boris.steipe@utoronto.ca; ChatGPT-4 and 4o
 #
 # Versions:
+#   1.1    More explanations in comments
 #   1.0    In class - Class session 05: new script with code contributions
 #          from FND-STA-Significance.R and 05-GeneticCodeExperiments.R
 #
@@ -28,18 +29,18 @@
 #TOC> 
 #TOC>   Section  Title                                              Line
 #TOC> ------------------------------------------------------------------
-#TOC>   1        INITIALIZATIONS                                      47
-#TOC>   1.1        Parameters                                         49
-#TOC>   1.2        Packages                                           52
-#TOC>   2        RATIONALE AND PROCESS                                62
-#TOC>   3        Significance and p-value                            115
-#TOC>   3.1        Significance levels                               126
-#TOC>   3.2        probability and p-value                           143
-#TOC>   3.2.1          p-value illustrated                           175
-#TOC>   4        One- or two-sided                                   232
-#TOC>   5        Significance by integration                         277
-#TOC>   6        Significance by simulation or permutation           283
-#TOC>   7        Finally: The genetic code ...                       395
+#TOC>   1        INITIALIZATIONS                                      48
+#TOC>   1.1        Parameters                                         50
+#TOC>   1.2        Packages                                           53
+#TOC>   2        RATIONALE AND PROCESS                                63
+#TOC>   3        Significance and p-value                            125
+#TOC>   3.1        Significance levels                               145
+#TOC>   3.2        probability and p-value                           161
+#TOC>   3.2.1          p-value illustrated                           193
+#TOC>   4        One- or two-sided                                   250
+#TOC>   5        Significance by integration                         297
+#TOC>   6        Significance by simulation or permutation           307
+#TOC>   7        Finally: The genetic code ...                       430
 #TOC> 
 #TOC> ==========================================================================
 
@@ -62,19 +63,44 @@ if (! requireNamespace("Biostrings", quietly = TRUE)) {
 # =    2  RATIONALE AND PROCESS  ===============================================
 
 # We have previously
-#  - defined an amino acid similarity function
-#  - defined a way to create "random" genetic codes
-#  - constructed code that identifies the adjacent codons to any given codon.
+#  (A) defined an amino acid similarity function
+#  (B) defined a way to create "random" genetic codes
+#  (C) constructed R code that constructs adjacent codons to any given codon.
 
 #  We can connect these elements together to create and evaluate random
 #  genetic codes.
 
-# The standard genetic code
-# =========================
+# Consider how we evaluate the standard genetic code:
 #
 
 thisCode <- GCdf$A                      # Define the sGC
 names(thisCode) <- rownames(GCdf)
+
+sumDist <- 0                            # Initialize a variable to contain
+                                        # thw sum of distances
+
+for (codonX in names(thisCode)) {       # For each codon in the code
+  aaX <- thisCode[codonX]               # ... get the encoded amino acid
+
+  for (codonY in neighCodons(codonX)) { # For all nine neighbors of the codon
+    aaY <- thisCode[codonY]             # ... get the encoded amino acid
+    dist <- aaSim(aaX, aaY)             # ... compute distance in feature space
+    sumDist <- sumDist + dist           # ... add to the sum of distances
+  }
+}
+
+# This is the result: a measure of how the genetic code preserves amino acid
+# similarity if it is subjected to point mutations
+sumDist
+
+# But this is just a single number, so we decided to compare this to random
+# genetic codes. Essentially this works with the same R code, except we
+# start from a random code.
+
+myRandomSeed <- sample(1:.Machine$integer.max, 1)
+thisCode <- rGC(myRandomSeed)           # Define a random genetic code
+names(thisCode) <- rownames(GCdf)       # Name with the 64 codons
+
 sumDist <- 0                            # Initialize the sum of distances
 
 for (codonX in names(thisCode)) {       # For each codon
@@ -82,33 +108,17 @@ for (codonX in names(thisCode)) {       # For each codon
 
   for (codonY in neighCodons(codonX)) { # For all nine neighbors
     aaY <- thisCode[codonY]             # get the encoded amino acid
-    dist <- aaSim(aaX, aaY)             # compute distance in feature space
+
+    dist <- aaSim(aaX, aaY)             # compute the distance
     sumDist <- sumDist + dist           # add to the sum of distances
   }
 }
 
 sumDist
-
-
-# A random code
-# =============
-
-
-thisCode <- rGC(112358)                 # Define a random genetic code
-names(thisCode) <- rownames(GCdf)
-sumDist <- 0                            # Initialize the sum of distances
-
-for (codonX in names(thisCode)) {       # For each codon
-  aaX <- thisCode[codonX]               # Get the encoded amino acid
-
-  for (codonY in neighCodons(codonX)) { # For all nine neighbors
-    aaY <- thisCode[codonY]             # get the encoded amino acid
-    dist <- aaSim(aaX, aaY)             # compute distance in feature space
-    sumDist <- sumDist + dist           # add to the sum of distances
-  }
-}
-
-sumDist
+# This number is different. But how different? Are we looking at a difference
+# that we should expect simply from random fluctuations, is this a
+# high-probability difference? Or is the difference significant? We need to
+# talk about statistical probability and significance.
 
 
 
@@ -118,26 +128,34 @@ sumDist
 # interpretation, but how is it useful to know the probability? Usually we are
 # interested in whether we should accept or reject a hypothesis based on the
 # observations we have. A rational way to do this is to say: if the probability
-# of observing the data is very small under the null-hypothesis, then we will
-# assume the observation is due to something other than the null-hypothesis. But
-# what do we mean by the "probability of our observation"? And what is "very
-# small"?
+# of observing the data is very small under some hypothesis of how it was
+# generated, then we will assume the observation is due to something other than
+# that hypothesis. Of course there are many ways in which the data could have
+# been generated, and we can have many hypotheses about the process. But in
+# statistics we are particularly interested in a process that is boring, i.e.
+# uninformative - essentially a process that is merely due to random chance.
+# Because, if we are able to reject that an observation is due to random chance,
+# something else is going on, something that is more interesting and will tell
+# us something worth knowing  about the system we are observing. We call this
+# "uninformative" hypothesis the "null-hypothesis".
+
+# But what do we mean by "the probability of observing the data is very small"?
+# What is the "probability we are speaking of here? And what is "very small"?
 
 # ==   3.1  Significance levels  ===============================================
 
 # A "very small" probability is purely a matter of convention - a cultural
-# convention. In the biomedical field we usually call probabilities of less then
-# 0.05 (5%) small enough to reject the null-hypothesis. Thus we call
-# observations with a probability of less than 0.05 "significant" and if we want
-# to highlight this in text or in a graph, we often mark them with an asterisk
-# (*). Also we often call observations with a probability of less than 0.01
-# "highly significant" and mark them with two asterisks (**). But there is no
-# special significance in these numbers, the cutoff point for significance could
-# also be 0.0498631, or 0.03, or 1/(pi^3). 0.05 is just the value that the
-# British statistician Ronald Fisher happened to propose for this purpose in
-# 1925. Incidentally, Fisher later recommended to use different cutoffs for
-# different purposes (cf.
-# https://en.wikipedia.org/wiki/Statistical_significance).
+# convention. In the biomedical field we usually call probabilities of less than
+# 0.05 (5%) small enough to reject the null-hypothesis. We call observations
+# with a probability of less than 0.05 "significant" and if we want to highlight
+# this in text or in a graph, we often mark them with an asterisk (*). Also we
+# often call observations with a probability of less than 0.01 "highly
+# significant" and mark them with two asterisks (**). But there is no special
+# significance in these numbers, the cutoff point for significance could also be
+# 0.0498631, or 0.03, or 1/(pi^3). 0.05 is just the value that the British
+# statistician Ronald Fisher happened to propose for this purpose in 1925.
+# Incidentally, Fisher later recommended to use different cutoffs for different
+# purposes (cf. https://en.wikipedia.org/wiki/Statistical_significance).
 
 
 # ==   3.2  probability and p-value  ===========================================
@@ -184,7 +202,7 @@ set.seed(NULL)                       # reset the RNG
 
 # Let's see what the distribution looks like:
 
-(h <- hist(r))
+(h <- hist(r, breaks = 40))
 
 # The histogram details are now available in the list h -  e.g. h$counts
 
@@ -201,7 +219,7 @@ hCol <- rep("#EE000044", sum(h$breaks < x) - 1)
 hCol <- c(hCol, "#FFFFFFFF")
 hCol <- c(hCol, rep("#00EE0044", sum(h$breaks > x) - 1))
 # ... then plot the histogram, with colored bars ...
-hist(r, col = hCol)
+hist(r, col = hCol, breaks = 40)
 # ... add two colored rectangles into the white bar ...
 idx <- sum(h$breaks < x)
 xMin <- h$breaks[idx]
@@ -264,7 +282,9 @@ sum(r > quantile(r, probs = 0.95))
 # Task:
 # Use abline() to add the p = 0.05 boundary for smaller values to the histogram.
 
-abline(v = quantile(r, probs = c(0.05)))
+abline(v = quantile(r, probs = c(0.05)), col = "#8800BB", lwd = 0.5)
+
+# This means: we consider outliers to the left of this line to be significant observations because they occur less than 5% of the total.
 
 # To summarize: when we evaluate the significance of an event, we divide a
 # probability distribution into two parts at the point where the event was
@@ -277,12 +297,16 @@ abline(v = quantile(r, probs = c(0.05)))
 # =    5  Significance by integration  =========================================
 
 # If the underlying probability distribution can be analytically or numerically
-# integrated, the siginificance of an observation can be directly computed.
+# integrated, the significance of an observation can be directly computed. This
+# is the basis of the many, many types of statistical tests that exist, and the
+# underlying mathematics can be somewhat challenging. It is generally not
+# recommended to publish work in which the conclusions depend on accurate
+# statistics if you are not able to involve someone with expertise in the field.
 
 
 # =    6  Significance by simulation or permutation  ===========================
 
-# But whether the integration is correct, or relies on assumptions that may not
+# Whether the integration is correct, or relies on assumptions that may not
 # be warranted for biological data, can be a highly technical question.
 # Fortunately, we can often simply run a simulation, a random resampling, or a
 # permutation and then count the number of outcomes, just as we did with our
@@ -310,15 +334,15 @@ MBP1 <- paste0("MSNQIYSARYSGVDVYEFIHSTGSIMKRKKDDWVNATHILKAANFAKAKRTRILEKEVLK",
                "QTVLLNKLIEDETQATTNNTVEKDNNTLERLELAQELTMLQLQRKNKLSSLVKKFEDNAK",
                "IHKYRRIIREGTEMNIEEVDSSLDVILQTLIANNNKNKGAEQIITISNANSHA")
 
-# first we split this string into individual characters:
+# First we split this string into individual characters:
 v <- unlist(strsplit(MBP1, ""))
 
-# and find the positions of our charged residues
+# ... and find the positions of our charged residues
 
-ED  <- grep("[ED]", v)
-RKH <- grep("[RKH]", v)
+ED  <- grep("[ED]", v)   # Vector containing the location of E and D
+RKH <- grep("[RKH]", v)  # Vector containing the location of R, K, and H
 
-sep <- numeric(length(ED)) # this vector will hold the distances
+sep <- numeric(length(ED)) # Vector to hold the distances
 for (i in seq_along(ED)) {
   sep[i] <- min(abs(RKH - ED[i]))
 }
@@ -360,16 +384,14 @@ chSep <- function(v) {
 # calculated above:
 chSep(v)
 
-# Now we can produce a random permutation of v, and recalculate
+# Now we can produce a random permutation of v (a "shuffle"), and recalculate
 
-set.seed(pi)                       # set RNG seed for repeatable randomness
-w <- sample(v, length(v))          # This shuffles the vector v. Memorize this
-# code paradigm. It is very useful.
-set.seed(NULL)                     # reset the RNG
+set.seed(112358)    # set RNG seed for repeatable randomness
+w <- sample(v)      # This shuffles the vector v. It is equivalent to
+                    # sample(v, length(v), replace = FALSE).
+                    # Memorize this code paradigm. It is very useful.
 
-
-
-chSep(w)
+chSep(w)            # Recompute the separation with the shuffled vector:
 # 3.773 ... that's actually less than what we had before.
 
 # Let's do this 10000 times and record the results (takes a few seconds):
@@ -385,19 +407,34 @@ abline(v = chSep(v), col = "#EE0000")
 
 # Contrary to our expectations, the actual observed mean minimum charge
 # separation seems to be larger than what we observe in randomly permuted
-# sequences. Now, what would we mean by: this is a significant result, or
-# this is not a significant result? Where does our 5% bound come in?
+# sequences. Now, what would we mean by: "this is a significant result", or
+# "this is not a significant result"? Where does our 5% bound appear? The shape
+# of the probability distribution is no longer symmetric, so our assumptions
+# about the normal distribution no longer hold...
+
+# So here is where our empirical p-value come to the rescue. Instead of
+# integrating over this unknown distribution, we simply count how many values
+# are equal or larger than the one we have observed, and divide that by the
+# total number of observations.
 
 # Task:
 # Calculate the empirical p-value for chsep(v)
 x <- (sum(chs >= chSep(v)) + 1) / (length(chs) + 1)
 
+# The result says: the minimum separation between oppositely charged residues in
+# this sequence is a bit larger than what we would expect by random chance, but
+# the difference is not significant: 12% of random observations are equal or
+# even larger.
+
+
 # =    7  Finally: The genetic code ...  =======================================
 
+# Task: Map out how to calculate an empirical p-value for genetic code
+# similarity. You can try simply handing the code snippet that evaluates the
+# random code similarity to your AI tutor and asking them how to proceed, to
+# explain the steps, and to plot the results. Also ask them to overlay the
+# histogram you receive with the curve of a normal distribution.
 
 
-
-
-# Note: sample(1:.Machine$integer.max, 1)
 
 # [END]
