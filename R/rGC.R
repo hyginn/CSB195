@@ -34,9 +34,9 @@ rGC <- function(seed, noSideEffects = FALSE) {
 
   # If noSideEffects is TRUE, the original state of the RNG is saved, and
   # restored on exit. Use this for applications in which the state of the
-  # RNG should not be modified by rGC(). However,
-  # code that produces the seed from a RNG dependent function like sample()
-  # will always produce the same output in a loop if the RNG is not modified.
+  # RNG should not be modified by rGC(). However, code that produces the seed
+  # from a RNG dependent function like sample() will always produce the same
+  # output in a loop if the RNG is not modified - the RNG cycles.
   if (noSideEffects) {
     oSeed <- .Random.seed
     on.exit(assign(".Random.seed", oSeed, envir = globalenv()))
