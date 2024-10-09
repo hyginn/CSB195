@@ -4,11 +4,14 @@
 #          redundancy as the standard genetic code, and three stop codons.
 #          This script is source()'d from .util.R
 #
-# Version: 1.2
-# Date:    2024-10-07
+# Version: 1.2.1
+# Date:    2024-10-08
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
+#   1.2.1  Turn restoration of RNG off by default to prevent cycling
+#          the same RNG state in a looped call to the function and
+#          RNG dependent generation of the seed.
 #   1.2    support setting a seed
 #   1.1    2024 - standalone and sourced from .util.R
 #   1.0    Written in 2023 as part of sampleSolutionGeneticCode.R
@@ -24,16 +27,21 @@
 # ==============================================================================
 
 
-rGC <- function(seed) {
+rGC <- function(seed, noSideEffects = FALSE) {
   # Returns a random Genetic Code with three stop codons, and the same
   # redundancy as the universal code, but randomly replaced amino
   # acids.
 
-  # Save the original state of the RNG, set a new seed for the RNG,
-  # and restore the original on exit.
-  if (! missing(seed)) {
+  # If noSideEffects is TRUE, the original state of the RNG is saved, and
+  # restored on exit. Use this for applications in which the state of the
+  # RNG should not be modified by rGC(). However,
+  # code that produces the seed from a RNG dependent function like sample()
+  # will always produce the same output in a loop if the RNG is not modified.
+  if (noSideEffects) {
     oSeed <- .Random.seed
     on.exit(assign(".Random.seed", oSeed, envir = globalenv()))
+  }
+  if (! missing(seed)) {
     set.seed(seed)
   }
 
