@@ -20,6 +20,7 @@
 #  To Do:
 #    Colour patterns (e.g. Gliders)
 #    Fade out background ether pattern
+#    Preload full window of evolving code
 #
 #  References:
 #   Cook, Matthew (2004) Universality in Elementary Cellular Automata.
@@ -42,7 +43,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                                  Line
 #TOC> ----------------------------------------------------------------------
 #TOC>   1        INTRODUCTION                                             62
@@ -55,7 +56,7 @@
 #TOC>   4.3.1          Digression: initializations                       322
 #TOC>   5        EVERY SINGLE CA                                         353
 #TOC>   6        LONG EVOLUTIONS                                         364
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -319,7 +320,7 @@ plotFigure("CA.8", iRule = 110,
            nx = 233, ny = 233, vInit = "fib")
 
 
-# ===   4.3.1  Digression: initializations                  
+# ===   4.3.1  Digression: initializations
 
 # Nb. the code I wrote for this exploration can generate a number of different
 # initializations:
