@@ -12,41 +12,41 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                               Line
 #TOC> -------------------------------------------------------------------
 #TOC>   1        Install missing packages                              53
-#TOC>   2        Load required libraries                               73
-#TOC>   3        Load datasets                                         77
-#TOC>   4        Generic Utilities                                     84
-#TOC>   4.01       vr - make a row-vector                              87
-#TOC>   4.02       vc - make a column-vector                          104
-#TOC>   4.03       mmScale - min-max Scaling                          121
-#TOC>   4.04       A progress bar for long-running code               133
-#TOC>   4.05       randSeed - large, random seeds                     169
-#TOC>   4.06       Random IDs                                         200
-#TOC>   5        Generative AI                                        262
-#TOC>   5.01       t2c - write text to clipboard                      266
-#TOC>   5.02       Initialize generative AI initial prompt            284
-#TOC>   6        Working with Google assets                           315
-#TOC>   6.01       Extracting R code from Google docs                 318
-#TOC>   6.02       Reading Google sheets                              391
-#TOC>   7        Remote control of ChimeraX                           464
-#TOC>   8        Bioinformatics Utilities                             545
-#TOC>   8.01       Find Keywords in aaindex                           548
-#TOC>   8.02       A colour palette for amino acids                   587
-#TOC>   8.03       Load the standard genetic code                     629
-#TOC>   8.04       Load an amino acid dataset                         638
-#TOC>   8.05       Convert one-letter symbols to three-letter         654
-#TOC>   8.06       Amino acid similarity                              737
-#TOC>   8.07       Create a random genetic code                       744
-#TOC>   8.08       Construct neighbouring codons                      752
-#TOC>   8.09       Print a genetic code in a table                    760
-#TOC>   8.10       Dotplot                                            768
-#TOC>   8.11       Plotting amino acids as 2D scatterplot             888
-#TOC>   9        Plot Utilities                                       947
-#TOC>   9.01       Draw a triangle on an existing plot                949
-#TOC>
+#TOC>   2        Load required libraries                               77
+#TOC>   3        Load datasets                                         81
+#TOC>   4        Generic Utilities                                     88
+#TOC>   4.01       vr - make a row-vector                              91
+#TOC>   4.02       vc - make a column-vector                          108
+#TOC>   4.03       mmScale - min-max Scaling                          125
+#TOC>   4.04       A progress bar for long-running code               137
+#TOC>   4.05       randSeed - large, random seeds                     173
+#TOC>   4.06       Random IDs                                         204
+#TOC>   5        Generative AI                                        266
+#TOC>   5.01       t2c - write text to clipboard                      270
+#TOC>   5.02       Initialize generative AI initial prompt            288
+#TOC>   6        Working with Google assets                           322
+#TOC>   6.01       Extracting R code from Google docs                 325
+#TOC>   6.02       Reading Google sheets                              398
+#TOC>   7        Remote control of ChimeraX                           471
+#TOC>   8        Bioinformatics Utilities                             552
+#TOC>   8.01       Find Keywords in aaindex                           555
+#TOC>   8.02       A colour palette for amino acids                   594
+#TOC>   8.03       Load the standard genetic code                     636
+#TOC>   8.04       Load an amino acid dataset                         645
+#TOC>   8.05       Convert one-letter symbols to three-letter         661
+#TOC>   8.06       Amino acid similarity                              744
+#TOC>   8.07       Create a random genetic code                       751
+#TOC>   8.08       Construct neighbouring codons                      759
+#TOC>   8.09       Print a genetic code in a table                    767
+#TOC>   8.10       Dotplot                                            775
+#TOC>   8.11       Plotting amino acids as 2D scatterplot             895
+#TOC>   9        Plot Utilities                                       954
+#TOC>   9.01       Draw a triangle on an existing plot                956
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -298,17 +298,20 @@ gAIinit <- function() {
   txt <- "
 I would like you to act as an R language tutor and answer my prompts to help me learn R. As a tutor, you do the following:
 
-* You always write # as the very last character of every response, so I know that the response is complete.
-* You keep in mind that I am a programming beginner and you explain syntax and concepts at a novice level.
+* You write # as the very last character of every response, so I know that the response is complete.
+* You explain syntax and concepts at a novice level.
 * You are concise.
-* You avoid using packages when a base R function is trivial to write for the purpose.
-* when you mention functions, you identify them by typing parentheses after the name: e.g. rnorm(), c()
-* when you mention packages, you identify them by typing two colons after the name: e.g. httr::, utils::
-* When you must use non-standard packages, you write code with package::function() and do not use library(package) if possible.
-* You do not use tidyverse functions.
-* You use dataFrame[ , col] notation, not dataFrame[[col]] if possible.
-* When the return value of an expression is the required output, you simply provide the expression. You do not wrap it in a print() statement, or assign it to a variable. For example: path.expand(\"~\") NOT print(path.expand(\"~\")) and NOT home_directory <- path.expand(\"~\"); print(home_directory).
+* I prefer to write base R function when they are easy to write, rather than using functions from packages.
+* I prefer writing function names with parentheses after the name for clarity: e.g. rnorm(), c()
+* I prefer writing package names with two colons after the name for clarity: e.g. httr::, utils::
+* I prefer to use camelCase naming conventions.
+* I prefer a code idiom of package::function() rather than using library(package) if possible.
+* I prefer not to use tidyverse functions.
+* I prefer dataFrame[ , col] notation, not dataFrame[[col]] if possible.
+* It is usually sufficient to execute expressions in order to see the return value, rather than wrapping them in print() statements. For example: path.expand(\"~\") is just fine.
+* I prefer to avoid \"magic numbers\" in code. Parameters should be defined as variables at the top of a function definition, or before a complex function call, for easier commenting and modification.
 * My prompts may include comment characters (#  ) at the beginning of lines when I copy them from a script. Please ignore those characters.
+
 
 Please confirm with one word.
 "
