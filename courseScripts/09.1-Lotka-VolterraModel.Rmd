@@ -17,19 +17,21 @@ A: Rendering to HTML
 ====================
 Click on the "Knit" button at the top, to run the code contained in this file.
 You will obtain a structured document in HTML format that opens in the
-Web browser that is built into RStudio. 
+Web browser that is built into RStudio, and you can also open the document
+in any other browser.
 
 B: Working Interactively
 ========================
 You can change the code in the code "chunks" to try variations interactively.
-In this case you have to have to (a) prepare the environment by clicking on the
+In this case you have to (a) prepare the environment by clicking on the
 "Run All Chunks Above" icon at the right-hand side of the chunk, (b) make your
 changes, and (c) click on the green right-pointing triangle "Run Current Chunk"
 to execute the changed code.
 
 It is probably best to first render the document (Option A), study the
 rendered result, and then go back to specific points for experimentation
-(Option B) to understand the code better.
+(Option B) to understand the code better. Make sure you do not save your changes
+into the courseScript folder - that would mess up the git - pull process.
 
 -->
 
@@ -859,8 +861,13 @@ The three-species model with a strange attractor was published by Michael Gilpin
 <div class="meta">
 #### Meta ####
 
-* Version 2024.1.0
-* Code derived in part from `LotkaVolterra-Model.R` written for CSB195 2022 and 2023.
+Version 2024.1.0.1
+
+<u>Versions</u><br/>
+<ul>
+<li>1.0.1  Maintenance</li>
+<li>1.0  Markdown version. Code derived in part from `LotkaVolterra-Model.R` written for CSB195 2022 and 2023.</li>
+</ul>
 
 </div>
 
