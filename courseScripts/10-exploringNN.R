@@ -1,4 +1,4 @@
-# tocID <- "10-courseScripts/exploringNN.R"
+# tocID <- "courseScripts/10-exploringNN.R"
 #
 #
 # Purpose: Define simple neural networks. Run them. Experiment with parameters.
@@ -11,7 +11,8 @@
 #
 # Versions:
 #   1.10  Add some tools to generate random weight matrices. Add a
-#         network plot function with weight-colored edges.
+#         network plot function with weight-colored edges. Add a phase-space
+#         density plot as the default option for the third plotting panel.
 #   1.9   Update iGraph network sketch. Changed name from "evolvingNN.R" to
 #         "exploringNN.R".
 #   1.0   Posted for course assignment
@@ -32,27 +33,29 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
-#TOC>   1        Preparation: packages                                     74
-#TOC>   2        Introduction                                              86
-#TOC>   2.1        Terminology:                                            91
-#TOC>   2.2        What goes on in a neuron                               155
-#TOC>   2.3        A computational neuron                                 169
-#TOC>   2.4        Activation functions                                   213
-#TOC>   3        Computational Neurons in a Network                       283
-#TOC>   3.1        Defining a Neural Network with a Weight matrix         323
-#TOC>   3.1.1          Digression: colors                                 363
-#TOC>   3.2        Plot the network with igraph::                         408
-#TOC>   4        Running the network                                      437
-#TOC>   5        Input                                                    546
-#TOC>   5.1        Feeding the network: harmonic oscillator               606
-#TOC>   6        Workbench                                                636
-#TOC>   6.1        Running experiments ...                                741
-#TOC>   7        "Interesting" Networks                                   776
-#TOC>   8        Code Glossary                                            813
-#TOC>
+#TOC>   1        Preparation: packages                                     86
+#TOC>   2        Introduction                                             107
+#TOC>   2.1        Terminology:                                           112
+#TOC>   2.2        What goes on in a neuron                               176
+#TOC>   2.3        A computational neuron                                 190
+#TOC>   2.4        Activation functions                                   234
+#TOC>   3        Computational Neurons in a Network                       304
+#TOC>   3.1        Defining a Neural Network with a Weight matrix         376
+#TOC>   3.1.1          Digression: colors                                 416
+#TOC>   3.2        Plot the network with igraph::                         461
+#TOC>   4        Running the network                                      529
+#TOC>   5        Input                                                    638
+#TOC>   5.1        Feeding the network: single pulse                      697
+#TOC>   5.2        Feeding the network: harmonic oscillator               710
+#TOC>   6        Workbench                                                740
+#TOC>   6.1        Running experiments ...                                854
+#TOC>   7        "Interesting" Networks                                   889
+#TOC>   7.1        Random weight matrices                                 923
+#TOC>   7.2        Putting everything together                           1013
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -65,8 +68,10 @@
 #     actually run code. Execute the statements in the if (FALSE) { ... }      #
 #     blocks to run the interactive parts of this script.                      #
 #                                                                              #
+#     To make changes in the code and experiment with it, make your own        #
+#     copy in your myScripts folder.                                           #
+#                                                                              #
 ################################################################################
-
 
 
 # NOTE: You need to read and explore this script, execute the functions but also
@@ -97,14 +102,6 @@ if (! requireNamespace("igraph", quietly=TRUE)) {
 }
 # Package information:
 #  library(help   = igraph)     # basic information on available commands
-
-# The fields:: package contains tools for spatial data. But it has a good
-# utility to plot legends for color gradients, which we use here.
-if (! requireNamespace("fields", quietly=TRUE)) {
-  install.packages("fields")
-}
-# Package information:
-#  library(help   = fields)     # basic information
 
 
 # =    2  Introduction  ========================================================
@@ -335,16 +332,21 @@ myLayout <- matrix(c(-1,  0,  # "IN" on the left
                       1,  0), # "OUT" on the right
                     ncol = 2, byrow = TRUE)
 
-plot(NN1,
-     layout = myLayout,
-     vertex.color = "#DDDDDD",
-     vertex.shape = "crectangle",
-     vertex.size = 31.5,
-     vertex.size2 = 22.5,
-     vertex.label.color = "#000000",
-     vertex.label.cex = c(1.2, 0.9, 0.9, 0.9, 1.2),
-     vertex.label.family = "Helvetica",
-     edge.curved = c(rep(0, 7), 0.7))
+
+if (FALSE) { # plot the network
+
+  plot(NN1,
+       layout = myLayout,
+       vertex.color = "#DDDDDD",
+       vertex.shape = "crectangle",
+       vertex.size = 31.5,
+       vertex.size2 = 22.5,
+       vertex.label.color = "#000000",
+       vertex.label.cex = c(1.2, 0.9, 0.9, 0.9, 1.2),
+       vertex.label.family = "Helvetica",
+       edge.curved = c(rep(0, 7), 0.7))
+}
+
 
 # What happens if we pass a single unit of input into the network?
 #
@@ -411,7 +413,7 @@ names(vBias) <- NEUNAM                       # You can later experiment with it.
 # we use the igraph plotting methods to plot the network.)
 
 
-# ===   3.1.1  Digression: colors
+# ===   3.1.1  Digression: colors                            
 
 # Never underestimate the importance of color schemes. Colors help to form
 # interpretative associations. Using colors well enhances the story your results
@@ -514,8 +516,11 @@ plotNN <- function(wMat){
 }
 
 # ... and use this to plot our network:
-plotNN(weightMat)
+if (FALSE) {
 
+    plotNN(weightMat)
+
+}
 
 # So far so good, we have a way to represent our neural network, and to plot it.
 # Now we can think of running it!
@@ -537,8 +542,8 @@ if (FALSE) {
 }
 
 
-# Take care to not assign
-# the return value, but the function! Here is an example of this syntax:
+# Take care to not assign the return value,
+# but the function! Here is an example of this syntax:
 
 if (FALSE) {
 
@@ -689,7 +694,7 @@ if (FALSE) {
 # But we're here to explore complexity. Can we get more interesting behaviour?
 # What happens when we "feed" an outside signal into the netwoork?
 
-# ==   5.1  Feeding the network: single pulse  ==========================
+# ==   5.1  Feeding the network: single pulse  =================================
 
 # For convenience, we write our simple single impulse vector into a function:
 
@@ -702,7 +707,7 @@ pulse <- function(N, lev = 1.0) {
 }
 
 
-# ==   5.1  Feeding the network: harmonic oscillator  ==========================
+# ==   5.2  Feeding the network: harmonic oscillator  ==========================
 
 # For sustained activity, we can feed a harmonic oscillator into the network
 # input. That's just a sine wave over time.
@@ -777,70 +782,52 @@ runIterations <- function(vF,                 # input feed vector
 
   # That's it. The rest is plotting and bookkeeping.
 
+  # Plotting block
   if (doPlot) {
 
-    # set up a matrix to define the plot window layout.
+    # Define layout
     lay <- matrix(c(1, 1, 2, 3), nrow = 2)
-    #         [,1] [,2]    This means: the next plot (#1) will go in the left
-    #    [1,]    1    2    half of the plot window, then (#2) in the top-right,
-    #    [2,]    1    3    and the last one (#3) in the bottom-right.
-    layout(lay, widths=c(1,1), heights=c(1,1))  # activate this layout
+    layout(lay, widths = c(1, 1), heights = c(1, 1))
 
-    # Plot #1: Individual neuron states over time
-    # ===========================================
-    plot(results[1, ], type = "l",                            # Plot [IN]
+    # Plot #1: Neuron states over time
+    plot(results[1, ], type = "l",
          ylim = c(min(results), max(results)),
          xlab = "iterations",
          ylab = "neuron output",
          col = NEUCOL[1])
-    for (i in 2:(nNodes - 1)) {
-      points(results[i, ], type = "l", col = NEUCOL[i])      # Plot [N_i]
-    }
-    points(results[nNodes, ], type="l", col=NEUCOL[nNodes])  # Plot [OUT]
 
-    # Plot #2: phase space of [IN] and [OUT]
-    # ======================================
-    normIn  <- mmScale(results[1, ])    # apply min-max scaling
+    for (i in 2:(nNodes - 1)) {
+      points(results[i, ], type = "l", col = NEUCOL[i])
+    }
+    points(results[nNodes, ], type = "l", col = NEUCOL[nNodes])
+
+    # Plot #2: Phase space of [IN] and [OUT]
+    normIn <- mmScale(results[1, ])
     normOut <- mmScale(results[nNodes, ])
-    myCols <- rev(hcl.colors(N,                     # fetch a predefined
-                             palette = "Red-Blue",  # spectrum of colors
-                             alpha=0.33))           # 67% transparent
+    myCols <- rev(hcl.colors(N, palette = "Red-Blue", alpha = 0.33))
     plot(normIn, normOut,
-         main = "Phase Space of [IN] and [OUT] (trajectory)",
+         main = "Phase Space (trajectory)",
          xlab = "[IN]", ylab = "[OUT]",
-         type = "n")                    # only setup the empty frame
-    # make a gradient colored line to show the progression of the states
+         type = "n")
+
     plotrix::color.scale.lines(normIn, normOut, col = myCols, lwd = 2)
-    legend("bottomright",                  # add a legend to the plot
-           legend = c("start",
-                      sprintf("%d iterations", N)),
-           fill =  c(myCols[1], myCols[N]),
+    legend("bottomright",
+           legend = c("start", sprintf("%d iterations", N)),
+           fill = c(myCols[1], myCols[N]),
            cex = 0.75,
            bty = "n")
 
+    # Panel 3: Conditional plots
     if (panel3 == "density") {
-      # Plot panel 3:
-      # Mode: density of the [IN]/[OUT] phase space
-      # ===========================================
-      xy <- t(results[c(1, 5), ])
-
-      # Calculate density colors using densCols
-      myPalette <- colorRampPalette(c("blue", "green", "yellow", "red"))
-      dCols <- densCols(xy[, 1],
-                        xy[, 2],
-                        colramp = myPalette)
-
-      # Plot the phase-space trajectory with density-based colors
-      plot(xy[, 1], xy[, 2],
-           main = "Phase Space of [IN] and [OUT] (density)",
-           xlab = "[IN]", ylab = "[OUT]",
-           col = dCols,
-           pch = 16, cex = 0.6)
-
-    }  else if (panel3 == "spectrum") {
-      # Plot panel 3:
-      # Mode: spectrum of the [OUT] trajectory
-      # =========================================
+       smoothScatter(normIn, normOut,
+                    nbin = 200,
+                    nrpoints = Inf,
+                    pch = "19", cex = 0.3, col = "#FFFFCC",
+                    bandwidth = 0.018,
+                    main = "Phase Space (density)",
+                    xlab = "[IN]", ylab = "[OUT]",
+                    colramp = colorRampPalette(hcl.colors(100, "viridis")))
+    } else if (panel3 == "spectrum") {
       stats::spectrum(results[5, ],
                       main = "Spectral density of [OUT]",
                       xlab = "frequency",
@@ -850,7 +837,7 @@ runIterations <- function(vF,                 # input feed vector
       stop("Requested mode for \"panel3\" parameter is not recognized.")
     }
 
-  } # end if (doPlot) ...
+  } # end if (doPlot)
 
   # Create output list
   argList <- list()
@@ -933,14 +920,14 @@ if (FALSE) {   # Experiments
 #   - Bistable behaviour?
 # - ...
 
-# == 1.1 Random weight matrices
+# ==   7.1  Random weight matrices  ============================================
 
 # One way to explore the potential behaviour of network topologies is to
 # trial random networks. Here is a tool to create random weight matrices.
 
 # rsample() helper function
-rsample <- function(n, v = c(0,1)) {
-  # random vector of v with length n
+rsample <- function(n, v = c(0, 1)) {
+  # random vector of v with length n. Default to a binary vector.
   return(sample(v, n, replace = TRUE))
 }
 
@@ -991,7 +978,7 @@ makeRandomNetwork <- function(nodeNames,
 }
 
 # Since makeRandomNetwork() accepts a topology matrix to produce networks
-# that are not fully connected, here is a topology for the network we have
+# that are not fully connected, here is the topology for the network we have
 # used above:
 
 myTopo <- matrix(c(0, 0, 0, 0, 1,
@@ -1000,25 +987,62 @@ myTopo <- matrix(c(0, 0, 0, 0, 1,
                    1, 0, 1, 0, 0,
                    0, 1, 1, 1, 0), nrow = length(NEUNAM), byrow = TRUE)
 
+# When we use this topology mask, we can explore the effects of changing
+# weights, while leaving the actual connections unchanged.
 
 
 # usage examples
-makeRandomNetwork(NEUNAM, func = rsample)  # unit weights
-makeRandomNetwork(NEUNAM, func = runif)    # uniform distribution
-makeRandomNetwork(NEUNAM, func = rnorm)    # normal distribution
-makeRandomNetwork(NEUNAM, func = rsample, v = c(-1, 0, 1))
-makeRandomNetwork(NEUNAM, func = runif, min = -1, max = 1)
-makeRandomNetwork(NEUNAM, func = rnorm, mean = 0.5, sd = 1.5)
+if (FALSE) {
 
-# Reproducible random, uniform distributed weights between -1 and 1, with
-# the topology we discussed above:
-makeRandomNetwork(NEUNAM,
-                  topology = myTopo,
-                  func = runif, min = -1, max = 1,
-                  seed = 271828182)
+  makeRandomNetwork(NEUNAM, func = rsample)  # unit weights
+  makeRandomNetwork(NEUNAM, func = runif)    # uniform distribution
+  makeRandomNetwork(NEUNAM, func = rnorm)    # normal distribution
+  makeRandomNetwork(NEUNAM, func = rsample, v = c(-1, 0, 1))
+  makeRandomNetwork(NEUNAM, func = runif, min = -1, max = 1)
+  makeRandomNetwork(NEUNAM, func = rnorm, mean = 0.5, sd = 1.5)
 
-# == 1.1 Putting it together
+  # Reproducible random, uniform distributed weights between -1 and 1, with
+  # the topology we defined above:
+  makeRandomNetwork(NEUNAM,
+                    topology = myTopo,
+                    func = runif, min = -1, max = 1,
+                    seed = 271828182)
 
+}
+
+# ==   7.2  Putting everything together  =======================================
+
+# Here is one mode of using these tools for explorations:
+
+if (FALSE) {
+
+# select the code between here ...
+(mySeed <- sample(1:.Machine$integer.max, 1))  # a large number
+outList <- runIterations(vF   = pulse(200),
+                         mat  = makeRandomNetwork(NEUNAM,
+                                                  topology = myTopo,
+                                                  func = rnorm, mean=0.1, sd=2,
+                                                  seed = mySeed),
+                         bias = c(0.01, 0.01, 0.01, 0.01, 0.01),
+                         fAct = ReLU)
+# ... and here.
+
+# Then execute it with <command><return> again and again. Observe the plots. If
+# you find an interesting combination of values, copy the last seed from
+# the console and note it down. This allows you to reproduce your network at
+# any time later.
+#
+# And inspect your network:
+
+plotNN(outList$args$NN$weightMat)
+
+# For an example of something "interesting", you could try:
+# mySeed <- 423686718
+#
+# Note: not all random networks will work - some parameter values will cause
+# errors. Don't worry about that. Just try again.
+
+}
 
 
 # Have fun!
