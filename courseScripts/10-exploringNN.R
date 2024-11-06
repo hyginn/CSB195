@@ -33,7 +33,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
 #TOC>   1        Preparation: packages                                     86
@@ -55,7 +55,7 @@
 #TOC>   7        "Interesting" Networks                                   889
 #TOC>   7.1        Random weight matrices                                 923
 #TOC>   7.2        Putting everything together                           1013
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -413,7 +413,7 @@ names(vBias) <- NEUNAM                       # You can later experiment with it.
 # we use the igraph plotting methods to plot the network.)
 
 
-# ===   3.1.1  Digression: colors                            
+# ===   3.1.1  Digression: colors
 
 # Never underestimate the importance of color schemes. Colors help to form
 # interpretative associations. Using colors well enhances the story your results
@@ -470,7 +470,7 @@ plotNN <- function(wMat){
                                       weighted = TRUE)
 
   # define the layout:
-  myLayout <- igraph::layout_in_circle(myNN, order = c(5,2,1,3,4))
+  myLayout <- igraph::layout_in_circle(thisNN, order = c(5,2,1,3,4))
   buffer <- 0.15 * max(abs(myLayout))  # 15% padding
 
   # define the edge colors
