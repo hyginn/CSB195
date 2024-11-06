@@ -5,23 +5,27 @@
 #            Find "interesting" variants.
 #
 #
-# Version: 1.9
+# Version: 1.10
 # Date:    2023-10 - 2024-11
 # Author:  boris.steipe@utoronto.ca
 #
 # Versions:
-#   1.9  Update iGraph network sketch. Changed name from "evolvingNN.R" to
-#        "exploringNN.R".
-#   1.0  Posted for course assignment
-#   0.5  More details about spectrum analysis.
-#   0.4  Make sure input is from a column vector!
-#   0.3  Refactored for better separation of concerns - Defining the network,
-#          constructing input, plotting time-course, analyzing output.
-#   0.2  Added theoretical explanations
-#   0.1  Starter Code
+#   1.10  Add some tools to generate random weight matrices. Add a
+#         network plot function with weight-colored edges.
+#   1.9   Update iGraph network sketch. Changed name from "evolvingNN.R" to
+#         "exploringNN.R".
+#   1.0   Posted for course assignment
+#   0.5   More details about spectrum analysis.
+#   0.4   Make sure input is from a column vector!
+#   0.3   Refactored for better separation of concerns - Defining the network,
+#           constructing input, plotting time-course, analyzing output.
+#   0.2   Added theoretical explanations
+#   0.1   Starter Code
 #
 # ToDo:
 #   2.0  Turn demo code into .Rmd
+#   Use fields::image.plot() for the color legend.
+#
 # Notes:
 #
 # ==============================================================================
@@ -93,6 +97,14 @@ if (! requireNamespace("igraph", quietly=TRUE)) {
 }
 # Package information:
 #  library(help   = igraph)     # basic information on available commands
+
+# The fields:: package contains tools for spatial data. But it has a good
+# utility to plot legends for color gradients, which we use here.
+if (! requireNamespace("fields", quietly=TRUE)) {
+  install.packages("fields")
+}
+# Package information:
+#  library(help   = fields)     # basic information
 
 
 # =    2  Introduction  ========================================================
@@ -446,27 +458,63 @@ NEUCOL <- neuCols(nNeurons)
 
 # ==   3.2  Plot the network with igraph::  ====================================
 
-# Step one: treat the weightMatrix as an adjacency matrix and create an
-# igraph::graph object
+# For future use, we turn plotting our network into a function.
 
-if (FALSE) {
-  myNN <- igraph::graph_from_adjacency_matrix(t(weightMat),
-                                              mode = "directed",
-                                              weighted = TRUE)
-}
+plotNN <- function(wMat){
+  # plot a neural network given an adjacency (weight) matrix
+
+  thisNN <- igraph::graph_from_adjacency_matrix(t(wMat),
+                                      mode = "directed",
+                                      weighted = TRUE)
+
+  # define the layout:
+  myLayout <- igraph::layout_in_circle(myNN, order = c(5,2,1,3,4))
+  buffer <- 0.15 * max(abs(myLayout))  # 15% padding
+
+  # define the edge colors
+  myWeights <- igraph::E(thisNN)$weight
+  wMin <- min(myWeights)
+  wMax <- max(myWeights)
+  if (wMin == wMax) {
+    wNorm <- rep(1, length(myWeights))
+    myEdgeLabels <- rep("", length(myWeights))
+  } else {
+    wNorm <- (myWeights - wMin) / (wMax - wMin)
+    myEdgeLabels <- sprintf("%3.2f", myWeights)
+  }
+  myPal <- colorRampPalette(c("#D9083F", "#878787", "#2CCFB4"))
+  myEdgeColors <- myPal(100)[as.numeric(cut(wNorm, breaks = 100))]
 
 
-# Step 2: do the actual plot.
+  # Reduce margins, make it a single-panel layout, save graphics state
+  oPar <- par(mar = rep(1, 4), mfrow = c(1,1))
 
-if (FALSE) {
-  oPar <- par(mar= rep(1, 4))     # Reduce margins, save graphics state
-  plot(NN1,
+  plot(thisNN,
+       layout = myLayout,
+       xlim = range(myLayout[, 1]) + c(-buffer, buffer),
+       ylim = range(myLayout[, 2]) + c(-buffer, buffer),
        vertex.size = 40,
-       layout = igraph::layout_in_circle(myNN, order = c(5,2,1,3,4)),
        vertex.color = NEUCOL,
-       vertex.label.family = "sans")
-  par(oPar)                       # Restore the graphics state
+       vertex.label.family = "sans",
+       vertex.label.cex = 1.6,
+       edge.label = myEdgeLabels,
+       edge.label.family = "sans",
+       edge.label.cex = 0.8,
+       edge.curved = 0.1,
+       edge.color = myEdgeColors,
+       edge.width = 2,
+       edge.arrow.size = 0.7,        # Reduce arrowhead size
+       edge.arrow.width = 0.8)       # Set arrow mode for a sharper look
+
+
+  par(oPar)                          # Restore the graphics state
+
+
+  return(invisible(NULL))            # nothing to return
 }
+
+# ... and use this to plot our network:
+plotNN(weightMat)
 
 
 # So far so good, we have a way to represent our neural network, and to plot it.
@@ -702,7 +750,8 @@ runIterations <- function(vF,                 # input feed vector
                           bias = vBias,       # the bias vector
                           fAct = ReLU,        # the activation function
                           ...,                #   ... additional parameters
-                          doPlot = TRUE) {    # plot the results
+                          doPlot = TRUE,
+                          panel3 = "density") {  # plot the results
 
   # Iterate the values in vFeed over the network specified in mat using
   # "bias" as a bias vector.
@@ -757,7 +806,7 @@ runIterations <- function(vF,                 # input feed vector
                              palette = "Red-Blue",  # spectrum of colors
                              alpha=0.33))           # 67% transparent
     plot(normIn, normOut,
-         main = "Phase Space of [IN] and [OUT]",
+         main = "Phase Space of [IN] and [OUT] (trajectory)",
          xlab = "[IN]", ylab = "[OUT]",
          type = "n")                    # only setup the empty frame
     # make a gradient colored line to show the progression of the states
@@ -769,11 +818,37 @@ runIterations <- function(vF,                 # input feed vector
            cex = 0.75,
            bty = "n")
 
-    # Plot #3: spectrum of the [OUT] trajectory
-    # =========================================
-    stats::spectrum(results[5, ], main = "Spectral density of [OUT]",
-                    xlab = "frequency", ylab = "density",
-                    col = NEUCOL[nNodes])
+    if (panel3 == "density") {
+      # Plot panel 3:
+      # Mode: density of the [IN]/[OUT] phase space
+      # ===========================================
+      xy <- t(results[c(1, 5), ])
+
+      # Calculate density colors using densCols
+      myPalette <- colorRampPalette(c("blue", "green", "yellow", "red"))
+      dCols <- densCols(xy[, 1],
+                        xy[, 2],
+                        colramp = myPalette)
+
+      # Plot the phase-space trajectory with density-based colors
+      plot(xy[, 1], xy[, 2],
+           main = "Phase Space of [IN] and [OUT] (density)",
+           xlab = "[IN]", ylab = "[OUT]",
+           col = dCols,
+           pch = 16, cex = 0.6)
+
+    }  else if (panel3 == "spectrum") {
+      # Plot panel 3:
+      # Mode: spectrum of the [OUT] trajectory
+      # =========================================
+      stats::spectrum(results[5, ],
+                      main = "Spectral density of [OUT]",
+                      xlab = "frequency",
+                      ylab = "density",
+                      col = NEUCOL[nNodes])
+    } else {
+      stop("Requested mode for \"panel3\" parameter is not recognized.")
+    }
 
   } # end if (doPlot) ...
 
@@ -858,78 +933,96 @@ if (FALSE) {   # Experiments
 #   - Bistable behaviour?
 # - ...
 
+# == 1.1 Random weight matrices
+
+# One way to explore the potential behaviour of network topologies is to
+# trial random networks. Here is a tool to create random weight matrices.
+
+# rsample() helper function
+rsample <- function(n, v = c(0,1)) {
+  # random vector of v with length n
+  return(sample(v, n, replace = TRUE))
+}
+
+makeRandomNetwork <- function(nodeNames,
+                              topology,
+                              func = rnorm,
+                              ...,
+                              seed = NULL) {
+  # Make a random neural network from nodeNames using random network weights
+  # which are distributed as per func(). The function accepts a seed to
+  # initialize the R RNG (Random Number Generator), so you can get the same
+  # matrix (and reproduce your results) by remembering only the seed you
+  # used.
+  #
+  # nodeNames   char      The names of the network nodes, also implies the
+  #                         number of nodes.
+  # topology    num       A matrix that defines the topology of the network.
+  #                         If missing, all weights are kept unchanged. If
+  #                         present, all weights are multiplied by the
+  #                         corresponding value in the topology matrix
+  #                         (Hadamard product).
+  #                       Typically the topology matrix would consist of
+  #                         1's wherever a node named in the column connects
+  #                         to a node named in the row, and 0's elsewhere,
+  #                         but non-integral values might also make sense.
+  # func        function  Name of the random-value generating  function.
+  # ...                   Optional additional arguments passed to func().
+  # seed                  Seed for the RNG, for reproducible randomness.
+  #                         Default NULL puts the RNG in a fresh state.
+  #
+
+  set.seed(seed)                   # Initialize the RNG
+  nN <- length(nodeNames)          # number of nodes
+
+  # Call function func() with parameters. The first argument is the square
+  # of nN, i.e. the number of values needed to fill the square matrix.
+  val <- do.call(func, c(list(n = nN^2), list(...)))
+
+  rMat <- matrix(val, nrow = nN)   # put val into the matrix
+  rownames(rMat) <- nodeNames      # name the matrix rows ...
+  colnames(rMat) <- nodeNames      # ... and columns
+
+  if (! missing(topology)) {
+    rMat <- rMat * topology       # Hadamard product
+  }
+
+  return(rMat)
+}
+
+# Since makeRandomNetwork() accepts a topology matrix to produce networks
+# that are not fully connected, here is a topology for the network we have
+# used above:
+
+myTopo <- matrix(c(0, 0, 0, 0, 1,
+                   1, 0, 0, 0, 0,
+                   1, 0, 0, 0, 0,
+                   1, 0, 1, 0, 0,
+                   0, 1, 1, 1, 0), nrow = length(NEUNAM), byrow = TRUE)
+
+
+
+# usage examples
+makeRandomNetwork(NEUNAM, func = rsample)  # unit weights
+makeRandomNetwork(NEUNAM, func = runif)    # uniform distribution
+makeRandomNetwork(NEUNAM, func = rnorm)    # normal distribution
+makeRandomNetwork(NEUNAM, func = rsample, v = c(-1, 0, 1))
+makeRandomNetwork(NEUNAM, func = runif, min = -1, max = 1)
+makeRandomNetwork(NEUNAM, func = rnorm, mean = 0.5, sd = 1.5)
+
+# Reproducible random, uniform distributed weights between -1 and 1, with
+# the topology we discussed above:
+makeRandomNetwork(NEUNAM,
+                  topology = myTopo,
+                  func = runif, min = -1, max = 1,
+                  seed = 271828182)
+
+# == 1.1 Putting it together
+
+
+
 # Have fun!
 
 
-# =    8  Code Glossary  =======================================================
-
-#: [Begin Glossary]
-
-# === Operators ===
-
-#: + - * / ^ (op: arithmetic {base}) Standard arithmetic operators. (a^b) is a
-#         to the power of b. [OXDyF]
-#: %% %/% (op: modulus {base}) (a %% b) gives the remainder of a/b - "modulus",
-#         (a %/% b) is the floored result of a/b - "integer division". [Gk3z4]
-#: : (op: sequence {base}) (a:b) creates a sequence from a to b in steps of 1
-#         or -1. [wgvi3]
-#: %*% (op: matrix {base}) Matrix multiplication. [JI9Y6]
-#: = <- <<- (op: assignment {base}) Assignment operators. [afYyx]
-#: [ ] [[ ]] (op: subsetting {base}) Paired subsetting operators retrieve
-#         groups of elements ([]) or single elements ([[]]) from objects.
-#         [7l5HI]
-#: ( ) (op: grouping {base}) Paired parentheses group elements for mathematical
-#         expressions and function argument lists. [rEjog]
-#: { } (op: block {base}) Paired curly braces define blocks of code, or combine
-#         multiple expressions. [ogeDk]
-#: :: ::: (op: access {base}) Access exported (::) or non-exported (:::)
-#         functions from a package. [CuewL]
-
-
-# === Language and keywords ===
-
-#: if (lan: control {base}) Executes code if the attached condition is true.
-#         [CUn39]
-#: else (lan: control {base}) Accompanies if to provide alternative code when
-#         the if condition is false. [mBaKk]
-#: ifelse() (func: control {base}) Vectorized short form of if / else.
-#         ifelse(a, b, c) returns b if a is TRUE, c if it is FALSE. [WkDiD]
-#: for (lan: control {base}) Repeatedly runs a block of code for each element
-#         in a sequence. [3Ttps]
-#: in (lan: control {base}) Used within a for loop as an iterator to access
-#         each element of a sequence or collection in turn. [eLRUR]
-#: TRUE (lan: keyword {base}) Logical constant. [vQULX]
-#: FALSE (lan: keyword {base}) Logical constant. [4yudz]
-
-
-# === Functions ===
-
-#: c() (func: manipulator {base}) Combines values into a vector or list. [TERFD]
-#: colnames() (func: attributes {base}) Retrieves or sets the column names of a
-#         matrix or data frame. [AvZNg]
-#: function() (func: constructor {base}) Constructs a function. [N6BsE]
-#: logical() (func: constructor {base}) Creates a logical vector. [uN0cu]
-#: matrix() (func: constructor {base}) Constructs a matrix from given data with
-#         specified numbers of rows and columns. [itkbr]
-#: max() (func: statistics {base}) Returns the maximum value of a numeric
-#         vector. [5k8NG]
-#: min() (func: statistics {base}) Returns the minimum value of a numeric
-#         vector. [XsKOW]
-#: names() (func: attributes {base}) Retrieves or assigns names to the elements
-#         of a vector or list. [1xzLs]
-#: nrow() (func: attributes {base}) Gets or sets the number of rows in a matrix
-#         or data frame. [1ABLH]
-#: numeric() (func: constructor {base}) Creates a numeric (double precision)
-#         vector. [GjWWt]
-#: rep() (func: sequences {base}) Replicates the values of a vector a specified
-#         number of times or to achieve a specified length. [O0G2t]
-#: return() (func: function control {base}) Ends a function and provides a
-#         result back to the caller. [ylArJ]
-#: rownames() (func: attributes {base}) Retrieves or sets the row names of a
-#         matrix or data frame. [Cc6vS]
-#: sqrt() (func: math {base}) Calculates the square root of numeric values.
-#         [dYjhX]
-
-#: [End Glossary]
 
 # [END]
