@@ -580,8 +580,12 @@ iterateNN <- function(v, mat, bias, fAct = ReLU, nrm = TRUE) {
   vOut <- mat %*% v           # Multiply weight matrix with input vector
   vOut <- vOut + bias         # Add biases
   vOut <- fAct(vOut)          # Apply the activation function to each neuron
-  if(nrm && sum(vOut) != 0) {
-    vOut <- vOut / sum(vOut)  # Normalize, to prevent runaway activation
+  if(nrm) {
+#  if(nrm && sum(vOut) != 0) {
+    x <- vOut / sum(vOut)  # Normalize, to prevent runaway activation
+    if (is.finite(x)) {
+      vOut <- x
+    }
   }
   return(vOut)
 
