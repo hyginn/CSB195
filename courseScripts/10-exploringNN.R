@@ -581,9 +581,8 @@ iterateNN <- function(v, mat, bias, fAct = ReLU, nrm = TRUE) {
   vOut <- vOut + bias         # Add biases
   vOut <- fAct(vOut)          # Apply the activation function to each neuron
   if(nrm) {
-#  if(nrm && sum(vOut) != 0) {
     x <- vOut / sum(vOut)  # Normalize, to prevent runaway activation
-    if (is.finite(x)) {
+    if (all(is.finite(x))) {
       vOut <- x
     }
   }
@@ -757,6 +756,7 @@ if (FALSE) { # Plot the output of oscillator function
 runIterations <- function(vF,                 # input feed vector
                           mat = weightMat,    # the weight matrix
                           bias = vBias,       # the bias vector
+                          nrm = TRUE,         # normalize output each iteration
                           fAct = ReLU,        # the activation function
                           ...,                #   ... additional parameters
                           doPlot = TRUE,
@@ -777,7 +777,8 @@ runIterations <- function(vF,                 # input feed vector
     results[,i] <- iterateNN(results[,(i-1)], # Take the previous step's output
                              mat = mat,       # and compute the output for the
                              bias = bias,     # current step.
-                             fAct = fAct)
+                             fAct = fAct,
+                             nrm = nrm)
 
     # Add the value in vF[i] to the input vector for [IN], to be
     # used in the next step.
