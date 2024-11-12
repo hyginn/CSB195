@@ -22,30 +22,30 @@
 #TOC>   4.01       vr - make a row-vector                              91
 #TOC>   4.02       vc - make a column-vector                          108
 #TOC>   4.03       mmScale - min-max Scaling                          125
-#TOC>   4.04       A progress bar for long-running code               137
-#TOC>   4.05       randSeed - large, random seeds                     173
-#TOC>   4.06       Random IDs                                         204
-#TOC>   5        Generative AI                                        266
-#TOC>   5.01       t2c - write text to clipboard                      270
-#TOC>   5.02       Initialize generative AI initial prompt            288
-#TOC>   6        Working with Google assets                           322
-#TOC>   6.01       Extracting R code from Google docs                 325
-#TOC>   6.02       Reading Google sheets                              398
-#TOC>   7        Remote control of ChimeraX                           471
-#TOC>   8        Bioinformatics Utilities                             552
-#TOC>   8.01       Find Keywords in aaindex                           555
-#TOC>   8.02       A colour palette for amino acids                   594
-#TOC>   8.03       Load the standard genetic code                     636
-#TOC>   8.04       Load an amino acid dataset                         645
-#TOC>   8.05       Convert one-letter symbols to three-letter         661
-#TOC>   8.06       Amino acid similarity                              744
-#TOC>   8.07       Create a random genetic code                       751
-#TOC>   8.08       Construct neighbouring codons                      759
-#TOC>   8.09       Print a genetic code in a table                    767
-#TOC>   8.10       Dotplot                                            775
-#TOC>   8.11       Plotting amino acids as 2D scatterplot             895
-#TOC>   9        Plot Utilities                                       954
-#TOC>   9.01       Draw a triangle on an existing plot                956
+#TOC>   4.04       A progress bar for long-running code               143
+#TOC>   4.05       randSeed - large, random seeds                     179
+#TOC>   4.06       Random IDs                                         210
+#TOC>   5        Generative AI                                        272
+#TOC>   5.01       t2c - write text to clipboard                      276
+#TOC>   5.02       Initialize generative AI initial prompt            294
+#TOC>   6        Working with Google assets                           328
+#TOC>   6.01       Extracting R code from Google docs                 331
+#TOC>   6.02       Reading Google sheets                              404
+#TOC>   7        Remote control of ChimeraX                           477
+#TOC>   8        Bioinformatics Utilities                             558
+#TOC>   8.01       Find Keywords in aaindex                           561
+#TOC>   8.02       A colour palette for amino acids                   600
+#TOC>   8.03       Load the standard genetic code                     642
+#TOC>   8.04       Load an amino acid dataset                         651
+#TOC>   8.05       Convert one-letter symbols to three-letter         667
+#TOC>   8.06       Amino acid similarity                              750
+#TOC>   8.07       Create a random genetic code                       757
+#TOC>   8.08       Construct neighbouring codons                      765
+#TOC>   8.09       Print a genetic code in a table                    773
+#TOC>   8.10       Dotplot                                            781
+#TOC>   8.11       Plotting amino acids as 2D scatterplot             901
+#TOC>   9        Plot Utilities                                       960
+#TOC>   9.01       Draw a triangle on an existing plot                962
 #TOC> 
 #TOC> ==========================================================================
 
@@ -129,10 +129,16 @@ cat("  Defining mmScale() ...\n")
 
 mmScale <- function(x) {
   #' min-max scaling of x. The returned vector has min(x) == 0 and max(x) == 1
+  #' returns 0.5 if max(x) == min(x)
   #' @examples
   #' summary(mmScale(rnorm(10000)))
-  return((x - min(x)) / (max(x) - min(x)))
+  if (max(x) == min(x)) {
+    return(rep(0.5, length(x)))
+  } else {
+    return((x - min(x)) / (max(x) - min(x)))
+  }
 }
+
 
 # ==   4.04  A progress bar for long-running code  =============================
 #
