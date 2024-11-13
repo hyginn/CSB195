@@ -30,7 +30,7 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                           Line
 #TOC> ---------------------------------------------------------------
 #TOC>   1        Setup and data                                    63
@@ -42,7 +42,7 @@
 #TOC>   2.3        Betweenness Centrality                         314
 #TOC>   3        biomaRt                                          364
 #TOC>   3.1        The most central proteins ...                  451
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -464,8 +464,17 @@ if (FALSE) {
 }
 
 
-# Ponder over this output for a bit. Then think about whast would be next in
+# Ponder over this output for a bit. Then think about what would be next in
 # your analysis.
+if (FALSE) {
+
+  geneSymbols <- character()
+  for (i in 1:length(cenP)) {
+    geneSymbols <- c(geneSymbols, cenP[[i]]$Symbol)
+  }
+  cat(paste(geneSymbols, collapse = ", "))
+}
+
 
 
 # [END]
