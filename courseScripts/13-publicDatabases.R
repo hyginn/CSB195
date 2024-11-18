@@ -18,16 +18,17 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                                       Line
 #TOC> ---------------------------------------------------------------------------
-#TOC>   1        Our Example: TP53                                             31
-#TOC>   2        GO - The Gene Ontology                                        36
-#TOC>   3        KEGG - The Kyoto Encyclopedia of Genes and Genomes            43
-#TOC>   4        Reactome - The Pathway database                               48
-#TOC>   5        The UCSC Genome Browser                                       54
-#TOC>   6        Ensembl - Annotated Genomes at the EBI                        60
-#TOC>
+#TOC>   1        Our Example: TP53                                             35
+#TOC>   2        PubMed - The Literature database                              41
+#TOC>   3        GO - The Gene Ontology                                        48
+#TOC>   4        KEGG - The Kyoto Encyclopedia of Genes and Genomes            56
+#TOC>   5        Reactome - The Pathway database                               62
+#TOC>   6        The UCSC Genome Browser                                       68
+#TOC>   7        Ensembl - Annotated Genomes at the EBI                        74
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -37,9 +38,14 @@
 # https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:11998
 
 
+# =    2  PubMed - The Literature database  ====================================
+
+# https://pubmed.ncbi.nlm.nih.gov/
+#
 
 
-# =    2  GO - The Gene Ontology  ==============================================
+
+# =    3  GO - The Gene Ontology  ==============================================
 
 # https://geneontology.org/
 #
@@ -47,25 +53,25 @@
 
 
 
-# =    3  KEGG - The Kyoto Encyclopedia of Genes and Genomes  ==================
+# =    4  KEGG - The Kyoto Encyclopedia of Genes and Genomes  ==================
 
 # https://www.genome.jp/kegg/pathway.html
 
 
 
-# =    4  Reactome - The Pathway database  =====================================
+# =    5  Reactome - The Pathway database  =====================================
 
 # https://reactome.org/
 
 
 
-# =    5  The UCSC Genome Browser  =============================================
+# =    6  The UCSC Genome Browser  =============================================
 
 # https://genome.ucsc.edu/
 
 
 
-# =    6  Ensembl - Annotated Genomes at the EBI  ==============================
+# =    7  Ensembl - Annotated Genomes at the EBI  ==============================
 
 # https://useast.ensembl.org/index.html
 #
