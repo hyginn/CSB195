@@ -1,0 +1,755 @@
+---
+title: "Introducing Regular Expressions"
+author: "Boris Steipe <boris.steipe@utoronto.ca>"
+date: "2024-11-20"
+output: html_document
+#    number_sections: yes
+#    toc: yes
+---
+
+<!--
+This document is an "R markdown" document. 
+
+There are two ways to work with this file:
+
+A: Rendering to HTML
+====================
+Click on the "Knit" button at the top, to run the code contained in this file.
+You will obtain a structured document in HTML format that opens in the
+Web browser that is built into RStudio. 
+
+B: Working Interactively
+========================
+You can change the code in the code "chunks" to try variations interactively.
+In this case you have to have to (a) prepare the environment by clicking on the
+"Run All Chunks Above" icon at the right-hand side of the chunk, (b) make your
+changes, and (c) click on the green right-pointing triangle "Run Current Chunk"
+to execute the changed code.
+
+It is probably best to first render the document (Option A), study the
+rendered result, and then go back to specific points for experimentation
+(Option B) to understand the code better.
+
+-->
+
+```{css, echo = FALSE}
+.striped tr:nth-child(even) {
+  background: #eaf1ff;
+}
+.striped td, .striped th {
+  padding: 5px;
+}
+.meta {
+  font-size: 0.8em;
+  color: #bbbbbb;
+}
+```
+
+```{r setup, include=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# if (! requireNamespace("here", quietly=TRUE)) {
+#   install.packages("here")
+# }
+
+knitr::opts_chunk$set(echo = TRUE,
+                      cache.path = 'tmp/')
+
+# Load the .util.R file into the document's workspace.
+# Note: all paths of files and files that are source()'d by files have to
+# be given via here::here() since development uses the project home as 
+# working directory but knitr uses the directory that contains the script.
+# (This required far more debugging and adjustments than I care for ...)
+# source(here::here(".util.R"))
+
+```
+
+
+
+
+
+<small>Regular Expressions (regex) with R.
+(c) Boris Steipe 2017-2024.</small>
+
+
+
+
+## Regular Expressions
+Using regular expressions is a key skill for all apsects of data science, and, by extension, for bioinformatics. There is a bit of a learning curve involved, but once you are even slightly comfortable with their syntax and use in code, you will appreciate their power in automating otherwise unbearably tedious tasks. Here we introduce the principles, the syntax, try some things in practice, and provide somme essential reference tables.
+
+## First steps
+A [Regular Expression](https://wikipedia.org/wiki/Regular%20expression) is a specification of a pattern of characters. The typical use of a regular expression is to find occurrences of the pattern in a string. Regular expressions have a flexible syntax that allows them to handle a range of tasks - from trivial substring matches to complex nested motifs. The syntax of regular expressions is a programming language in its own right, and is a powerful way of concisely and uniquely defining a pattern.
+
+Regular expressions are examples of **deterministic pattern matching** - they either match a particular expression or not. This is in contrast to probabilistic pattern matching in which a pattern is _more or less_ similar to a query.
+
+Truth be told, many programmers have a love-hate relationship with regular expressions. The syntax of regular expressions is very powerful and expressive, but also terse, not always intuitive, and sometimes hard to understand. Of course, you can always ask your AI assistant to interpet a regex for you, or to collaborate with you to write one. But you still need to understand what's going on in order to validate the result.
+
+Let’s try a few simple things:
+
+Here is string to play with: the sequence of the major isoform of the human TP53 gene, copied from the [NCBI RefSeq Protein database page](https://www.ncbi.nlm.nih.gov/protein/NP_000537).
+
+```
+        1 meepqsdpsv epplsqetfs dlwkllpenn vlsplpsqam ddlmlspddi eqwftedpgp
+       61 deaprmpeaa ppvapapaap tpaapapaps wplsssvpsq ktyqgsygfr lgflhsgtak
+      121 svtctyspal nkmfcqlakt cpvqlwvdst pppgtrvram aiykqsqhmt evvrrcphhe
+      181 rcsdsdglap pqhlirvegn lrveylddrn tfrhsvvvpy eppevgsdct tihynymcns
+      241 scmggmnrrp iltiitleds sgnllgrnsf evrvcacpgr drrteeenlr kkgephhelp
+      301 pgstkralpn ntssspqpkk kpldgeyftl qirgrerfem frelnealel kdaqagkepg
+      361 gsrahsshlk skkgqstsrh kklmfktegp dsd
+```
+
+Task…
+Navigate to http://regexpal.com and paste the sequence into the lower box. This site is one of a number of online regular expression testers; their immediate, visual feedback is invaluable when you are developing regular expression patterns.
+
+Lets try some expressions:
+
+Most characters are matched literally.
+: Type "`a`" in to the upper box and you will see all "`a`" characters matched. Then replace a with `q`.
+: Now type "`aa`" instead. Then "`paapapap`". _Sequences_ of characters are also matched literally.
+
+The pipe character `|` that symbolizes logical OR can be used to match more than one character
+: `p(a|l|q)p` matches `pap` OR `plp` OR `pqp` Note how we can group with parentheses, and try what would happen without them.
+
+More convenient is to match more than one character by placing it in square brackets. 
+: This is called a "character class". We will encounter those frequently. `[lq]` matches l OR q. `[familyvw]` matches hydrophobic amino acids.
+
+Within square brackets, we can specify "ranges".
+: `[1-5]` matches digits from 1 to 5.
+
+Within square brackets, we can identify characters that should NOT be matched, with the "caret", `^`.
+: `[^0-9]` matches everything EXCEPT digits. `[^a-z]` matches everything that is not a lower-case letter. Note that **outside** of the square brackets the caret means "beginning of the string". When you see a caret, you need to consider its context carefully.
+ 
+
+Make frequent use of this site to develop your regular expressions step by step.
+
+ 
+
+## Theory
+According to the [Chomsky hierarchy](https://wikipedia.org/wiki/Chomsky%20hierarchy) regular expressions are a [Type-3 (regular) grammar](https://wikipedia.org/wiki/Regular%20grammar), thus they define a [regular language](https://wikipedia.org/wiki/regular%20language). Therefore, like all Type-3 grammatical expressions they can be decided by a [finite-state machine](https://wikipedia.org/wiki/finite-state%20machine), i.e. a "machine" that is defined by possible states, plus triggering conditions that control transitions between states. Think of such automata as (elaborate) `if ... else` constructs. The "regex" processor translates the search pattern into such an automaton, which is then applied to the search domain - the string in which the occurrence of the pattern is to be sought.
+
+ 
+
+### What are they good for
+Regular expressions support virtually all pattern matching tasks in data clean-up, extracting information items, data mining, "screen scraping", parsing of files, subsetting large tables, _etc. etc._ This means, they need to be part of your everyday toolkit.
+
+ 
+
+### When should they not be used
+Since regular expressions are Type-3 grammars, they must fail when trying to parse more complex grammars - i.e. gramars that can’t be expressed in a regular language. This means, you can’t reliably parse XML - and in particular HTML - with regular expressions. There is a long discussion on this particular topic however, e.g. see [here](http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags), and many other similar threads on stackoverflow, and see [here](http://programmers.stackexchange.com/questions/113237/when-you-should-not-use-regular-expressions) for a discussion of when regular expressions should not be used. Use a real XML parser instead.
+
+ 
+
+### Perl and POSIX
+Two dialects of regular expressions exist, they differ in some details of syntax. One is the nearly universal "Perl" dialect ([Perl](https://wikipedia.org/wiki/Perl) is a programming language), the other one is the "POSIX" standard that nearly no one uses. Except R. Tragically, in R the POSIX standard is the default. Fortunately this often does not make a difference, and we can explicitly turn this nonsense off. But we need to type the argument `perl = TRUE` much more often than we would like. Somebody, some time, made a wrong design decision and thousands of wasted man- and woman hours later we are still stuck with the consequences. If you use regular expressions according to the POSIX standard, you have to learn the Perl standard anyway. But then you can just use the Perl standard in the first place. The Wikipedia page on [Regular Expressions](https://wikipedia.org/wiki/Regular%20expression) has a table with a side-by-side comparison of the different ways the two standards express character classes. Also see the help page on `regex` in R for details.
+
+ 
+
+## Regular Expressions in R
+
+Regular expressions in R can be used
+
+- to match patterns in strings for use in if() or while() conditions, or to retrieve specific instances of patterns with the regexpr() family of functions;
+- to substitute occurrences of patterns in strings with other strings with gsub();
+- to split strings into substrings that are delimited by the occurrence of a pattern with strsplit();
+- …and more.
+
+Accordingly, a basic knowledge of regular expressions is needed to read and write code, especially code that parses text.
+
+ 
+
+### Syntax
+
+Regular expressions in R are strings, thus they are enclosed in quotation marks.
+
+```{r example_01}
+"a"
+```
+is a regular expression. It specifies the single, literal character `a` exactly.
+
+### Specifying symbols
+
+The power of regular expressions lies in their flexible syntax that allows to specify character ranges, classes of characters, unspecified characters, alternatives, and much more. This sometimes can be confusing, because the symbols that specify ranges, options, wildcards and the like are of course themselves characters. Characters that specify information about other characters are called metacharacters, these include "`.`", "`?`", "`+`", "`*`","`[`" and "`]`","`{`" and "`}`" and more. And the opposite is also possible: some plain characters can be turned into metacharacters to denote character classes.
+
+The "`\`" - **escape character** - allows to distinguish when a character is to be taken literally and when it is to be interpreted as a metacharacter. Note that some symbols have to be escaped to be read literally, while some symbols have to be escaped to be read as metacharacters.
+
+But there is a catch in R, relating to when the escape characater is interpreted. Remember that "`\n`" is a linebreak in a string, "`\t`" is a tab, etc. Obviously if you write "`\?`" (a literal questionmark in a regex), or "`\+`" (a literal plus-sign in a regex) into a regular string, the mechanism that parses the string in R is going to see the escape character first, then it expects an "n" or a "t" or the like - but what it gets instead is something it doesn’t know. So it throws an error. 
+
+But then how can we write something like "`\?`" when we need it? That becomes obvious when you consider what happens with the string: it gets sent to the regex engine for interpretation. Thus the regex engine needs to see: character "`\`", then character "`?`". So it needs two characters. The secret is: we need to prevent "`\`" from attaching to the next character, and specify it as a single character in its own right. We do that by escaping "`\`" itself - with a backslash. Thus "`\\`" is a literal "`\`" character from the perspective of R - and that can get sent to the regex engine which attaches it to the following character for its own purposes.
+
+```{R example02}
+"\\?" # ok
+cat("\\?") # that's what the regex engine sees.
+```
+
+Remember: you need to double the "`\`" to "`\\`"in R when you want a single "`\`". That works differently from other programming languages that pass patterns to the regex engine as-is. You need to be aware of this, for example when you develop a pattern in an online regex tool, and then copy it back into your R code. You need to double all occurrences of "`\`" in your R string.
+
+Letters whose special meaning as a metacharacter is turned on with the escape character:
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Character
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+<code> w</code>
+</td>
+<td>
+the letter “w”
+</td>
+</tr>
+<tr>
+<td>
+<code>\\w</code>
+</td>
+<td>
+a “word” character, ie one of A-Z, a-z, 0-9 and “_“
+</td>
+</tr>
+<tr>
+<td>
+<code> s</code>
+</td>
+<td>
+the letter “s”
+</td>
+</tr>
+<tr>
+<td>
+<code>\\s</code>
+</td>
+<td>
+a “space” character, i.e. one of ” “, tab or newline
+</td>
+</tr>
+<tr>
+<td>
+<code> b</code>
+</td>
+<td>
+the letter “b”
+</td>
+</tr>
+<tr>
+<td>
+<code>\\b</code>
+</td>
+<td>
+a word boundary
+</td>
+</tr>
+</table>
+
+
+
+
+
+
+
+&nbsp;
+
+Metacharacters whose special meaning is turned off with the escape character:
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Character
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+<code> +</code>
+</td>
+<td>
+One or more repetitions of the preceeding expression
+</td>
+</tr>
+<tr>
+<td>
+<code>\\+</code>
+</td>
+<td>
+the literal character “+”
+</td>
+</tr>
+<tr>
+<td>
+<code>\\\\</code>
+</td>
+<td>
+the escape character
+</td>
+</tr>
+<tr>
+<td>
+<code> \\</code>
+</td>
+<td>
+the literal character “\\”
+</td>
+</tr>
+<tr>
+<td>
+<code> .</code>
+</td>
+<td>
+any single character except the newline (\n)
+</td>
+</tr>
+<tr>
+<td>
+<code>\\.</code>
+</td>
+<td>
+a literal period
+</td>
+</tr>
+</table>
+
+
+
+Note that these examples are not exhaustive. A (nearly) complete table of symbols and meanings is given in the appendix.
+
+ 
+
+### Character Classes
+Square brackets specify when more than one specific character can match at a position.
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Means
+</th>
+</tr>
+<tr>
+<td>
+<code>[acgtACGT]</code>
+</td>
+<td>
+Any non-degenerate nucleotide
+</td>
+</tr>
+</table>
+
+For example: "[AGR]AATT[CTY]" matches all occurrences of an ApoI restriction site, either specified explicitly, or through the nucleotide ambiguity codes R (purines) or Y (pyrimidines).
+
+Within character sets, hyphens can specify character ranges.
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Means
+</th>
+</tr>
+<tr>
+<td>
+<code>[a-z]</code>
+</td>
+<td>
+lowercase letters
+</td>
+</tr>
+<tr>
+<td>
+<code>[0-9]</code>
+</td>
+<td>
+digits
+</td>
+</tr>
+<tr>
+<td>
+<code>[0-9+*/=^\\-]</code>
+</td>
+<td>
+digits and arithmetic symbols (Note the escaped hyphen)
+</td>
+</tr>
+</table>
+
+If you want to match a literal hyphen, you must escape it. Within character sets, some metacharacters that otherwise have special meanings usually do not need to be escaped.
+
+
+###The complement
+
+The caret character "^" denotes the complement of a character set; i.e. everything that is not that expression.
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Means
+</th>
+</tr>
+<tr>
+<td>
+<code>[^9]</code>
+</td>
+<td>
+Everything but the digit “9”
+</td>
+</tr>
+<tr>
+<td>
+<code>[^ACGT]</code>
+</td>
+<td>
+Not a nucleotide code letter
+</td>
+</tr>
+</table>
+
+
+Note that outside of square brackets, the "^" character is an "anchoring code" and means "beginning of the string". And inside a pattern it can of course be the literal carat: "^". This can be confusing.
+
+For many metacharacters that denote character classes, the metacharacter in upper case denotes the complement. This can also be confusing !
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Character
+</th>
+<th>
+Means
+</th>
+</tr>
+<tr>
+<td>
+<code>\\w</code>
+</td>
+<td>
+a word character
+</td>
+</tr>
+<tr>
+<td>
+<code>\\W</code>
+</td>
+<td>
+<strong>not</strong> a word character
+</td>
+</tr>
+<tr>
+<td>
+<code>\\s</code>
+</td>
+<td>
+a space character
+</td>
+</tr>
+<tr>
+<td>
+<code>\\S</code>
+</td>
+<td>
+<strong>not</strong> a space character
+</td>
+</tr>
+</table>
+
+
+###Specifying quantity
+
+Special characters in regular expressions control how often a pattern must be present in order to match:
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Expression
+</th>
+<th>
+What it means
+</th>
+<th>
+Example (meaning)
+</th>
+</tr>
+<tr>
+<td>
+<code>?</code>
+</td>
+<td>
+match zero or one times
+</td>
+<td>
+<code>“?</code> (there may or may not be a quote mark)
+</td>
+</tr>
+<tr>
+<td>
+<code>+</code>
+</td>
+<td>
+match one or more
+</td>
+<td>
+<code>[A-Z]+</code> (there’s at least one uppercase letter)
+</td>
+</tr>
+<tr>
+<td>
+<code>*</code>
+</td>
+<td>
+match any number
+</td>
+<td>
+<code>.*</code> (there may be some characters)
+</td>
+</tr>
+<tr>
+<td>
+<code>{min,max}</code>
+</td>
+<td>
+match between min and max times (assumes 0 for min, if min is omitted;
+assumes infinity for max, if max is omitted).
+</td>
+<td>
+<code>[atAT]{20,200}</code> (a stretch of between 20 and 200 upper- or
+lowercase As or Ts)
+</td>
+</tr>
+</table>
+
+
+For example: "AAUAAA[ACGU]{10,30}$" defines a polyadenylation site - a AAUAAA motif, followed by 10 to 30 of any nucleotide before the end of the RNA.
+
+
+### Specifying position (anchoring)
+
+If a pattern must be matched at a particular location in the string, special terms denote string anchors.
+
+<table border="1" cellpadding="5">
+<tr>
+<th>
+Anchoring Term
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+<code>^</code>
+</td>
+<td>
+Start of a line or string
+</td>
+</tr>
+<tr>
+<td>
+<code>$</code>
+</td>
+<td>
+End of a line or string
+</td>
+</tr>
+<tr>
+<td>
+<code>\\A</code>
+</td>
+<td>
+Start of the string
+</td>
+</tr>
+<tr>
+<td>
+<code>\\Z</code>
+</td>
+<td>
+End of the string
+</td>
+</tr>
+<tr>
+<td>
+<code>\\G</code>
+</td>
+<td>
+Last global match end
+</td>
+</tr>
+</table>
+
+
+## Using regular expressions in R
+
+
+Of course defining a regular expression pattern does not yet do anything with it. Below are the most important R functions that use regular expressions. Write the small code samples that are provided below, play with variations, and test how the operators and regular expressions work.
+
+ 
+
+Functions that don’t use regular expressions
+Not all pattern searches in strings use (and need) regular expressions. Sometimes simple, exact string-matching is enough. R uses string matching in character equality (`==`) and by extension, the set operation functions (`union()`, `intersect()` etc.), the `match()` function, and the `%in%` operator.
+
+```{R example03}
+vA <- c("the", "quick", "brown", "fox", "jumps", "over", "a", "lazy", "dog")
+
+vA[2] == "quick"  # TRUE
+vA[2] == "quack"  # FALSE
+
+vA == "fox"  # boolean vector
+
+# match tests for string equality
+match("fox", vA)   # 4, i.e. the 4th element matches the string
+match("o", vA)     # NA: matches have to be to the WHOLE element
+
+# match("fox", vA) is equivalent to...
+which(vA == "fox")
+
+# %in% can be used for creating intersections
+# find whether elements from one vector are
+# contained in another:
+
+vB <- c("Quacking", "the", "duck", "wings", "over", "my", "cozy", "cot")
+
+vA %in% vB
+vB %in% vA  # note that the length of the return vector is the same as the
+            # length of the first argument. So read this as:
+            # "Which of my vB are also in vA"
+
+# We can use this to subset the vector with elements that are present in
+# both:
+
+vB[vB %in% vA]
+
+# which is, of course, the intersection set operation.
+intersect(vA, vB)
+```
+
+### R Functions that use regular expressions
+
+The general online help page is [here](http://stat.ethz.ch/R-manual/R-patched/library/base/html/regex.html. Remember: R’s default behaviour is extended POSIX. To be sure which regex dialect is used, make it a habit to pass the `perl = TRUE` parameter.
+
+ 
+
+### `grep()`
+
+```{R example04}
+# grep() is like match(), but uses regular expressions. A variant of grep() that
+# returns a boolean vector - like "==" does - is grepl(). That is useful
+# because we can & or | the vector, or invert it with ! .
+
+grep("fox", vA)
+grep("o", vA) # Aha! now we get all elements that contain an "o" -
+              # Because we get partial matches with regular expressions.
+vA[grep("o", vA)] # subset
+
+grepl("o", vA)    # logical
+! grepl("o", vA)  # its inverse
+
+vA[! grepl("o", vA)] # subset all words without "o"
+```
+ 
+
+###Subsetting example
+
+Consider the following regular expression:
+
+```{R example05}
+
+patt <- "^\\s*#"
+```
+
+This matches if the string it is applied to does not begin with a "#", which may or may not be preceeded by whitespaces. This would be useful to ignore comment lines in a data file.
+
+The regular expression above is decomposed as follows:
+
+- ^   the beginning of the line
+- \\s   any whitespace character …
+- *    … repeated 0 or more times
+- #    the hash character
+
+The following example would read a file into an vector of lines, then drop all lines that are empty, and all lines that are comments. This is a straightforward idiom.
+
+```{R example06, eval = FALSE}
+IN <- "test.txt"
+patt <- "^\\s*#"
+
+myData <- readLines(IN)
+myData <- myData[myData != ""]  # drop all elements that are the empty string
+myData <- myData[! grepl(patt, myData)]  # drop all elements match the pattern
+```
+ 
+
+###Substitution - `gsub()`
+
+Think of "gsub"" as "global substitution", and you’ll understand that there exists another function, sub() that replaces only the first occurrence of a pattern, rather than all of them as gsub() does. I can’t imagine what the use case for that might be and I don’t think I have ever used sub(). I get an intuitive sense that code that needs such a function should probably be reconceived. But `gsub()` is very useful.
+
+```{R example07}
+(s <- "   1 MKLAACFLTL LPGFAVA... 17   ") # E-coli Alpha Amylase signal peptide
+
+# Drop everything from this string that is not an amino acid one-letter code.
+# We use gsub() to first identify all non-amino acid letters with a character
+# class regular expression, then we replace each occurrence with the empty
+# string.
+
+gsub("[^ACDEFGHIKLMNPQRSTVWY]", "", s)
+
+# or, with assignment: ...
+s <- gsub("[^ACDEFGHIKLMNPQRSTVWY]", "", s)
+```
+ 
+
+### `strsplit()`
+Another function that makes use of regular expressions is `strsplit()`. It takes a vector of strings, and returns a list, one element for each element of the vector, in which each string has been split up by separating it along a regular expression.
+
+```{R example08}
+
+x <- c("a b c", "1 2")
+strsplit(x, " ")
+# [[1]]
+# [1] "a" "b" "c"
+#
+# [[2]]
+# [1] "1" "2"
+```
+
+
+Since even a single string returns a list, you often have to extract the element you want as a vector for further use.
+
+```{R example09}
+corvidae <- c("crow:jackdaw:jay:magpie:raven:rook")
+strsplit(corvidae, ":")
+
+unlist(strsplit(corvidae, ":"))
+strsplit(corvidae, ":")[[1]]
+
+# Consider:
+length(strsplit(corvidae, ":"))
+length(unlist(strsplit(corvidae, ":")))
+```
+
+strsplit() is immensely useful to extract elements from strings with a relatively well defined structure.
+
+```{R example10}
+
+s <- "1, 1, 2, 3, 5, 8"
+strsplit(s, ", ")[[1]] # split on comma-space
+
+s <- "~`!@#$%^&*()_-=+[{]}\\|;:',<.>/?"
+strsplit(s, "")[[1]]  # split on empty string
+
+s <- "chronological lifespan:\tincreased\ncold sensitivity:\tincreased\nsporulation:\tnormal"
+strsplit(s, "\\t|\\n")[[1]]  # split on tab or newline
+```
+ 
+
+## More to come ...
+
+<!-- [END] -->
