@@ -6,13 +6,13 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                             Line
 #TOC> -------------------------------------------------
 #TOC>   1        Preparations                        19
 #TOC>   2        Processing ensembl Genes            28
 #TOC>   3        Parsing ...                         98
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -102,6 +102,14 @@ if (FALSE) {
 
   # Now what ... ?
 
+  # Example
+  hits <- grep("[Cc]ancer", myPhenotypes)
+  myPhenotypes[hits]
+
+
+  # Task:
+  # Find a way to identify many (all?) cancer- associated phenotype
+  # annotations in our list, using regular expressions.
 
 }
 
