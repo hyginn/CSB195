@@ -84,7 +84,7 @@ Regular expressions are examples of **deterministic pattern matching** - they ei
 
 Truth be told, many programmers have a love-hate relationship with regular expressions. The syntax of regular expressions is very powerful and expressive, but also terse, not always intuitive, and sometimes hard to understand. Of course, you can always ask your AI assistant to interpet a regex for you, or to collaborate with you to write one. But you still need to understand what's going on in order to validate the result.
 
-Let’s try a few simple things:
+Let's try a few simple things:
 
 Here is string to play with: the sequence of the major isoform of the human TP53 gene, copied from the [NCBI RefSeq Protein database page](https://www.ncbi.nlm.nih.gov/protein/NP_000537).
 
@@ -135,7 +135,7 @@ Regular expressions support virtually all pattern matching tasks in data clean-u
  
 
 ### When should they not be used
-Since regular expressions are Type-3 grammars, they must fail when trying to parse more complex grammars - i.e. gramars that can’t be expressed in a regular language. This means, you can’t reliably parse XML - and in particular HTML - with regular expressions. There is a long discussion on this particular topic however, e.g. see [here](http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags), and many other similar threads on stackoverflow, and see [here](http://programmers.stackexchange.com/questions/113237/when-you-should-not-use-regular-expressions) for a discussion of when regular expressions should not be used. Use a real XML parser instead.
+Since regular expressions are Type-3 grammars, they must fail when trying to parse more complex grammars - i.e. gramars that can't be expressed in a regular language. This means, you can't reliably parse XML - and in particular HTML - with regular expressions. There is a long discussion on this particular topic however, e.g. see [here](http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags), and many other similar threads on stackoverflow, and see [here](http://programmers.stackexchange.com/questions/113237/when-you-should-not-use-regular-expressions) for a discussion of when regular expressions should not be used. Use a real XML parser instead.
 
  
 
@@ -172,7 +172,7 @@ The power of regular expressions lies in their flexible syntax that allows to sp
 
 The "`\`" - **escape character** - allows to distinguish when a character is to be taken literally and when it is to be interpreted as a metacharacter. Note that some symbols have to be escaped to be read literally, while some symbols have to be escaped to be read as metacharacters.
 
-But there is a catch in R, relating to when the escape characater is interpreted. Remember that "`\n`" is a linebreak in a string, "`\t`" is a tab, etc. Obviously if you write "`\?`" (a literal questionmark in a regex), or "`\+`" (a literal plus-sign in a regex) into a regular string, the mechanism that parses the string in R is going to see the escape character first, then it expects an "n" or a "t" or the like - but what it gets instead is something it doesn’t know. So it throws an error. 
+But there is a catch in R, relating to when the escape characater is interpreted. Remember that "`\n`" is a linebreak in a string, "`\t`" is a tab, etc. Obviously if you write "`\?`" (a literal questionmark in a regex), or "`\+`" (a literal plus-sign in a regex) into a regular string, the mechanism that parses the string in R is going to see the escape character first, then it expects an "n" or a "t" or the like - but what it gets instead is something it doesn't know. So it throws an error. 
 
 But then how can we write something like "`\?`" when we need it? That becomes obvious when you consider what happens with the string: it gets sent to the regex engine for interpretation. Thus the regex engine needs to see: character "`\`", then character "`?`". So it needs two characters. The secret is: we need to prevent "`\`" from attaching to the next character, and specify it as a single character in its own right. We do that by escaping "`\`" itself - with a backslash. Thus "`\\`" is a literal "`\`" character from the perspective of R - and that can get sent to the regex engine which attaches it to the following character for its own purposes.
 
@@ -185,7 +185,7 @@ Remember: you need to double the "`\`" to "`\\`"in R when you want a single "`\`
 
 Letters whose special meaning as a metacharacter is turned on with the escape character:
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Character
@@ -196,47 +196,47 @@ Meaning
 </tr>
 <tr>
 <td>
-<code> w</code>
+` w`
 </td>
 <td>
-the letter “w”
-</td>
-</tr>
-<tr>
-<td>
-<code>\\w</code>
-</td>
-<td>
-a “word” character, ie one of A-Z, a-z, 0-9 and “_“
+the letter "w"
 </td>
 </tr>
 <tr>
 <td>
-<code> s</code>
+`\\w`
 </td>
 <td>
-the letter “s”
-</td>
-</tr>
-<tr>
-<td>
-<code>\\s</code>
-</td>
-<td>
-a “space” character, i.e. one of ” “, tab or newline
+a "word" character, ie one of A-Z, a-z, 0-9 and "_"
 </td>
 </tr>
 <tr>
 <td>
-<code> b</code>
+` s`
 </td>
 <td>
-the letter “b”
+the letter "s"
 </td>
 </tr>
 <tr>
 <td>
-<code>\\b</code>
+`\\s`
+</td>
+<td>
+a "space" character, i.e. one of " ", tab or newline
+</td>
+</tr>
+<tr>
+<td>
+` b`
+</td>
+<td>
+the letter "b"
+</td>
+</tr>
+<tr>
+<td>
+`\\b`
 </td>
 <td>
 a word boundary
@@ -254,7 +254,7 @@ a word boundary
 
 Metacharacters whose special meaning is turned off with the escape character:
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Character
@@ -265,7 +265,7 @@ Meaning
 </tr>
 <tr>
 <td>
-<code> +</code>
+` +`
 </td>
 <td>
 One or more repetitions of the preceeding expression
@@ -273,15 +273,15 @@ One or more repetitions of the preceeding expression
 </tr>
 <tr>
 <td>
-<code>\\+</code>
+`\\+`
 </td>
 <td>
-the literal character “+”
+the literal character "+"
 </td>
 </tr>
 <tr>
 <td>
-<code>\\\\</code>
+`\\\\`
 </td>
 <td>
 the escape character
@@ -289,15 +289,15 @@ the escape character
 </tr>
 <tr>
 <td>
-<code> \\</code>
+` \\`
 </td>
 <td>
-the literal character “\\”
+the literal character "\\"
 </td>
 </tr>
 <tr>
 <td>
-<code> .</code>
+` .`
 </td>
 <td>
 any single character except the newline (\n)
@@ -305,7 +305,7 @@ any single character except the newline (\n)
 </tr>
 <tr>
 <td>
-<code>\\.</code>
+`\\.`
 </td>
 <td>
 a literal period
@@ -322,7 +322,7 @@ Note that these examples are not exhaustive. A (nearly) complete table of symbol
 ### Character Classes
 Square brackets specify when more than one specific character can match at a position.
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Expression
@@ -333,7 +333,7 @@ Means
 </tr>
 <tr>
 <td>
-<code>[acgtACGT]</code>
+`[acgtACGT]`
 </td>
 <td>
 Any non-degenerate nucleotide
@@ -345,7 +345,7 @@ For example: "[AGR]AATT[CTY]" matches all occurrences of an ApoI restriction sit
 
 Within character sets, hyphens can specify character ranges.
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Expression
@@ -356,7 +356,7 @@ Means
 </tr>
 <tr>
 <td>
-<code>[a-z]</code>
+`[a-z]`
 </td>
 <td>
 lowercase letters
@@ -364,7 +364,7 @@ lowercase letters
 </tr>
 <tr>
 <td>
-<code>[0-9]</code>
+`[0-9]`
 </td>
 <td>
 digits
@@ -372,7 +372,7 @@ digits
 </tr>
 <tr>
 <td>
-<code>[0-9+*/=^\\-]</code>
+`[0-9+*/=^\\-]`
 </td>
 <td>
 digits and arithmetic symbols (Note the escaped hyphen)
@@ -387,7 +387,7 @@ If you want to match a literal hyphen, you must escape it. Within character sets
 
 The caret character "^" denotes the complement of a character set; i.e. everything that is not that expression.
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Expression
@@ -398,15 +398,15 @@ Means
 </tr>
 <tr>
 <td>
-<code>[^9]</code>
+`[^9]`
 </td>
 <td>
-Everything but the digit “9”
+Everything but the digit "9"
 </td>
 </tr>
 <tr>
 <td>
-<code>[^ACGT]</code>
+`[^ACGT]`
 </td>
 <td>
 Not a nucleotide code letter
@@ -419,7 +419,7 @@ Note that outside of square brackets, the "^" character is an "anchoring code" a
 
 For many metacharacters that denote character classes, the metacharacter in upper case denotes the complement. This can also be confusing !
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Character
@@ -430,7 +430,7 @@ Means
 </tr>
 <tr>
 <td>
-<code>\\w</code>
+`\\w`
 </td>
 <td>
 a word character
@@ -438,7 +438,7 @@ a word character
 </tr>
 <tr>
 <td>
-<code>\\W</code>
+`\\W`
 </td>
 <td>
 <strong>not</strong> a word character
@@ -446,7 +446,7 @@ a word character
 </tr>
 <tr>
 <td>
-<code>\\s</code>
+`\\s`
 </td>
 <td>
 a space character
@@ -454,7 +454,7 @@ a space character
 </tr>
 <tr>
 <td>
-<code>\\S</code>
+`\\S`
 </td>
 <td>
 <strong>not</strong> a space character
@@ -467,7 +467,7 @@ a space character
 
 Special characters in regular expressions control how often a pattern must be present in order to match:
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Expression
@@ -481,61 +481,61 @@ Example (meaning)
 </tr>
 <tr>
 <td>
-<code>?</code>
+`?`
 </td>
 <td>
 match zero or one times
 </td>
 <td>
-<code>“?</code> (there may or may not be a quote mark)
+`"?` (there may or may not be a quote mark)
 </td>
 </tr>
 <tr>
 <td>
-<code>+</code>
+`+`
 </td>
 <td>
 match one or more
 </td>
 <td>
-<code>[A-Z]+</code> (there’s at least one uppercase letter)
+`[A-Z]+` (there's at least one uppercase letter)
 </td>
 </tr>
 <tr>
 <td>
-<code>*</code>
+`*`
 </td>
 <td>
 match any number
 </td>
 <td>
-<code>.*</code> (there may be some characters)
+`.*` (there may be some characters)
 </td>
 </tr>
 <tr>
 <td>
-<code>{min,max}</code>
+`{min,max}`
 </td>
 <td>
 match between min and max times (assumes 0 for min, if min is omitted;
 assumes infinity for max, if max is omitted).
 </td>
 <td>
-<code>[atAT]{20,200}</code> (a stretch of between 20 and 200 upper- or
+`[atAT]{20,200}` (a stretch of between 20 and 200 upper- or
 lowercase As or Ts)
 </td>
 </tr>
 </table>
 
 
-For example: "AAUAAA[ACGU]{10,30}$" defines a polyadenylation site - a AAUAAA motif, followed by 10 to 30 of any nucleotide before the end of the RNA.
+For example: "`AAUAAA[ACGU]{10,30}$`" defines a polyadenylation site - a `AAUAAA` motif, followed by 10 to 30 of any nucleotide before the end of the RNA.
 
 
 ### Specifying position (anchoring)
 
 If a pattern must be matched at a particular location in the string, special terms denote string anchors.
 
-<table border="1" cellpadding="5">
+<table class="striped">
 <tr>
 <th>
 Anchoring Term
@@ -546,7 +546,7 @@ Meaning
 </tr>
 <tr>
 <td>
-<code>^</code>
+`^`
 </td>
 <td>
 Start of a line or string
@@ -554,7 +554,7 @@ Start of a line or string
 </tr>
 <tr>
 <td>
-<code>$</code>
+`$`
 </td>
 <td>
 End of a line or string
@@ -562,7 +562,7 @@ End of a line or string
 </tr>
 <tr>
 <td>
-<code>\\A</code>
+`\\A`
 </td>
 <td>
 Start of the string
@@ -570,7 +570,7 @@ Start of the string
 </tr>
 <tr>
 <td>
-<code>\\Z</code>
+`\\Z`
 </td>
 <td>
 End of the string
@@ -578,7 +578,7 @@ End of the string
 </tr>
 <tr>
 <td>
-<code>\\G</code>
+`\\G`
 </td>
 <td>
 Last global match end
@@ -594,7 +594,7 @@ Of course defining a regular expression pattern does not yet do anything with it
 
  
 
-Functions that don’t use regular expressions
+Functions that don't use regular expressions
 Not all pattern searches in strings use (and need) regular expressions. Sometimes simple, exact string-matching is enough. R uses string matching in character equality (`==`) and by extension, the set operation functions (`union()`, `intersect()` etc.), the `match()` function, and the `%in%` operator.
 
 ```{R example03}
@@ -634,7 +634,7 @@ intersect(vA, vB)
 
 ### R Functions that use regular expressions
 
-The general online help page is [here](http://stat.ethz.ch/R-manual/R-patched/library/base/html/regex.html. Remember: R’s default behaviour is extended POSIX. To be sure which regex dialect is used, make it a habit to pass the `perl = TRUE` parameter.
+The general online help page is [here](http://stat.ethz.ch/R-manual/R-patched/library/base/html/regex.html. Remember: R's default behaviour is extended POSIX. To be sure which regex dialect is used, make it a habit to pass the `perl = TRUE` parameter.
 
  
 
@@ -657,11 +657,11 @@ vA[! grepl("o", vA)] # subset all words without "o"
 ```
  
 
-###Subsetting example
+### Subsetting example
 
 Consider the following regular expression:
 
-```{R example05}
+```{R example05, eval = FALSE}
 
 patt <- "^\\s*#"
 ```
@@ -670,10 +670,10 @@ This matches if the string it is applied to does not begin with a "#", which may
 
 The regular expression above is decomposed as follows:
 
-- ^   the beginning of the line
-- \\s   any whitespace character …
-- *    … repeated 0 or more times
-- #    the hash character
+- `^`   the beginning of the line
+- `\\s`   any whitespace character …
+- `*`    … repeated 0 or more times
+- `#`    the hash character
 
 The following example would read a file into an vector of lines, then drop all lines that are empty, and all lines that are comments. This is a straightforward idiom.
 
@@ -683,13 +683,16 @@ patt <- "^\\s*#"
 
 myData <- readLines(IN)
 myData <- myData[myData != ""]  # drop all elements that are the empty string
-myData <- myData[! grepl(patt, myData)]  # drop all elements match the pattern
+
+sel <- grepl(patt, myData) # find all elements that contain a pattern
+myData <- myData[! sel]    # drop all matching elements
+
 ```
  
 
-###Substitution - `gsub()`
+### Substitution - `gsub()`
 
-Think of "gsub"" as "global substitution", and you’ll understand that there exists another function, sub() that replaces only the first occurrence of a pattern, rather than all of them as gsub() does. I can’t imagine what the use case for that might be and I don’t think I have ever used sub(). I get an intuitive sense that code that needs such a function should probably be reconceived. But `gsub()` is very useful.
+Think of "`gsub()`"" as "**g**lobal **sub**stitution", and you'll understand that there exists another function, `sub()` that replaces only the first occurrence of a pattern, rather than all of them as `gsub()` does. I can't imagine what the use case for that might be and I don't think I have ever used `sub()`. I have a feeling that code that needs such a function should probably be reconceived. But `gsub()` is very useful.
 
 ```{R example07}
 (s <- "   1 MKLAACFLTL LPGFAVA... 17   ") # E-coli Alpha Amylase signal peptide
@@ -713,34 +716,27 @@ Another function that makes use of regular expressions is `strsplit()`. It takes
 
 x <- c("a b c", "1 2")
 strsplit(x, " ")
-# [[1]]
-# [1] "a" "b" "c"
-#
-# [[2]]
-# [1] "1" "2"
+
 ```
 
 
 Since even a single string returns a list, you often have to extract the element you want as a vector for further use.
 
 ```{R example09}
-corvidae <- c("crow:jackdaw:jay:magpie:raven:rook")
-strsplit(corvidae, ":")
+corvidae <- c("crow, jackdaw, jay, magpie, raven, rook")
+strsplit(corvidae, ", ")
 
-unlist(strsplit(corvidae, ":"))
-strsplit(corvidae, ":")[[1]]
+unlist(strsplit(corvidae, ", "))
+strsplit(corvidae, ", ")[[1]]
 
 # Consider:
-length(strsplit(corvidae, ":"))
-length(unlist(strsplit(corvidae, ":")))
+length(strsplit(corvidae, ", "))
+length(unlist(strsplit(corvidae, ", ")))
 ```
 
-strsplit() is immensely useful to extract elements from strings with a relatively well defined structure.
+`strsplit()` is immensely useful to extract elements from strings with a relatively well defined structure.
 
 ```{R example10}
-
-s <- "1, 1, 2, 3, 5, 8"
-strsplit(s, ", ")[[1]] # split on comma-space
 
 s <- "~`!@#$%^&*()_-=+[{]}\\|;:',<.>/?"
 strsplit(s, "")[[1]]  # split on empty string
@@ -750,6 +746,858 @@ strsplit(s, "\\t|\\n")[[1]]  # split on tab or newline
 ```
  
 
-## More to come ...
+## Behaviour
+ 
+
+### Capturing and immediately using matches
+Matches can be captured, retrieved or otherwise made available. 
+
+```{R example11}
+
+# Capture matches by placing them in parentheses. To immediatley reuse them, refer to them with "backreferences": `\\1`, `\\2`, `\\3`, etc.
+
+# Example 1:
+# The beginning and ending three words of some text...
+s <- "I know, however, that its precarious and remote villages lie within the lowlands of the Wisla River."
+gsub("^((\\S+\\s+){3}).*((\\s\\S+){3})$", "\\1 ... \\3", s)
+
+# Note: matches \\2 and \\4 are the inside the parentheses that are there to
+# group things to be found {3}-times.
+
+# Example 2:
+# A binomial species name has a genus, a species, and possibly a strain name.
+# We use \\S (not whitespace) and \\s (whitespace) to tease this apart into
+# three captured expressions:
+s <- "Saccharomyces cerevisiae S288C"
+gsub("^(\\S+)\\s(\\S+)\\s*(.*)$",
+     "genus: \\1; species: \\1 \\2; (strain: \\3)",
+     s)
+
+```
+
+
+### Capturing and returning matches
+
+Finding and returning matches in R is a two-step process. 
+
+1. find matches with `regexpr()` (one match), `gregexpr()` (all matches), or `regexec()` (sub-expressions in parentheses). All of these return a "match object". 
+1. use the match object to extract the matching substrings from the original string.
+
+```{R example12}
+# Extracting gene names in text.
+
+# Let's define a valid gene name to be a substring that is bounded by
+# word-boundaries, starts with an upper-case character, contains more upper-case
+# characters or numbers or a hyphen or underscore, with a minimal length of 3.
+# Here is a regex, and we put the part of the string that we want to recover, in
+# parentheses:
+
+patt <- "\\b([A-Z][A-Z0-9\\-_]+[A-Z0-9])\\b"
+
+# Test: positives
+grepl(patt, "MBP1")
+grepl(patt, "AAT")
+grepl(patt, " AI1")
+grepl(patt, "ASP3-1 ")
+grepl(patt, " AI5_ALPHA; ")
+grepl(patt, " (TY1B-PR3) ")
+# Test: negatives
+grepl(patt, "G1") # Too short
+grepl(patt, "G1-") # Hyphen at end
+grepl(patt, "Cell") # contains lower-case
+
+# Let's apply this to retrieve gene names in text
+
+s <- "Transcriptional activation of CLN1, CLN2, and a putative new G1 cyclin (HCS26) by SWI4, a positive regulator of G1-specific transcription. Cell 66(5):1015-26"
+
+(m <- regexpr(patt, s)) # found a match in position 31
+regmatches(s, m)        # retrieve it
+
+(m <- gregexpr(patt, s)) # found all matches
+regmatches(s, m)         # retrieve them (note, this is a list)
+
+# The function of choice however is regexec(). It returns whatever the pattern
+# has defined in parentheses, the others return the entire match. The
+# parentheses are quite important, because we might want to specify additional
+# context for a valid match, but we might not want the context in the match
+# itself. In our example we used word boundaries - \\b - for such context; but
+# these are zero-length and don't actually match a character, so they don't
+# contaminate the substring anyway. But in general we need to be able to
+# precisely retrieve only the target substring.
+
+(m <- regexec(patt, s)) # only the parenthesized substring
+regmatches(s, m)        # retrieve it
+
+# Note that there are two elements: the first is the whole match, the second
+# is the substring that is in parentheses. In our example these are the same.
+# Here is an example where they are not:
+s <- "Find the last word. And tell me."
+(m <- regexec("\\s(\\w+)\\.", s))
+regmatches(s, m)        # retrieve it
+
+# Unfortunately there is no option to capture multiple matches
+# in base R: regexec() lacks a corresponding gregexec()...
+
+patt <- "\\b([A-Z][A-Z0-9\\-_]+[A-Z0-9])\\b"
+
+s <- "Transcriptional activation of CLN1, CLN2, and a putative new G1 cyclin (HCS26) by SWI4, a positive regulator of G1-specific transcription. Cell 66(5):1015-26"
+
+# Solution 1 (base R): you can use multiple matches in an sapply()
+# statement...
+sapply(regmatches(s, gregexpr(patt, s))[[1]],
+       function(M){regmatches(M, regexec(patt, M))})
+
+# Solution 2 (probably preferred): you can use
+# str_match_all() from the very useful library "stringr" ...
+if (! requireNamespace("stringr", quietly=TRUE)) {
+  install.packages("stringr")
+}
+# Package information:
+#  library(help = stringr)       # basic information
+#  browseVignettes("stringr")    # available vignettes
+#  data(package = "stringr")     # available datasets
+
+stringr::str_match_all(s, patt)
+stringr::str_match_all(s, patt)[[1]][,2]
+# [1] "CLN1"  "CLN2"  "HCS26" "SWI4"
+
+# Note that str_match_all() handles the match object internally, no need for
+# the two-step code.
+```
+
+
+An interesting new alternative/complement to the base R regex libraries is the "`ore`" R package that uses the [Oniguruma](https://wikipedia.org/wiki/Oniguruma) libraries and supports multiple character encodings, which you need when you work with Unicode and/or CJK character sets.
+
+```{R example13}
+if (! requireNamespace("ore", quietly = TRUE)) {
+    install.packages("ore")
+}
+# Package information:
+#  library(help = ore)       # basic information
+#  browseVignettes("ore")    # available vignettes
+#  data(package = "ore")     # available datasets
+
+S <- "The quick brown fox jumps over a lazy dog"
+
+ore::ore.search(". .", S)
+ore::ore.search(". .", S, all=TRUE)
+M <- ore::ore.search(". .", S, all=TRUE)
+M$nMatches
+M$match[2:4]
+
+```
+
+According to the author John Clayden, key advantages include:
+
+- Search results focus around the matched substrings (including parenthesised groups), rather than the locations of matches. This saves extra work with regmatches() or similar to extract the matches themselves.
+- Substantially better performance, especially when matching against long strings.
+- Substitutions can be functions as well as strings.
+- Matches can be efficiently obtained over only part of the strings.
+- Fewer core functions, with more consistent names.
+ 
+
+## Modifiers
+
+A number of modifiers can be applied as arguments to regular expression functions that may be useful. Here are the two most important ones.
+
+```{R example14}
+# Option "ignore.case" allows to have case-insensitive matches. This is usually
+# poor programming style, a more explicit (= better) way is to define your
+# character classes appropriately.
+
+patt <- "\\b([A-Z][A-Z0-9\\-_]+[A-Z0-9])\\b"
+
+s <- "The MBP1 gene encodes the Mbp1 protein."
+
+m <- gregexpr(patt, s)
+regmatches(s, m)[[1]]
+
+m <- gregexpr(patt, s, ignore.case = TRUE)
+regmatches(s, m)[[1]]
+
+# For regex functions in the stringr package, you can compile the pattern
+# with the regex() function, and include the option "comments = TRUE". This
+# allows you to insert whitespace and # characters into the pattern
+# which will be ingnored by the regex engine. Thus you can comment
+# complex regular expressions inline.
+
+myRegex <- stringr::regex("\\b            # word boundary
+                          (               # begin capture
+                          [A-Z]           # one uppercase letter
+                          [A-Z0-9\\-_]+   # one or more letters, numbers, hyphen or
+                                          #   underscore
+                          [A-Z0-9]        # one letter or number.
+                          # Note: this captured subexpression has a minimum length of 3.
+                          )               # end capture
+                          \\b",           # word boundary
+                          comments = TRUE)
+
+stringr::str_match_all(s, myRegex)[[1]][2]
+```
+
+
+## Greed
+
+By default, quantitative matches except zero/one (i.e. the `?` character) are "greedy", i.e. they will match the largest possible number of characters. For example:
+
+```{R example15}
+s <- "abc123"
+
+patt <- "(\\w+)(\\d+)"   # word characters, followed by digits. This pattern ...
+stringr::str_match_all(s, patt)[[1]][-1]
+
+# ...yields "abc12" and "3" . This is because \w+ is greedy and grabs as many
+# alphanumeric characters as it can before \d+ gets a chance to match.  A "?"
+# after a quantity specifier makes it non-greedy, therefore ...
+
+patt <- "(\\w+?)(\\d+)"   # Note the questionmark in (\\w+?)
+stringr::str_match_all(s, patt)[[1]][-1]
+
+# ... now \d+ gets a chance to match as many digits as possible
+```
+ 
+
+## Regular Expressions in other languages
+ 
+
+### PHP
+```{PHP example16}
+<?php
+$string = "The quick brown fox jumps over a lazy dog";
+
+$words = preg_split('/\s+/', $string);
+print_r($words);
+
+preg_match('/.\W./', $string, $matches);
+print_r($matches);
+
+preg_match_all('/.\W./', $string, $matches);
+print_r($matches);
+
+# indexed preg_replace, iterates over array elements
+$pat = array(); #broken
+$pat[0] = '/quick brown/';
+$pat[1] = '/fox/';
+$pat[2] = '/lazy/';
+$pat[3] = '/dog/';
+$rep = array();
+$rep[0] = 'lazy';
+$rep[1] = 'dog';
+$rep[2] = 'quick brown';
+$rep[3] = 'fox';
+print(preg_replace($pat, $rep, $string));
+print("\n");
+
+$pat = array();
+$pat[0] = '/quick brown fox/';
+$pat[1] = '/lazy dog/';
+$pat[2] = '/foo/';
+$pat[3] = '/bar/';
+$rep = array();
+$rep[0] = 'foo';
+$rep[1] = 'bar';
+$rep[2] = 'lazy dog';
+$rep[3] = 'quick brown fox';
+print(preg_replace($pat, $rep, $string));
+print("\n");
+
+?>
+```
+ 
+
+### Python
+
+Python regular expression are provided through the module `re`. See [here](https://docs.python.org/3/library/re.html) for documentation.
+
+`.re` functions in general operate on a string and return a MatchObject. The MatchObject is then further analyzed by supplied methods.
+
+The most frequently used functions are:
+
+- `re.match(pattern, string)` matches only at the beginning of a line.
+- `re.search(pattern, string)` matches anywhere in a line.
+- `re.split(pattern, string)` returns the split string as a list.
+- `re.findall(pattern, string)` returns all matches in a list.
+
+<!--
+#### Python example
+Download this .svg file to experiment.
+
+# parse_SVG_example.py
+# Read an svg file line by line and process path data
+# to write commands separately to an output file, line by line.
+
+import re
+
+filePath = "/my/working/directory/whatever/"
+
+myIn  = filePath + "sample.svg"
+myOut = filePath + "test.svg"
+
+IN  = open(myIn)
+OUT = open(myOut, "w")
+
+for line in IN:
+   path = re.search('\sd=\"(.*?)\"', line) # returns the MatchObject "path"
+   if path:
+       # Found. Process the result with a second regex.
+       # path.group() is a method of the MatchObject
+       pathData = re.findall('([aAcChHlLmMqQsStTvVzZ]|-?\d*\.?\d+)',
+                             path.group(1))
+       # Write it nicely formatted to output, one command per line
+       OUT.write("d=\"")
+       s = ""    # we accumulate output lines in this variable
+       for token in pathData:
+           if re.match('[aAcChHlLmMqQsStTvVzZ]', token):
+               # it's a letter:
+               OUT.write("\n    "+s)     # flush s to output
+               s = token + " "       # new s
+           else:
+               s = s + token + " "   # append to s
+       OUT.write("\n    " + s + "\"\n")  # flush s, close string, and add \n
+
+   else:
+       OUT.write(line)
+
+IN.close()
+OUT.close()
+-->
+
+### Javascript
+
+Javascript is probably the most convenient choice if you want to interact directly with the DOM (Document Object Model) of a Web page. Here is example code for a "bookmarklet" that rewrites the URL of a journal-article page for access from outside the UofT network.
+
+```{javascript example17}
+javascript:(function(){
+   var url=window.location.href;
+   var re=/\/([\w.]+)\/(.*$)/;
+   var match=url.match(re);
+   var newURL="http://"+match[1]+".myaccess.library.utoronto.ca/"+match[2];
+   window.location.href=newURL;
+})();
+void 0
+```
+
+Put this into the body of an arbitrary bookmark on your browser, then when you find yourself on a journal manuscript or book-chapter page that is access restricted, just click on the bookmark to be redirected to our library's licensed access system.
+
+ 
+
+### POSIX (Unix, the bash shell)
+
+Use in: 
+- `grep` : `grep` finds patterns in files. Patterns are regular expressions and can come in basic or extended flavors. In GNU `grep` there is no difference between these; in implementations where there is, you switch from basic to extended syntax with the `grep -E` flag which is the same as invoking `egrep.` : Example: what demons run on your system? 
+
+``` ps -ax | egrep -o "/([^A-Z]+d) | sort -u```
+
+Other uses of regular expressions in: 
+- `find`
+- `sed`
+- `awk`
+- `cut` … see the man pages.
+
+ 
+
+
+
+## Appendix I: Metacharacters and their meaning
+
+
+<table class="striped">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+`\\`
+</td>
+<td>
+Escape character
+</td>
+</tr>
+<tr>
+<td>
+`|`
+</td>
+<td>
+Alternation character. Matches either one of specified alternatives. For
+example, `/Asp|Glu/i` matches ASP, Asp, asp, GLU, Glu or glu.
+</td>
+</tr>
+<tr>
+<td>
+`^`
+</td>
+<td>
+If the caret occurs at the beginning of an expression it anchors the
+expression at the beginning of a line or input.<br />For example, /^AT/
+does not match the 'AT' in "HETATM" but does match it in "ATOM". If the
+caret occurs as the first character of a character set as in [^a-z] it
+specifies the complement of the character set. Everywhere else, it
+simply matches the character "^".
+</td>
+</tr>
+<tr>
+<td>
+`$`
+</td>
+<td>
+Matches end of input or line. <br />For example, /t$/ does not match the
+'t' in "eater", but does match it in "eat"
+</td>
+</tr>
+<tr>
+<td>
+`*`
+</td>
+<td>
+Matches the preceding character 0 or more times. For example, /bo*/
+matches 'boooo' in "A ghost booooed" and 'b' in "A bird warbled", but
+nothing in "A goat grunted".
+</td>
+</tr>
+<tr>
+<td>
+`+`
+</td>
+<td>
+Matches the preceding character 1 or more times. Equivalent to {1,} .
+For example, /a+/ matches the 'a' in "candy" and all the a's in
+"caaaaaaandy."
+</td>
+</tr>
+<tr>
+<td>
+`?`
+</td>
+<td>
+Matches the preceding character 0 or 1 time. For example, /e?le?/
+matches the 'el' in "angel" and the 'le' in "angle."
+</td>
+</tr>
+<tr>
+<td>
+`.`
+</td>
+<td>
+(The decimal point) matches any single character except the newline
+character.
+</td>
+</tr>
+<tr>
+<td>
+`(x)`
+</td>
+<td>
+Matches 'x' and remembers the match. For example, /(foo) bar/ matches
+"foo bar" and stores 'foo' in the special variable $1. /(more) (joy)/
+matches "more joy", then stores 'more' in $1 and 'joy' in $2.
+</td>
+</tr>
+<tr>
+<td>
+`{n}`
+</td>
+<td>
+Where n is a positive integer. Matches exactly n occurrences of the
+preceding character. For example, /a{2}/ doesn't match the 'a' in
+"candy," but it matches all of the a's in "caandy," and the first two
+a's in "caaandy."
+</td>
+</tr>
+<tr>
+<td>
+`{n,}`
+</td>
+<td>
+Where n is a positive integer. Matches at least n occurrences of the
+preceding character. For example, /a{2,}/ doesn't match the 'a' in
+"candy", but matches all of the a's in "caandy" and in "caaaaaaandy."
+</td>
+</tr>
+<tr>
+<td>
+`{n,m}`
+</td>
+<td>
+Where n and m are positive integers. Matches at least n and at most m
+occurrences of the preceding character. For example, /a{1,3}/ matches
+nothing in "cndy", the 'a' in "candy," the first two a's in "caandy,"
+and the first three a's in "caaaaaaandy" Notice that when matching
+"caaaaaaandy", the match is "aaa", even though the original string had
+more a's in it.
+</td>
+</tr>
+<tr>
+<td>
+`[xyz]`
+</td>
+<td>
+A character set. Matches any one of the enclosed characters. You can
+specify a range of characters by using a hyphen. For example, [bcd] is
+the same as [b-d] . They match the 'c' in "cysteine" and the 'd' in
+"ached" .
+</td>
+</tr>
+<tr>
+<td>
+`[^xyz]`
+</td>
+<td>
+A negated or complemented character set. That is, it matches anything
+that is not enclosed in the brackets. Note that the caret has to be the
+first character in the bracket set. For example, [^abc] is the same as
+[^a-c] . They initially match 'l' in "alanine" and 'y' in "cysteine"
+</td>
+</tr>
+</table>
+
+ 
+
+## Appendix II: Character classes and their meaning
+
+<table class="striped">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+`[\b]`
+</td>
+<td>
+Matches a backspace. (Not to be confused with \b .)
+</td>
+</tr>
+<tr>
+<td>
+`\b`
+</td>
+<td>
+Matches a word boundary, such as a space. (Not to be confused with
+[\b].) The difference is that one is within a character set and the
+other is not! For example, /\bn\w/ matches the 'no' in "noonday";
+/\wy\b/ matches the 'ly' in "possibly yesterday."
+</td>
+</tr>
+<tr>
+<td>
+`\B`
+</td>
+<td>
+Matches a non-word boundary. For example, /\w\Bn/ matches 'on' in
+"noonday", and /y\B\w/ matches 'ye' in "possibly yesterday."
+</td>
+</tr>
+<tr>
+<td>
+`\cX`
+</td>
+<td>
+Where X is a control character. Matches a control character in a string.
+For example, /\cM/ matches control-M in a string.
+</td>
+</tr>
+<tr>
+<td>
+`\d`
+</td>
+<td>
+Matches a digit character. Equivalent to [0-9] . For example, /\d/ or
+/[0-9]/ matches '2' in "B2 is the suite number."
+</td>
+</tr>
+<tr>
+<td>
+`\D`
+</td>
+<td>
+Matches any non-digit character. Equivalent to [^0-9] . For example,
+/\D/ or /[^0-9]/ matches 'B' in "B2 is the suite number."
+</td>
+</tr>
+<tr>
+<td>
+`\f`
+</td>
+<td>
+Matches a form-feed.
+</td>
+</tr>
+<tr>
+<td>
+`\n`
+</td>
+<td>
+Matches a linefeed.
+</td>
+</tr>
+<tr>
+<td>
+`\r`
+</td>
+<td>
+Matches a carriage return.
+</td>
+</tr>
+<tr>
+<td>
+`\s`
+</td>
+<td>
+Matches a single white space character, including space, tab, form feed,
+line feed. Equivalent to [ \f\n\r\t\v] . For example, /\s\w*/ matches '
+bar' in "foo bar."
+</td>
+</tr>
+<tr>
+<td>
+`\S`
+</td>
+<td>
+Matches a single character other than white space. Equivalent to [^
+\f\n\r\t\v] . For example, /\S/\w* matches 'foo' in "foo bar."
+</td>
+</tr>
+<tr>
+<td>
+`\t`
+</td>
+<td>
+Matches a tab
+</td>
+</tr>
+<tr>
+<td>
+`\v`
+</td>
+<td>
+Matches a vertical tab.
+</td>
+</tr>
+<tr>
+<td>
+`\w`
+</td>
+<td>
+Matches any alphanumeric character including the underscore. Equivalent
+to [A-Za-z0-9_] . For example, /\w/ matches 'a' in "apple," '5' in
+"$5.28," and '3' in "3D."
+</td>
+</tr>
+<tr>
+<td>
+`\W`
+</td>
+<td>
+Matches any non-word character. Equivalent to [^A-Za-z0-9_] . For
+example, /\W/ or /[^\$A-Za-z0-9_]/ matches '%' in "50%."
+</td>
+</tr>
+</table>
+ 
+
+## Appendix III: Anchor codes and their meaning
+<table class="striped">
+<tr>
+<th>
+Expression
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+`^`
+</td>
+<td>
+If the caret occurs at the beginning of an expression it anchors the
+expression at the beginning of a line or input. For example, `^AT` does
+not match the '`AT`' in "HETATM" but does match it in "ATOM".
+</td>
+</tr>
+<tr>
+<td>
+` $ `
+</td>
+<td>
+Matches end of input or line. For example, `t$` does not match the 't'
+in "`eater`", but does match it in "`eat`" as well as in "`eat\n`".
+</td>
+</tr>
+<tr>
+<td>
+`\b`
+</td>
+<td>
+Matches a word boundary, such as a space. (Not to be confused with
+`[\b]`.) The difference is that one is within a character set and the
+other is not! For example, `\bn\w` matches the 'no' in "noonday";
+`\wy\b` matches the 'ly' in "possibly yesterday."
+</td>
+</tr>
+<tr>
+<td>
+`\B`
+</td>
+<td>
+Matches a non-word boundary. For example, `\w\Bn` matches 'on' in
+"noonday", and `y\B\w` matches 'ye' in "possibly yesterday."
+</td>
+</tr>
+<tr>
+<td>
+`\A`
+</td>
+<td>
+Matches at the start of a string. Like "^". For example, `\AAT` matches
+"AT" in "ATOM" but not in "HETATM"
+</td>
+</tr>
+<tr>
+<td>
+`\Z`
+</td>
+<td>
+Matches at the end of a string. Like "$". For example, `\t\Z` matches a
+tab at the end of the string but not anywhere else.
+</td>
+</tr>
+<tr>
+<td>
+`(?: … )`
+</td>
+<td>
+Group what's between the brackets, but discard match.
+</td>
+</tr>
+<tr>
+<td>
+`(?= … )`
+</td>
+<td>
+The preceeding pattern must be followed by this one in order to match.
+</td>
+</tr>
+<tr>
+<td>
+`(?! … )`
+</td>
+<td>
+The preceeding pattern must not be followed by this one in order to
+match.
+</td>
+</tr>
+</table>
+
+ 
+
+## Appendix IV: Modifiers and their meaning
+
+<table class="striped">
+<tr>
+<th>
+Expression&lt;
+</th>
+<th>
+Meaning
+</th>
+</tr>
+<tr>
+<td>
+`g`
+</td>
+<td>
+Matches globally - i.e. matches all occurrences of pattern, one after
+the other, do not stop at the first one.
+</td>
+</tr>
+<tr>
+<td>
+`i`
+</td>
+<td>
+Match in a case-insensitive manner. For example, /[ACGT]/i matches any
+specific nucleotide in upper or lower case.
+</td>
+</tr>
+<tr>
+<td>
+`x`
+</td>
+<td>
+Ignore whitespace in the expression
+</td>
+</tr>
+<tr>
+<td>
+`o`
+</td>
+<td>
+Evaluate pattern only once.
+</td>
+</tr>
+<tr>
+<td>
+`m`
+</td>
+<td>
+Treat the whole string as multiple lines.
+</td>
+</tr>
+<tr>
+<td>
+`s`
+</td>
+<td>
+Treat the whole string as a single line, i.e. don't treat "" as line
+separators. For example, /(&lt;table&gt;.*?&lt;/table&gt;)/s captures an
+entire table, including newline characters. Without the modifier nothing
+would match if there is even a single newline in between the tags.
+</td>
+</tr>
+</table>
+ 
+
+## Further Reading
+- [Regular expressions (Wikipedia)](https://en.wikipedia.org/wiki/Regular_expression)
+- [R regular expressions](http://stat.ethz.ch/R-manual/R-patched/library/base/html/regex.html)
+- [RegexPal](RegexPal - a javascript regex tester) - a javascript regex tester
+- Visit [the stackoverflow thread on regex and HTML parsing](http://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags). What's your opinion on the OP's question?
+- [XKCD](http://xkcd.com/208/)
+
+
+## References
+
+
+<div class="meta">
+#### Meta ####
+
+About this page …
+
+Author: Boris Steipe ( <boris.steipe@utoronto.ca> )<br/>
+Created: 2017-08-05<br/>
+Last modified: 2024-11-20<br/>
+Version: 2.0<br/>
+Version History:<br/>
+-  2.0 Converted RPR-RegEx unit to .Rmd and updated for CSB195<br/>
+–  1.2.1 2022 Formatting<br/>
+–  1.2 2020 Maintenance, added gsub() cature and backreference<br/>
+–  1.1 Change from require() to requireNamespace() and use <package>::<function>() idiom.<br/>
+–  1.0 First live version, translated from Perl examples in old version<br/>
+–  0.1 First stub<br/>
+To Do:<br/>
+- ...<br/>
+
+</div>
+
 
 <!-- [END] -->
