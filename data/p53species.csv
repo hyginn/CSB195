@@ -1,0 +1,27 @@
+species,code,name,taxid,uniprotID
+Ciona intestinalis,CIOIN,Sea Squirt,7719,Q4H300
+Callorhinchus milii,CALMI,Elephant Shark,7868,G9J1L8
+Lepisosteus oculatus,LEPOC,Spotted Gar,7918,W5N8V9
+Danio rerio,DANRE,Zebrafish,7955,P79734
+Salmo salar,SALSA,Atlantic Salmon,8030,C0H8X1
+Takifugu rubripes,TAKRU,Fugu,31033,H2U133
+Latimeria chalumnae,LATCH,Coelacanth,7897,H3B1Z4
+Xenopus tropicalis,XENTR,Clawed Frog,8364,Q6NTF1
+Naja naja,NAJNA,Cobra,35670,A0A8C6XKD9
+Chelydra serpentina,CHESE,Snapping Turtle,8475,A0A8C3SD45
+Crocodylus porosus,CROPO,Saltwater Crocodile,8502,A0A7M4F2D1
+Nothoprocta Perdicaria,NOTPE,Chilean Tinamou,30464,A0A8C6Z2T7
+Gallus gallus,GALGA,Chicken,9031,P10360
+Ornithorhynchus anatinus,ORNAN,Platypus,9258,A0A6I8N9A8
+Phascolarctos cinereus,PHACI,Koala,38626,A0A6P5IIX8
+Loxodonta africana,LOXAF,Elephant,9785,G3T035
+Rhinolophus ferrumequinum,RHIFE,Greater Horseshoe Bat,59479,A0A671EZ36
+Felis catus,FELCA,Cat,9685,P41685
+Vulpes vulpes,VULVU,Fox,9627,A0A3Q7TIN0
+Balaenoptera musculus,BALMU,Blue Whale,9771,A0A8C0DFA9
+Bos taurus,BOSTA,Cow,9913,P67939
+Homo sapiens,HOMSA,Human,9606,P04637
+Otolemur garnettii,OTOGA,Bushbaby,30611,H0XGB0
+Mus musculus,MUSMU,Mouse,10090,P02340
+Petromyzon marinus,PETMA,Lamprey,7757,A0AAJ7THN8
+Drosophila melanogaster,DROME,Fruit Fly,7227,Q9N6D8
