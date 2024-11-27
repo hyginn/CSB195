@@ -466,15 +466,14 @@ if (FALSE) {
 
 # Ponder over this output for a bit. Then think about what would be next in
 # your analysis.
-if (FALSE) {
 
+if (FALSE) {
   geneSymbols <- character()
   for (i in 1:length(cenP)) {
-    geneSymbols <- c(geneSymbols, cenP[[i]]$Symbol)
+    geneSymbols[i] <- sprintf("%s\n", cenP[[i]]$Symbol)
   }
-  cat(paste(geneSymbols, collapse = ", "))
+  cat(geneSymbols)
 }
-
 
 
 # [END]
