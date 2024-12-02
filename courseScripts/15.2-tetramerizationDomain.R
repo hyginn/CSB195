@@ -25,13 +25,13 @@
 
 
 #TOC> ==========================================================================
-#TOC> 
+#TOC>
 #TOC>   Section  Title                                 Line
 #TOC> -----------------------------------------------------
 #TOC>   1        PREPARE                                 35
 #TOC>   2        LOAD THE REFERENCE STRUCTURE            46
 #TOC>   3        LOAD THE MODEL                          65
-#TOC> 
+#TOC>
 #TOC> ==========================================================================
 
 
@@ -67,7 +67,7 @@ CX("hide #1 atoms,bonds,cartoons")
 
 # =    3  LOAD THE MODEL  ======================================================
 
-a3Model <- file.path(getwd(), "./data/alphafold3_p53_tertramer_dna_complex.cif")
+a3Model <- file.path(getwd(), "./data/alphafold3_p53_tetramer_dna_complex.cif")
 CX(sprintf("open \"%s\"", a3Model))
 CX("cofr #2")
 
