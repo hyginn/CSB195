@@ -24,6 +24,7 @@
 #   0.1   Starter Code
 #
 # ToDo:
+#   Add GeLU to activation functions: https://paperswithcode.com/method/gelu
 #   2.0  Turn demo code into .Rmd
 #   Use fields::image.plot() for the color legend.
 #
@@ -33,29 +34,29 @@
 
 
 #TOC> ==========================================================================
-#TOC>
+#TOC> 
 #TOC>   Section  Title                                                   Line
 #TOC> -----------------------------------------------------------------------
-#TOC>   1        Preparation: packages                                     86
-#TOC>   2        Introduction                                             107
-#TOC>   2.1        Terminology:                                           112
-#TOC>   2.2        What goes on in a neuron                               176
-#TOC>   2.3        A computational neuron                                 190
-#TOC>   2.4        Activation functions                                   234
-#TOC>   3        Computational Neurons in a Network                       304
-#TOC>   3.1        Defining a Neural Network with a Weight matrix         376
-#TOC>   3.1.1          Digression: colors                                 416
-#TOC>   3.2        Plot the network with igraph::                         461
-#TOC>   4        Running the network                                      529
-#TOC>   5        Input                                                    638
-#TOC>   5.1        Feeding the network: single pulse                      697
-#TOC>   5.2        Feeding the network: harmonic oscillator               710
-#TOC>   6        Workbench                                                740
-#TOC>   6.1        Running experiments ...                                854
-#TOC>   7        "Interesting" Networks                                   889
-#TOC>   7.1        Random weight matrices                                 923
-#TOC>   7.2        Putting everything together                           1013
-#TOC>
+#TOC>   1        Preparation: packages                                     87
+#TOC>   2        Introduction                                             108
+#TOC>   2.1        Terminology:                                           113
+#TOC>   2.2        What goes on in a neuron                               177
+#TOC>   2.3        A computational neuron                                 191
+#TOC>   2.4        Activation functions                                   235
+#TOC>   3        Computational Neurons in a Network                       305
+#TOC>   3.1        Defining a Neural Network with a Weight matrix         377
+#TOC>   3.1.1          Digression: colors                                 417
+#TOC>   3.2        Plot the network with igraph::                         462
+#TOC>   4        Running the network                                      530
+#TOC>   5        Input                                                    642
+#TOC>   5.1        Feeding the network: single pulse                      701
+#TOC>   5.2        Feeding the network: harmonic oscillator               714
+#TOC>   6        Workbench                                                744
+#TOC>   6.1        Running experiments ...                                860
+#TOC>   7        "Interesting" Networks                                   895
+#TOC>   7.1        Random weight matrices                                 929
+#TOC>   7.2        Putting everything together                           1019
+#TOC> 
 #TOC> ==========================================================================
 
 
@@ -413,7 +414,7 @@ names(vBias) <- NEUNAM                       # You can later experiment with it.
 # we use the igraph plotting methods to plot the network.)
 
 
-# ===   3.1.1  Digression: colors
+# ===   3.1.1  Digression: colors                            
 
 # Never underestimate the importance of color schemes. Colors help to form
 # interpretative associations. Using colors well enhances the story your results
