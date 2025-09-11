@@ -48,9 +48,9 @@ GTC,Valine,Val,V,G,T,C
 GTG,Valine,Val,V,G,T,G
 GTT,Valine,Val,V,G,T,T
 TAA,STOP,***,*,T,A,A
-TAC,Serine,Ser,S,T,A,C
+TAC,Tyrosine,Tyr,Y,T,A,C
 TAG,STOP,***,*,T,A,G
-TAT,Tyr,Tyr,Y,T,A,T
+TAT,Tyrosine,Tyr,Y,T,A,T
 TCA,Serine,Ser,S,T,C,A
 TCC,Serine,Ser,S,T,C,C
 TCG,Serine,Ser,S,T,C,G
