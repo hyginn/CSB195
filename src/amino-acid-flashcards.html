@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amino Acid Flashcards</title>
+<style>
+  :root{
+    --bg:#0b0c10; --card:#111318; --ink:#e7e9ee; --muted:#9aa2b1; --accent:#4da3ff;
+    --outline:#f3c623; --danger:#e23; --box:#1b1f27; --soft:#232833;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);}
+  .wrap{max-width:1100px; margin:26px auto 80px; padding:0 16px;}
+  .panel{background:var(--card); border-radius:16px; padding:22px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .section-title{font-weight:700; font-size:18px; margin:4px 0 12px;}
+  .controls{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+  .btn{background:var(--accent); color:#08111e; border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer;}
+  .btn.secondary{background:#2d3440; color:var(--ink)}
+  .btn.ghost{background:transparent; border:1px solid #394150; color:var(--ink)}
+  .small{font-size:12px; color:var(--muted)}
+  input[type="number"]{width:90px; padding:8px; border-radius:10px; border:1px solid #394150; background:#1b1f27; color:var(--ink)}
+  label.chk{display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center}
+  .grid{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  table.cfg{width:100%; border-collapse:separate; border-spacing:0 10px}
+  table.cfg th, table.cfg td{padding:8px 10px; text-align:left}
+  table.cfg th{color:var(--muted); font-size:12px; font-weight:600}
+  table.cfg tr{background:var(--soft); border-radius:12px}
+  .pill{font-family:var(--mono); font-size:12px; background:#1f2631; border:1px solid #2c3441; padding:2px 8px; border-radius:999px}
+  .card{background:var(--card); border-radius:22px; padding:20px; box-shadow:0 14px 40px rgba(0,0,0,.35);
+    display:grid; gap:16px; grid-template-columns:320px 1fr;}
+  @media(max-width:900px){.card{grid-template-columns:1fr}}
+  .L{display:grid; gap:12px;}
+  .R{display:grid; gap:16px; align-content:start}
+  .box{background:var(--box); border:1px solid #252b36; border-radius:16px; padding:12px; min-height:58px; position:relative}
+  .box .label{position:absolute; top:-10px; left:10px; background:var(--box); padding:2px 8px; border-radius:8px; border:1px solid #252b36; color:var(--muted); font-size:11px}
+  .big{font-size:140px; text-align:center; font-weight:800}
+  .value{font-size:22px; font-weight:700}
+  .muted{color:var(--muted)}
+  .outline{box-shadow:0 0 0 3px var(--outline) inset}
+  .imgbox{display:flex; align-items:center; justify-content:center; min-height:200px; background:#ffffff; border-radius: 16px;}
+  .imgbox img{max-height:220px; max-width:100%}
+  .controls-row{display:flex; gap:10px; justify-content:flex-end}
+  .plot svg{width:100%; height:100px; display:block}
+  .glyph{font-family:var(--mono); font-weight:700; font-size:18px}
+  .glyph.q{fill:#90a0ba}
+  .glyph.answer{fill:#e23}
+  .axis{stroke:#364051; stroke-width:1}
+  .gridline{stroke:#1e2532; stroke-width:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Amino Acid Flashcards</h1>
+  <div class="small">Data source: <span class="pill">GitHub JSON</span></div>
+
+  <div id="config" class="panel">
+    <div class="section-title">Deck configuration</div>
+    <div id="status" class="small muted">Loading data…</div>
+    <div class="grid" style="margin-top:10px">
+      <div class="panel" style="padding:14px">
+        <div class="section-title">General</div>
+        <div class="controls"><label>Number of cards <input id="numCards" type="number" min="1" max="200" value="30"></label></div>
+        <div class="controls"><label class="chk"><input id="randomOrder" type="checkbox" checked> Random order</label></div>
+      </div>
+      <div class="panel" style="padding:14px; grid-column:1/-1">
+        <div class="section-title">What to show on cards</div>
+        <table class="cfg"><thead><tr><th>Column</th><th>Front</th><th>Back</th><th>Question?</th><th>Type</th></tr></thead><tbody id="cfgBody"></tbody></table>
+      </div>
+    </div>
+    <div class="controls" style="justify-content:flex-end"><button class="btn" id="startBtn">Start session →</button></div>
+  </div>
+
+  <div id="cardScreen" class="panel" style="display:none">
+    <div class="controls" style="justify-content:space-between">
+      <div class="small muted" id="deckMeta"></div>
+      <button class="btn ghost" id="backToConfig">⟵ Config</button>
+    </div>
+    <div id="cardHost"></div>
+    <div class="controls-row"><button class="btn secondary" id="flipBtn">Flip</button><button class="btn" id="nextBtn">Next ›</button></div>
+  </div>
+</div>
+
+<script>
+const DATA_URL = "https://raw.githubusercontent.com/hyginn/CSB195/refs/heads/main/dat/aa_prop.json";
+
+const NUMERIC_FIELDS = new Set(['pKa','hydrophobicity','volume','cost']);
+const IMAGE_FIELDS   = new Set(['image']);
+function classifyField(n){if(IMAGE_FIELDS.has(n))return'image';if(NUMERIC_FIELDS.has(n))return'number';return'text';}
+function rngShuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const AppState={data:[],fields:[],config:{},deck:[],idx:0,showBack:false,ranges:{}};
+
+function buildConfigUI(){const tbody=document.getElementById('cfgBody');tbody.innerHTML='';for(const f of AppState.fields){if(!(f in AppState.config)){AppState.config[f]={front:true,back:true,question:false};}const tr=document.createElement('tr');tr.innerHTML=`<td>${f}</td><td><input type="checkbox" data-k="${f}" data-prop="front" ${AppState.config[f].front?'checked':''}></td><td><input type="checkbox" data-k="${f}" data-prop="back" ${AppState.config[f].back?'checked':''}></td><td><input type="checkbox" data-k="${f}" data-prop="question" ${AppState.config[f].question?'checked':''}></td><td>${classifyField(f)}</td>`;tbody.appendChild(tr);}tbody.querySelectorAll('input').forEach(cb=>{cb.addEventListener('change',e=>{const k=e.target.dataset.k,prop=e.target.dataset.prop;AppState.config[k][prop]=e.target.checked;if(prop==='question'&&e.target.checked)AppState.config[k].back=true;});});}
+
+function renderCard(host,row,front=true){host.innerHTML='';const cfg=AppState.config;const card=document.createElement('div');card.className='card';const L=document.createElement('div');L.className='L';for(const key of ['one','three','name','mnemonic','codons','redundancy']){if(!AppState.fields.includes(key))continue;const box=document.createElement('div');box.className='box';box.innerHTML=`<div class="label">${key}</div>`;const q=cfg[key]?.question&&front;const show=cfg[key]&&(cfg[key][front?'front':'back']);if(!show&&!q){box.style.display='none';}else if(q){box.classList.add('outline');}else{box.innerHTML+=`<div class="${key==='one'?'big':'value'}">${row[key]||''}</div>`;}L.appendChild(box);}const R=document.createElement('div');R.className='R';if(AppState.fields.includes('image')&&(cfg.image?.[front?'front':'back']||cfg.image?.question)){const box=document.createElement('div');box.className='box imgbox';box.innerHTML='<div class="label">image</div>';if(cfg.image?.question&&front){box.classList.add('outline');}else if(row.image){const img=new Image();img.src=row.image;box.appendChild(img);}R.appendChild(box);}for(const key of ['pKa','hydrophobicity','volume','cost']){if(!AppState.fields.includes(key))continue;const show=cfg[key]&&(cfg[key][front?'front':'back']||cfg[key].question);if(!show)continue;const box=document.createElement('div');box.className='box plot';box.innerHTML=`<div class="label">${key}</div>`;box.appendChild(renderPlot(key,row.one,cfg[key].question&&front,!front));R.appendChild(box);}card.appendChild(L);card.appendChild(R);host.appendChild(card);}
+
+function renderPlot(field,qLetter,isQuestion,isBack){const range=AppState.ranges[field]||{min:0,max:1};const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 800 120');const axis=document.createElementNS(svg.namespaceURI,'line');axis.setAttribute('x1',20);axis.setAttribute('x2',780);axis.setAttribute('y1',70);axis.setAttribute('y2',70);axis.setAttribute('class','axis');svg.appendChild(axis);for(const row of AppState.data){const v=Number(row[field]);if(!Number.isFinite(v))continue;if(isQuestion&&row.one===qLetter)continue;const x=20+(v-range.min)/(range.max-range.min||1)*760;const t=document.createElementNS(svg.namespaceURI,'text');t.setAttribute('x',x);t.setAttribute('y',66);t.setAttribute('text-anchor','middle');t.setAttribute('class','glyph q');t.textContent=row.one;svg.appendChild(t);}if(isBack){const row=AppState.data.find(d=>d.one===qLetter);if(row){const v=Number(row[field]);if(Number.isFinite(v)){const x=20+(v-range.min)/(range.max-range.min||1)*760;const t=document.createElementNS(svg.namespaceURI,'text');t.setAttribute('x',x);t.setAttribute('y',66);t.setAttribute('text-anchor','middle');t.setAttribute('class','glyph answer');t.textContent=qLetter;svg.appendChild(t);}}}return svg;}
+
+function startSession(){let N=parseInt(document.getElementById('numCards').value)||30;if(document.getElementById('randomOrder').checked)AppState.deck=rngShuffle([...AppState.data.keys()]);else AppState.deck=[...AppState.data.keys()];AppState.deck=AppState.deck.slice(0,N);AppState.idx=0;AppState.showBack=false;document.getElementById('config').style.display='none';document.getElementById('cardScreen').style.display='block';updateCard();}
+function updateCard(){const i=AppState.idx;if(i>=AppState.deck.length){document.getElementById('cardHost').innerHTML='<div>Done</div>';return;}const row=AppState.data[AppState.deck[i]];renderCard(document.getElementById('cardHost'),row,!AppState.showBack);document.getElementById('deckMeta').textContent=`Card ${i+1}/${AppState.deck.length} • ${AppState.showBack?'Back':'Front'}`;}
+
+document.getElementById('startBtn').onclick=startSession;
+document.getElementById('flipBtn').onclick=()=>{AppState.showBack=!AppState.showBack;updateCard();}
+document.getElementById('nextBtn').onclick=()=>{AppState.idx++;AppState.showBack=false;updateCard();}
+document.getElementById('backToConfig').onclick=()=>{document.getElementById('cardScreen').style.display='none';document.getElementById('config').style.display='block';}
+
+(async function init(){try{const res=await fetch(DATA_URL);const data=await res.json();AppState.data=data;AppState.fields=Object.keys(data[0]);for(const f of AppState.fields){if(NUMERIC_FIELDS.has(f)){const vals=data.map(r=>Number(r[f])).filter(x=>!isNaN(x));AppState.ranges[f]={min:Math.min(...vals),max:Math.max(...vals)};}}buildConfigUI();document.getElementById('status').textContent=`Loaded ${data.length} rows • ${AppState.fields.length} columns`;}catch(e){document.getElementById('status').textContent='Failed to load';console.error(e);}})();
+</script>
+</body>
+</html>
