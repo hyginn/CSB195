@@ -1,18 +1,5 @@
 [
   {
-    "one": "A",
-    "three": "Ala",
-    "name": "alanine",
-    "mnemonic": "",
-    "codons": "GCN",
-    "redundancy": 4,
-    "pKa": "",
-    "hydrophobicity": "0.33",
-    "volume": "67",
-    "cost": "1",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/9/90/L-Alanin_-_L-Alanine.svg"
-  },
-  {
     "one": "C",
     "three": "Cys",
     "name": "cysteine",
@@ -22,8 +9,21 @@
     "pKa": "8.55",
     "hydrophobicity": "0.22",
     "volume": "86",
-    "cost": "15",
+    "cost": "11",
     "image": "https://upload.wikimedia.org/wikipedia/commons/1/1a/L-Cystein_-_L-Cysteine.svg"
+  },
+  {
+    "one": "A",
+    "three": "Ala",
+    "name": "alanine",
+    "mnemonic": "",
+    "codons": "GCN",
+    "redundancy": 4,
+    "pKa": "",
+    "hydrophobicity": "0.33",
+    "volume": "67",
+    "cost": "-1",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/9/90/L-Alanin_-_L-Alanine.svg"
   },
   {
     "one": "D",
@@ -35,7 +35,7 @@
     "pKa": "3.67",
     "hydrophobicity": "2.41",
     "volume": "91",
-    "cost": "2",
+    "cost": "0",
     "image": "https://upload.wikimedia.org/wikipedia/commons/c/ce/L-Asparagins%C3%A4ure_-_L-Aspartic_acid.svg"
   },
   {
@@ -48,7 +48,7 @@
     "pKa": "4.25",
     "hydrophobicity": "1.61",
     "volume": "109",
-    "cost": "-1",
+    "cost": "-7",
     "image": "https://upload.wikimedia.org/wikipedia/commons/d/db/L-Glutamins%C3%A4ure_-_L-Glutamic_acid.svg"
   },
   {
@@ -61,7 +61,7 @@
     "pKa": "",
     "hydrophobicity": "-0.58",
     "volume": "135",
-    "cost": "2",
+    "cost": "-6",
     "image": "https://upload.wikimedia.org/wikipedia/commons/7/7a/L-Phenylalanin_-_L-Phenylalanine.svg"
   },
   {
@@ -74,7 +74,7 @@
     "pKa": "",
     "hydrophobicity": "1.14",
     "volume": "48",
-    "cost": "2",
+    "cost": "-2",
     "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Glycine-2D-skeletal.svg"
   },
   {
@@ -87,7 +87,7 @@
     "pKa": "6.54",
     "hydrophobicity": "1.37",
     "volume": "118",
-    "cost": "7",
+    "cost": "1",
     "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/L-Histidin_-_L-Histidine.svg"
   },
   {
@@ -95,12 +95,12 @@
     "three": "Ile",
     "name": "isoleucine",
     "mnemonic": "",
-    "codons": "TCH",
+    "codons": "ATH",
     "redundancy": 3,
     "pKa": "",
     "hydrophobicity": "-0.81",
     "volume": "124",
-    "cost": "11",
+    "cost": "7",
     "image": "https://upload.wikimedia.org/wikipedia/commons/4/46/L-Isoleucin_-_L-Isoleucine.svg"
   },
   {
@@ -113,7 +113,7 @@
     "pKa": "10.4",
     "hydrophobicity": "1.81",
     "volume": "135",
-    "cost": "9",
+    "cost": "5",
     "image": "https://upload.wikimedia.org/wikipedia/commons/8/88/L-Lysin_-_L-Lysine.svg"
   },
   {
@@ -126,7 +126,7 @@
     "pKa": "",
     "hydrophobicity": "-0.69",
     "volume": "124",
-    "cost": "1",
+    "cost": "-9",
     "image": "https://upload.wikimedia.org/wikipedia/commons/4/4d/L-Leucine.svg"
   },
   {
@@ -139,7 +139,7 @@
     "pKa": "",
     "hydrophobicity": "-0.04",
     "volume": "124",
-    "cost": "23",
+    "cost": "21",
     "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/Methionin_-_Methionine.svg"
   },
   {
@@ -152,7 +152,7 @@
     "pKa": "",
     "hydrophobicity": "0.43",
     "volume": "96",
-    "cost": "5",
+    "cost": "3",
     "image": "https://upload.wikimedia.org/wikipedia/commons/0/0c/L-Asparagin_-_L-Asparagine.svg"
   },
   {
@@ -165,7 +165,7 @@
     "pKa": "",
     "hydrophobicity": "-0.31",
     "volume": "90",
-    "cost": "4",
+    "cost": "-2",
     "image": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Prolin_-_Proline.svg"
   },
   {
@@ -178,7 +178,7 @@
     "pKa": "",
     "hydrophobicity": "0.19",
     "volume": "114",
-    "cost": "0",
+    "cost": "-6",
     "image": "https://upload.wikimedia.org/wikipedia/commons/5/5d/L-Glutamin_-_L-Glutamine.svg"
   },
   {
@@ -191,7 +191,7 @@
     "pKa": "12.3",
     "hydrophobicity": "1",
     "volume": "148",
-    "cost": "13",
+    "cost": "5",
     "image": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Arginin_-_Arginine.svg"
   },
   {
@@ -199,12 +199,12 @@
     "three": "Ser",
     "name": "serine",
     "mnemonic": "",
-    "codons": "CGR CGY AGY",
+    "codons": "TCR TCY AGY",
     "redundancy": 6,
     "pKa": "",
     "hydrophobicity": "0.33",
     "volume": "73",
-    "cost": "2",
+    "cost": "-2",
     "image": "https://upload.wikimedia.org/wikipedia/commons/b/b9/L-Serin_-_L-Serine.svg"
   },
   {
@@ -217,7 +217,7 @@
     "pKa": "",
     "hydrophobicity": "0.11",
     "volume": "93",
-    "cost": "8",
+    "cost": "6",
     "image": "https://upload.wikimedia.org/wikipedia/commons/a/a0/L-Threonin_-_L-Threonine.svg"
   },
   {
@@ -230,7 +230,7 @@
     "pKa": "",
     "hydrophobicity": "-0.53",
     "volume": "105",
-    "cost": "2",
+    "cost": "-2",
     "image": "https://upload.wikimedia.org/wikipedia/commons/0/05/Valine_3.svg"
   },
   {
@@ -243,7 +243,7 @@
     "pKa": "",
     "hydrophobicity": "-0.24",
     "volume": "163",
-    "cost": "7",
+    "cost": "-7",
     "image": "https://upload.wikimedia.org/wikipedia/commons/c/c1/L-Tryptophan_-_L-Tryptophan.svg"
   },
   {
@@ -256,7 +256,7 @@
     "pKa": "9.84",
     "hydrophobicity": "0.23",
     "volume": "141",
-    "cost": "2",
+    "cost": "-8",
     "image": "https://upload.wikimedia.org/wikipedia/commons/4/40/L-Tyrosin_-_L-Tyrosine.svg"
   },
   {
