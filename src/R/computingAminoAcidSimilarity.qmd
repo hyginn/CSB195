@@ -1,49 +1,69 @@
 ---
-title: "computingAminoAcidSimilarity"
-author: "boris.steipe@utoronto.ca"
-format: html
+title:    "Computing Amino Acid Similarity"
+subtitle: "Data handling, PCA, and Feature Space"
+author:   "Boris Steipe (boris.steipe@utoronto.ca)"
+date:     last-modified
+version:  "v1.1"
+format:
+  html:
+    include-in-header: 
+      text: | # the css below will be inserted in the HTML header
+        <style>
+          .version-info {
+            font-size: 80%;
+            color: #AAAAAE;
+            font-style: italic;
+          }
+        </style>
 ---
+
+<!--
+Version history:
+  v1.1 Fix project directory issue (syntax fixed in ./_quarto.yml), add
+       version as metadata, add a css block; clean up file and directory paths
+       to work relatively to ./ . Add interpretation of space axes (PCs)
+       relative to original scales using a 2D tSNE embedding. Add 3d-t-SNE. 
+       Completely revise text and add many notes on coding principles.
+  v1.0 First quarto version, based on prior teaching code in
+       aminoAcidSimlarity.R and aaSim.R .
+-->
+
+::: version-info
+Version {{< meta version >}}, last updated {{< meta date >}}
+:::
 
 
 In this quarto document, we combine some ideas we discussed in class about amino acid properties, and how to construct a function that can compute values of amino acid similarity that we can use to evaluate the structure of a genetic code.
 
-This document was rendered with version: {{< meta version >}}
-
 
 # Initializations.
 
-We first check the existence of required files, and whether your course direcrtory is "in a sane state". That goes on under the hood of this first code chunk.
+We first check the existence of required files, and whether your course direcrtory is "in a sane state". That goes on under the hood of the first code chunk - you can inspect in in the `qmd` source, but it is hidden in the HTML document.
+
 ```{r}
 #| echo: false
-if (!dir.exists("../../dat")) {
-  stop("Data directory 'dat/' not found. Is this file located in \"src/R\"?")
+if (!dir.exists("dat")) {
+  stop("Data directory 'dat/' not found. Was the directory not created? Did you place \"_quarto.yml\" into the project directory?")
 }
 
 # Download two Excel tables into the dat/ folder (if those don't exist yet) ...
-
-if (! file.exists("../../dat/Breimann_2024_Supplementary_Table_1.xlsx")) {
-  ghURL  <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/dat/",
-                   "Breimann_2024_Supplementary_Table_1.xlsx")
-  myPath <- paste0("../../dat/",
-                   "Breimann_2024_Supplementary_Table_1.xlsx")
-  download.file(url = ghURL, destfile = myPath, mode = "wb")
+myFN <- "dat/Breimann_2024_Supplementary_Table_1.xlsx"
+if (! file.exists(myFN)) {
+  ghURL <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/", myFN)
+  download.file(url = ghURL, destfile = myFN, mode = "wb")
 }
 
-if (! file.exists("../../dat/Breimann_2024_Supplementary_Table_3.xlsx")) {
-  ghURL  <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/dat/",
-                   "Breimann_2024_Supplementary_Table_3.xlsx")
-  myPath <- paste0("../../dat/",
-                   "Breimann_2024_Supplementary_Table_3.xlsx")
-  download.file(url = ghURL, destfile = myPath, mode = "wb")
+myFN <- "dat/Breimann_2024_Supplementary_Table_3.xlsx"
+if (! file.exists(myFN)) {
+  ghURL <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/", myFN)
+  download.file(url = ghURL, destfile = myFN, mode = "wb")
 }
 
 # Download a precomputed amino acid feature spcae file
-if (! file.exists("../../dat/aaFeatureSpace.4.0.Rds")) {
-  ghURL  <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/dat/",
-                   "aaFeatureSpace.4.0.Rds")
-  myPath <- paste0("../../dat/",
-                   "aaFeatureSpace.4.0.Rds")
-  download.file(url = ghURL, destfile = myPath, mode = "wb")
+myFN <- "dat/aaFeatureSpace.4.1.Rds"
+if (! file.exists(myFN)) {
+  ghURL <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/", myFN)
+  download.file(url = ghURL, destfile = myFN, mode = "wb")
 }
 
 # Define a consistent set of amino acid colours
@@ -53,38 +73,35 @@ AACOLS <- c(G = "#B9C2CD", P = "#D4CF82", C = "#F1DD38", A = "#D2DF40",
             R = "#3B48D4", K = "#5F6BD8", Q = "#838FDC", N = "#A8B3E0",
             T = "#AA90BA", S = "#AD6D95", D = "#B04B70", E = "#B3294B")
 
-Aaa2A <- function(txt) {
-  # bare-bones - no checking done
-  AAmap <- c(Ala = "A", Arg = "R", Asn = "N",
-             Asp = "D", Cys = "C", Gln = "Q",
-             Glu = "E", Gly = "G", His = "H",
-             Ile = "I", Leu = "L", Lys = "K",
-             Met = "M", Phe = "F", Pro = "P",
-             Ser = "S", Thr = "T", Trp = "W",
-             Tyr = "Y", Val = "V")
-  return(AAmap[txt])
-}
-
 ```
 
 
 # Preparing the data
 
-First, we read the sheets we need from the downloaded, published excel files that were distributed with the Amino Acid Ontology paper. These are the _Supplementary Tables_ 1 and 3. 
+First, we read the sheets we need from the downloaded, published excel files that were distributed with AAontology paper ([Breimann _et al._, 2024](https://www.sciencedirect.com/science/article/pii/S0022283624003267)). These are the _Supplementary Tables_ 1 and 3. 
 
 I often use names like "mySomething" as variable names, to avoid conflicts with
 existing names or reserved words in the language:
 
 ```{r}
 
-  myScales <- readxl::read_excel("../../dat/Breimann_2024_Supplementary_Table_1.xlsx",
+  myScales <- readxl::read_excel("dat/Breimann_2024_Supplementary_Table_1.xlsx",
                                  sheet = "Normalized")
 
-  myCats   <- readxl::read_excel("../../dat/Breimann_2024_Supplementary_Table_3.xlsx",
+  myCats   <- readxl::read_excel("dat/Breimann_2024_Supplementary_Table_3.xlsx",
                                  sheet = "Scales")
 
+  # These are returned as "tibbles", we simplify them to data frames
+  myScales <- as.data.frame(myScales)
+  myCats   <- as.data.frame(myCats)
+  
+  # The first column of myScales contains amino acid labels. We assign 
+  # these to rownames, and then remove that column:
+  rownames(myScales) <- myScales[ , 1]
+  myScales[ , 1] <- NULL
+  
   # Always examine the result and check for sanity
-  myScales[1:3,1:5]
+  myScales[1:5,1:7]
   
   str(myCats)
 
@@ -95,22 +112,44 @@ is important. Here we use the function `setequal()` since we don't assume
 that the order matches, only the IDs themselves.
 
 ```{r}
-  setequal(colnames(myScales)[-1], myCats$scale_id)  # must be TRUE
-  any(duplicated(myCats$scale_id))                   # must be FALSE
+  setequal(colnames(myScales), myCats$scale_id)  # must be TRUE
+  any(duplicated(myCats$scale_id))               # must be FALSE
 ```
 
 Define a vector of amino acid labels explicitly. This is the standard ordering of amino acids in this code. Using this variable guarantees that we don't accidentally mix up ordering. (For example the order in the AAindex is not the same as in aaOntology...) 
 ```{r}
-  (aaLabels <- myScales$AA)
+  (aaLabels <- rownames(myScales))
 ```
 
-# Build a table of Amino Acid scale types and values
+## Scaling the scales
 
-Build a skeleton data structure from the metadata in myCats. We do this
-explicitly, rather than relying on whatever structure the incoming
-data has: **build from intent!** This ensures we control the column names
-and order, and that all assumptions we have about the resulting data
-are met.
+The raw data in the observations has widely different scales, which depend on the experimenters' choice of experimental datails. However, the dimensionality reduction method that we will use later (PCA) is
+sensitive to the variance of the data: it would give observations that use a numerically larger scale more weight than those that use a samller scale. We will compensate for that by re-scaling each data set to a mean of 0 and a
+standard deviation of 1, with the R commans `scale()`.
+
+```{r}
+  x <- myScales   # make a temporary copy for validation
+
+  for (i in seq_len(ncol(myScales))) {
+    myScales[ , i] <- scale(myScales[ , i])
+  }
+
+  # Validate
+  idx <- 63                           # Pick a random dataset
+  mean(myScales[ , idx])              # Must be (nearly) zero
+  sd(myScales[ , idx])                # Must be (nearly) one
+
+  # Clean up
+  rm(x)
+```
+
+
+# A table of Amino Acid scale types and values
+
+We build a skeleton data structure that can contain both the categories and subcategories in `myCats`, as well as the actual values for the 20 amino acids from `myScales`. There are ways to merge such tables with a single expression in R, based on the shared scale IDs. However, here we do this
+explicitly, rather than inheriting the structure of the incoming
+data. We **build from intent!** This ensures we control the column names
+and their order, we know exactly what item goes where, and we can be sure that all assumptions we have about the resulting data are met.
 
 ```{r}
 aaOntology <- data.frame(
@@ -122,7 +161,7 @@ aaOntology <- data.frame(
 
   rownames(aaOntology) <- aaOntology$scaleID # this gives us a convenient
                                              # way to access each row by
-                                             # its ID
+                                             # its ID. 
 
   # Add amino acid columns, initialized to NA
   for (aa in aaLabels) {
@@ -130,16 +169,22 @@ aaOntology <- data.frame(
   }
 ```
 
-Fill in values scale by scale. Selection is by subcategory name,
+Next, we fill in the values scale by scale. We select them by the scaleID,
 not by row position. This makes the code robust to reordering. Use this
 as a general principle: match by semantics (meaning, content), not by
 structure (row index, relative position).
 
 ```{r}
+  # This takes the rows for each ID, and puts the values in the right 
+  # columns for the ID in the joint table
   for (sID in aaOntology$scaleID) {
-    aaOntology[sID, aaLabels] <- myScales[[sID]]
+    aaOntology[sID, aaLabels] <- myScales[ aaLabels , sID]
   }
 ```
+
+Note: it is now easy to pass the twenty or so lines of code to an AI, as part of a specification, and give it an exact description of the structure of our data.
+
+
 
 Final sanity check
 ```{r}
@@ -156,19 +201,17 @@ Final sanity check
 
   # Confirm equality (the identical() functionis VERY strict,
   # TRUE means success)
-  cat("\nAre they identical?\n")
   identical(
     as.numeric(aaOntology[testID, aaLabels]),
     myScales[[testID]]
   )
 ```
 
+
+
 ## Selecting categories of amino acid scales
 
-Prepare a data frame of subcategory IDs and 0 / 1 selectors
-We let the code write code, which we can then examine interactively
-and select by hand. This is a reproducible way to scaffold manual
-decisions: generate template code programmatically, then curate it by hand.
+To select only a subset of subcategorites, we prepare a data frame of subcategory IDs and 0 / 1 selectors. 0 will mean: don't use that subcategory. We want to do this explicitly, so we have a record of our choices. Therefore, we ask the code to write code for us, which we can then edit interactively and select by hand. This is a reproducible way to scaffold manual decisions: generate template code programmatically, then curate it by hand.
 
 ```{r}
 
@@ -177,11 +220,12 @@ decisions: generate template code programmatically, then curate it by hand.
                           use = numeric(nrow(aaOntology)))
 ```
 
-Remove duplicates: we only need one row per unique subcategory. The `! duplicated()` idiom is very useful to keep only unique values. This keeps only the first occurrence of each - which is fine, for this
+Remove duplicates: we only need each unique subcategory listed once. The `! duplicated()` idiom is very useful to keep only unique values. This keeps only the first occurrence of each - which is fine, for this
 purpose they are all equivalent.
 
 ```{r}
   mySubCats <- mySubCats[! duplicated(mySubCats$subcat), ]
+  (nrow(mySubCats))  # The number of unique subcategories in the dataset 
 ```
 
 The following code can be used to write code ... the repeated lines of assignments were created this way. Once it was run, I copied the result, pasted it into this script (below) and used it to select categories for inclusion.
@@ -203,8 +247,7 @@ exclude all scales that are in some way influenced by the genetic
 code structure itself, rather than the inherent properties of the amino acid itself. If we are not careful about this point, we easily fall into a trap of _circular reasoning_.
 
 In particular, things like codon counts, exchange probabilities,
-propensities to be observed in specific structural context, or categories
-that are not well defined or unclassified should be excluded.
+propensities to be observed in specific structural context in existin proteins, or categories that are not well defined or unclassified should be excluded.
 
 The following section is deliberately long and explicit: it’s our
 record of assumptions. This ensures future readers (including
@@ -288,8 +331,7 @@ our rationale above.
   mySubCats$use[74] <- 0    # Structure-Activity : Unclassified (Structure-Activity)
 ```
 
-Finally, we define a selection vector that selects only the desired
-subcategories in the aaOntology table.
+Finally, we define a selection vector that selects only the subcategories we want in the aaOntology table.
   
 ```{r}
   sel <- logical(nrow(aaOntology))
@@ -298,7 +340,8 @@ subcategories in the aaOntology table.
     sel[i] <- (mySubCats$use[idx] == 1)  # This is a bit of idiomatic R style:
                                          # wrapping the expression in
                                          # parentheses returns the result,
-                                         # which can then be assigned
+                                         # which can then be assigned. Here, the
+                                         # result is either TRUE or FALSE
   }
 ```
 
@@ -320,10 +363,12 @@ along which the categories of observations in a large data set vary
 most strongly.
 
 In our context:
+
 - Observations = the 20 amino acids - as categories
 - Variables    = the selected scales (hundreds of them)
 
 PCA gives us a reduced-dimensional "feature space" for amino acids:
+
 - Each _axis_ (principal component, PC) is orthogonal and ordered
     by how much variance it explains.
 - Each _amino acid_ is projected into this space as a point with
@@ -340,7 +385,7 @@ them as e.g. hydrophobicity, polarity, size, etc.
 ## Computing the PCA
 
 Computing PCAs in R can be done with a single command. We apply it to
-the selected rows. Rememebr that the data columns of each amino acid
+the selected rows. Remember that the data columns of each amino acid
 are named according to the aaLabels...
 
 ```{r}
@@ -352,10 +397,10 @@ are named according to the aaLabels...
 
 Note: Normally we would scale each variable to unit variance, (PCA is
 sensitive to the magnitude of its input data), but here we already
-normalized, the various inputs, so we don't scale them again. The
-parameter scale. = TRUE is the default, once again: be wary of hidden
+`scale()`'d the raw inputs, so we don't scale them again. The
+parameter `scale. = TRUE` of `prcomp()` is set to `TRUE` by default, once again: be wary of hidden
 behaviour. For example, in the case that some of your data is meaningfully
-more "important" you might actually want the variance to be larger.
+more "important" you might actually want its variance to be larger and not to scale implicitly.
 
 ## Selecting "important" components
 
@@ -396,17 +441,20 @@ name we want:
 
 ```{r}
 
-  aaFeatureSpace <- aaPCA$x[ , 1:1:numPCsToRetain]
+  aaFeatureSpace <- aaPCA$x[ , 1:numPCsToRetain]
 
 ```
 
 
 # Relationships between amino acids
 
-A natural way to explore such relationships is a "heatmap". Here we compute a heatmap from the distances (note:  smaller distances mean greater similarity). Above we have defined a feature space. If we measure Euclidean distances of all pairs of positions of amino acids in that space, we get an overview of all similarities between amino acids. A heatmap is a commmon way to visualize that: bright spots mean amino acids are far apart, dark spots mean they’re close, and block structures identify groups. Notice how biochemically similar residues cluster together — that is our abstract space lining up with biology.
+A natural way to explore such relationships is a "heatmap". Here we compute a heatmap from the distances (note:  smaller distances mean greater similarity). Above we have defined a feature space. If we measure Euclidean distances of all pairs of positions of amino acids in that space, we get an overview of all similarities between amino acids. A heatmap is a commmon way to visualize that: bright spots mean amino acids are far apart, dark spots mean they’re close, and block structures identify groups. Notice how biochemically similar residues cluster together - that is a signal that our abstract space lines up with biology.
 
 
 ```{r}
+#| out-width: "100%"
+#| fig-cap: "**Figure:**  Heatmap of amino acid distances in Feature Space. Pink colours are closer distance. The dendrograms show the rleationships through hierarchical clustering. This clustering controls the order of rows and columns, which results in the visible block-structure that makes inherent groupings visible."
+
   dmat <- as.matrix(dist(aaFeatureSpace))
 
   pinkPeaksPal <- colorRampPalette(c("#ff295f", "#f0297f",
@@ -418,10 +466,67 @@ A natural way to explore such relationships is a "heatmap". Here we compute a he
           main = "Amino Acid Similarity (PCA Feature Space)")
 ```
 
+
+## Summarize and Save
+
+In summary our "Feature Space" for amino acids:
+
+- ... takes all of the original data into account, each scale according to
+     its contribution to the variance;
+- ... recognizes that with 20 categories of observations (the 20 amino
+     acids), there are only 19 independent dimensions of variance;
+- ... defines those independent dimensions along which the contributions
+     are orthogonal, i.e. uncorrelated;
+- ... selects from those only the most "important" ones, i.e. those that
+     jointly explain most of the variance;
+- ... contains each amino acid as a unique "point", its position given by
+     its coordinates - which are the values along the dimensions of the
+     feature space.
+
+
+Save the feature space for re-use using saveRDS() ... (see below)
+```{r}
+  myFN <- "dat/aaFeatureSpace.2025.Rds"
+  if (! file.exists(myFN)) {
+    saveRDS(aaFeatureSpace, file = myFN)
+  }
+  # If we wish to reload later:
+  # aaFeatureSpace <- readRDS("dat/aaFeatureSpace.2025.Rds")
+```
+
+Note: The pair `saveRDS()` / `readRDS()` save and _recreate_ single compressed
+R objects. You can assign the "value" of `readRDS()` to a new variable, if
+you want, or to the same variable name you used when creating the object.
+
+In contrast the pair `save()` / `load()`,  _restores_ an R object to its
+original name. This might silently overwrite an object that currently
+exists in your workspace.
+
+
+#  MILESTONE: Amino Acid Feature Space
+
+At this point:
+
+- we have taken a large set of biophysical and statistical observations
+  of amino acids;
+- we have scaled them to be numerically comparable among each other;
+- we have selected categories of observations that we believe are independent
+  of the genetic code itself, and thus can be used to evaluate the
+  genetic code;
+- we have used PCA to remove any sampling bias and correlations between
+  the various sets of observations;
+- we have constructed a "feature space" constructed from the most
+  important "Principal Components" of the dataset, which represents
+  the whole information contained in the original observations.
+- we have defined the position of each amino acid in this space.
+
+Next, we need to consider what these numbers all mean.
+
+
 # Interpreting the Principal Components
 
 Each of the original scales contributed a little to every dimension
-of our feature space - but this does not mean that this is now
+of our feature space - but this does not mean that the feature space is now
 a purely abstract mathematical artefact. We can interpret the dimensions
 by comparing them back to the original scales.
 
@@ -450,6 +555,7 @@ By contrast, the explicit loop below states exactly what we intend:
  "For each scale (row), compute its correlation with this PC."
 
 This may be more pedestrian, but it is:
+
 - Readable: the intent is obvious.
 - Robust: no hidden conventions about rows vs. columns.
 - Fast enough: looping over a few hundred scales × 20 amino acids
@@ -487,16 +593,28 @@ this point in the code.)
   }
   
   # Print out the 10 most positive and most negative correlations
-  head(sort(myCors, decreasing = TRUE), 10)   # strongest positive
-  head(sort(myCors, decreasing = FALSE), 10)  # strongest negative
+  (topPos <- head(sort(myCors, decreasing = TRUE ), 10))   # strongest positive
+  (topNeg <- head(sort(myCors, decreasing = FALSE), 10))   # strongest negative
 ```
+... and of course we can retrieve the actual scale-definitions, like so:
+
+```{r}
+c(topPos[1], aaOntology[names(topPos[1]), 2:5])
+```
+
+```{r}
+c(topNeg[1], aaOntology[names(topPos[1]), 2:5])
+```
+
+
+
 ## Examine the dimensions
 
-We can also plot two dimensions of the feature space as a scatterplot:
+We can also plot two dimensions of the feature space as a scatterplot, with one-letter codes. This is a great way to get an intuitive sense of the similarity. These are just the two first principal components, but jointly they already explain about 70% of the variance.
 
 ```{r, fig.width=6, fig.height=6}
-  myDim1 <- 2
-  myDim2 <- 5
+  myDim1 <- 1
+  myDim2 <- 2
   plot(aaFeatureSpace[ , myDim1], aaFeatureSpace[ , myDim2],
        asp = 1.0,
        type = "n",
@@ -508,59 +626,335 @@ We can also plot two dimensions of the feature space as a scatterplot:
        col = AACOLS[rownames(aaFeatureSpace)],
        cex = 2.0)
 ```
+But looking at this plot, we have to ask ourselves - what do these _principal components_ actually mean? Is this just a mathematical trick, or does this connect to the "real world"? To examine that, we need to take a more global view of the original scales, and their relationship to the PCs we use.
 
 
-## Summarize and Save
 
-In summary our "Feature Space" for amino acids:
+## Global Interpretation of Axes and Scales
 
-- ... takes all of the original data into account, each scale according to
-     its contribution to the variance;
-- ... recognizes that with 20 categories of observations (the 20 amino
-     acids), there are only 19 independent dimensions of variance;
-- ... defines those independent dimensions along which the contributions
-     are orthogonal, i.e. uncorrelated;
-- ... selects from those only the most "important" ones, i.e. those that
-     jointly explain most of the variance;
-- ... contains each amino acid as a unique "point", its position given by
-     its coordinates - which are the values along the dimensions of the
-     feature space.
+### Interpreting in 2D
 
+The original 586 scales for 20 amino acids occupy a 20-dimensional subspace of a 586-dimensional space. But even after using PCA, the resulting space is too high-dimensional to properly visualize. This is a common problem for data science and one of the most popular solutions was contributed in 2008 by UofT's Geoffrey Hinton, with Laurens van der Maaten ([**PDF**](https://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)): this is "t-Stochastic Neighbour Embedding", or t-SNE. This is an excellent dimensionality reduction algorithm that works by embedding in a low dimensional space while preserving neighborhood relations. Essentially, this is a projection that is not based on algebra, but on semantics, the meaning and significance of the data. The only drawback was its _O_(_N_<sup>2</sup>) time complexity, that made computational requirements very significant for large datasets. However, van der Maaten published an improvement in 2014 ([**PDF**](https://www.jmlr.org/papers/volume15/vandermaaten14a/vandermaaten14a.pdf)) which used a tree-based algorithm to achieve an _O_( _N_ log _N_ ) complexity, which is practical even for "large" datasets. This is the version that is implemented in R.
 
-Save the feature space for re-use using saveRDS() ... (see below)
+Below, I am showcasing how to prepare our data and run it through tSNE. It's actually quite simple. We prepare a joint matrix of scales and feature Space PCs, run that through t-SNE, and plot the results. The difficulties are only in the details of data preparation and plotting:
+
+- We need to ensure none of our points overlap exactly;
+- We need to keep the names and definitions attached to the data, so we can interpret the plot;
+- We need to color code the points to identify and distinguish scales and PCs;
+- We would like some interactivity - the ability to zoom into the plot, or get detailed information;
+- ...
+
+... in short, all those things that allow us to tell a story with our data. And that is what data science is really about.
+
+### Joint t-SNE embedding of scales + PCs (2D)
+
+#### First step: Organising our Data
+
+We define a lookup table for clear naming of PCs. PCs don’t come with
+globally unique IDs, some of the AA ontology scales are also called "PC1",
+"PC2" etc. so we _namespace_ them: we add a prefix that makes sure we won't
+have any collision between names. The lookup table allows us to switch between
+our "private" names, and the names we used in the `aaFeatureSpace` table,
+as needed.
+
 ```{r}
-  myFN <- "../../dat/aaFeatureSpace.2025.Rds"
-  if (! file.exists(myFN)) {
-    saveRDS(aaFeatureSpace, file = "../../dat/aaFeatureSpace.2025.Rds")
-  }
-  # If we wish to reload later:
-  # aaFeatureSpace <- readRDS("dat/aaFeatureSpace.2025.Rds")
+
+pcLookup <- data.frame(
+  myID   = paste0("my.", colnames(aaFeatureSpace)),  # e.g. "my.PC1"
+  pcID   = colnames(aaFeatureSpace)                  # e.g. "PC1"
+)
 ```
 
-Note: The pair `saveRDS()` / `readRDS()` save and _recreate_ single compressed
-R objects. You can assign the "value" of `readRDS()` to a new variable, if
-you want, or to the same variable name you used when creating the object.
+Scales already have unique and meaningful IDs, so we leave them as-is.
 
-In contrast the pair `save()` / `load()`,  _restores_ an R object to its
-original name. This might silently overwrite an object that currently
-exists in your workspace.
+However, some scales have duplicated values. That will cause a problem later, because
+the t-SNE embedding method will not work if
+points with a distance of zero are present in the dataset. Let's quickly
+build a vector of scale-IDs whose values (i.e positions in the 20-
+dimensional space) are unique: `myScID`:
+
+```{r}
+
+# identify duplicated rownames
+isDup <- duplicated(aaOntology[, aaLabels])   # a vector of TRUE and FALSE
+
+# Check which scales these are:
+rownames(aaOntology)[isDup]
+
+# define IDs of unique scales
+myScID <- rownames(aaOntology)[! isDup]
+
+# ... as well, for symmetry of reference:
+myPcID <- pcLookup$myID
+```
+
+These two vectors define our scales and PCs, each as a vector of rownames in the respective matrices that store the originals. Referencing them thrrough names rather than row numbers guarantees we will always use the correct rows (or columns) in exactly the right order. Errors about row numbers are notoriously hard to identify and may lead to subtly wrong results. Using names as labels of the contents is the safer way.
+
+```{r}
+# Define the joint matrix of scales and PCs
+jointMat <- rbind(
+  aaOntology[ myScID, aaLabels],              # rows: scales, cols: amino acids
+  t(aaFeatureSpace[aaLabels, pcLookup$pcID])  # rows: PCs, cols: amino acids
+)
+
+# Row names: preserve scale IDs, add namespaced PC IDs
+rownames(jointMat) <- c(myScID, myPcID)
+
+# Define hover text for scales: include ID, name, and description
+scaleHover <- paste0(
+  "Scale: ", aaOntology[myScID, "scaleID"], "<br>",
+  "Name: ", aaOntology[myScID, "scaleName"], "<br>",
+  "Description: ", aaOntology[myScID, "scaleDescription"]
+)
+
+# Add hover text for PCs: minimal but interpretable
+pcHover <- paste0(
+  "Feature-space axis ", pcLookup$pcID,
+  " (", pcLookup$myID, ")"
+)
+
+# Combine into a single vector aligned with the jointMat rows
+hoverText <- c(scaleHover, pcHover)
+names(hoverText) <- rownames(jointMat)
+
+# Final sanity checks 
+
+stopifnot(ncol(jointMat) == length(aaLabels))     # 20 amino acids
+stopifnot(nrow(jointMat) == length(myScID) +
+                            nrow(pcLookup))       # unique scales + PCs
+stopifnot(all(aaLabels %in% colnames(jointMat)))  # column names intact
+```
+
+#### Computing the t-SNE embeddings
+
+```{r}
+
+# Download the Rtsne package if needed ...
+if (! requireNamespace("Rtsne", quietly=TRUE)) {
+  install.packages("Rtsne")
+}
+
+# Ready to run t-SNE ...
+set.seed(13)  # reproducible layout
+tsneRes <- Rtsne::Rtsne(as.matrix(jointMat),
+                        dims = 2,
+                        perplexity = 30,
+                        max_iter = 3000)
+```
+
+#### Prepare the data for plotting 
+
+```{r}
+
+# Download the plotly package if needed ...
+if (! requireNamespace("plotly", quietly=TRUE)) {
+  install.packages("plotly")
+}
 
 
-#  MILESTONE: Amino Acid Feature Space
+# Define category colors (explicit, ordered)
 
-At this point
-- we have taken a large set of biophysical and statistical observations
-  of amino acids;
-- we have scaled them to be numerically comparable among each other;
-- we have selected catgories of observations that we believe are independent
-  of the genetic code itself, and thus can be used to evaluate the
-  genetic code;
-- we have used PCA to remove any sampling bias and correlations between
-  the various sets of observations;
-- we have constructed a "feature space" constructed from the most
-  important "Principal Components" of the dataset, which represents
-  the whole information contained in the original observations.
-- we have defined the position of each amino acid in this space.
+catColors <- c(
+  Energy               = "#f2003c",
+  Shape                = "#F0A200",
+  `ASA/Volume`         = "#f0ea00",
+  Conformation         = "#62C923",
+  Composition          = "#0A9A9B",
+  Polarity             = "#1958C3",
+  `Structure-Activity` = "#8000D3",
+  Others               = "#999999"
+)
+
+#  Extract the embedded coordinates from the t-SNE result object
+tsneCoords <- tsneRes$Y
+rownames(tsneCoords) <- rownames(jointMat)
+
+scaleCoords <- tsneCoords[myScID, , drop = FALSE]
+pcCoords    <- tsneCoords[myPcID, , drop = FALSE]
+
+# Build data frames with coordinates and annotations
+scaleDF <- data.frame(
+  x        = tsneCoords[myScID, 1],
+  y        = tsneCoords[myScID, 2],
+  category = aaOntology[myScID, "category"],   # bring in category explicitly
+  hover    = hoverText[myScID]
+)
+
+pcDF <- data.frame(
+  x     = tsneCoords[myPcID, 1],
+  y     = tsneCoords[myPcID, 2],
+  myID  = myPcID,                 # short ID for plot labels
+  hover = hoverText[myPcID]       # full hover text
+)
+
+```
+
+#### Create the actual interactive plot 
+
+We went through a fair bit of assembling and bookkeeping to have everything prepared prior to creating the plots. We could have just pushed the respective data into the statements that produce the plots themselves, but uniting it all in one data structure makes it easier:
+
+- to check for correctness;
+- to establish a shared understanding about our data and annotations with the pair-programming AI;
+- to **make our implicit intent explicit**.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+#| out-width: "100%"
+#| fig-cap: "**Figure:**  t-SNE of amino acid scales and Feature Space PCs."
+
+# Initialize the figure as an empty container
+fig <- plotly::plot_ly()
+
+# Add the observed scales (colored by category) with the add_trace() function
+# of the plotly:: package
+fig <- fig |>
+  plotly::add_trace(
+    data = scaleDF,
+    x = ~x, y = ~y,
+    type = "scatter",
+    mode = "markers",
+    color = ~factor(category, levels = names(catColors)),
+    colors = catColors,
+    hoverinfo = "text",
+    hovertext = ~hover,
+    marker = list(size = 6)
+  )
+
+# Add the PCs (red squares, single legend entry)
+fig <- fig |>
+  plotly::add_trace(
+    data = pcDF,
+    x = ~x, y = ~y,
+    type = "scatter",
+    mode = "markers+text",
+    marker = list(symbol = "square", size = 10, color = "#ff295f"),
+    text = ~myID,
+    textposition = "top center",
+    hoverinfo = "text",
+    hovertext = ~hover,
+    name = "Feature-space PCs",
+    showlegend = TRUE
+  )
+
+# We are done preparing the figure: show it
+fig
+
+```
+
+This plot is interactive: hovering over data points show what the point contains. It uses color to identify the different categories of our scales, and you can zoom in and out for details.
+
+**Task: interpret this plot.**
+
+
+### Joint t-SNE embedding of PCs and scales in 3d
+
+If a 2D embedding of data gives us a good understanding, 3D should be even better. 
+
+Well, maybe. That really depends on the data and the question. But see for yourself. Once we have gone though the trouble of our 2d-plot, moving to 3d is just more of the same...
+
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| out-width: "100%"
+#| fig-cap: "**Figure:** 3D t-SNE of amino acid scales and Feature Space PCs."
+
+
+# run t-SNE on the prepared data
+set.seed(13)  # reproducible layout
+tsneRes3d <- Rtsne::Rtsne(as.matrix(jointMat),
+                          dims = 3,             # 3 dimensions
+                          perplexity = 30,
+                          max_iter = 3000)
+
+
+# Extract t-SNE coordinates
+tsneCoords3d <- tsneRes3d$Y
+rownames(tsneCoords3d) <- rownames(jointMat)
+
+
+# Scales
+scaleDF3d <- data.frame(
+  x         = tsneCoords3d[myScID, 1],
+  y         = tsneCoords3d[myScID, 2],
+  z         = tsneCoords3d[myScID, 3],
+  category  = aaOntology[myScID, "category"],
+  hover     = hoverText[myScID]
+)
+
+# Ensure category factor order matches catColors
+scaleDF3d$category <- factor(scaleDF3d$category, levels = names(catColors))
+
+# PCs
+pcDF3d <- data.frame(
+  x     = tsneCoords3d[myPcID, 1],
+  y     = tsneCoords3d[myPcID, 2],
+  z     = tsneCoords3d[myPcID, 3],
+  myID  = seq_along(myPcID),       # 1, 2, … 12 for labels
+  hover = hoverText[myPcID]
+)
+
+
+# Create 3D plot with explicit category colors 
+
+fig3d <- plotly::plot_ly(type = "scatter3d", mode = "markers")
+
+# Loop over categories explicitly
+for (cat in names(catColors)) {
+  df_cat <- subset(scaleDF3d, category == cat)
+  fig3d <- fig3d |>
+    plotly::add_trace(
+      data = df_cat,
+      x = ~x, y = ~y, z = ~z,
+      name = cat,                      # legend label
+      text = ~hover,
+      hoverinfo = "text",
+      marker = list(
+        size = 4,
+        opacity = 0.7,
+        color = catColors[cat],        # assign fixed color
+        symbol = "circle"
+      ),
+      showlegend = TRUE
+    )
+}
+
+# Add PCs (squares with labels 1..12)
+fig3d <- fig3d |>
+  plotly::add_trace(
+    data = pcDF3d,
+    x = ~x, y = ~y, z = ~z,
+    text = ~hover,
+    hoverinfo = "text",
+    marker = list(size = 6, color = "#ff295f", symbol = "square"),
+    name = "Feature-space PCs",   # gives a single legend entry for PCs
+    showlegend = TRUE
+  )
+
+# Add PC text labels (numbers 1..12)
+fig3d <- fig3d |>
+  plotly::add_text(
+    data = pcDF3d,
+    x = ~x, y = ~y, z = ~z,
+    text = ~myID,
+    textposition = "top center",
+    textfont = list(color = "#ff295f", size = 12),
+    showlegend = FALSE
+  )
+
+# Show the plot
+fig3d
+
+```
+
+You can rotate the plot to see the 3d relationships, as well as zoom in and out with "pinching" gestures. In some aspects the plot is similar to the 2d plot - after all, it displays the same neighbour-relationships. But much overlap is resolved, and it is easier to see which of the source scales best represent the PCs. 
+
+A note on coding these plots: this entire visualization was developed with ChatGPT-5. A quick visualization was easy to obtain, but getting it exactly right took quite a bit of back-and-forth. We are making extensive use of the `plotly::` package, which I haven't used very much at all, so my knowledge of the R language did not help that much. It was very much a process of explaining what I want, discussing strategies and alternatives to get it, patiently revising, refining, copying and pasting error messages, copying and pasting lots of code to ensure we are talking about the same thing etc. Throughout, I had the feeling to be pair-programming with a competent colleague. This is absolutely something that you should be able to do even as a programming novice, and that you need to practice. You need language skills, and structured thinking, not coding skills.
+
+The result however is quite convincing, it presents exactly the right kind of "best practicy" that make data analysis meaningful, to unravel relationships between facts and interpret them.
+
+We are ready to move on: use our feature space to define a function with which we can compute "similarity" between amino acid pairs.
 
 
 # Amino Acid Similarity - the Function `aaSim()`
@@ -571,7 +965,7 @@ We are now ready to define:
 
 This maps the diverse properties of a pair of amino acids to a single number.
 
-With that we are ready to write a function that computes similarity. I define
+I construct
 this function as a "closure" - an R specialty which allows us to package
 code and data into a convenient unit. You can skip this section if you
 are only interested in the result.
@@ -582,38 +976,34 @@ are only interested in the result.
     # Value: a function that computes pairwise amino acid distances.
 
     # Note:
-
     # This function returns another function as its output. The returned
     # function is a so-called "closure" - a combination of data in its
     # environment, and code instructions. By doing this, the auxiliary data for
     # our function is created only once, when the function is defined, not every
     # time it is called. Yet, since the objects are defined locally, we do not
     # risk overwriting objects in our workspace when we define the function.
-
-    # Note:
-    #    The resulting function takes as its input two amino acid
-    #    one-letter symbols and returns the Euclidian distance between
-    #    the two vectors in the feature space defined in SPACEFILE.
-    #    a1, a1: two letters from "ACDEFGHIKLMNPQRSTVWY*"
-    #    Value:  distance
+    
+    # This constructor function does not use external parameters that are 
+    # "passed in" in the function call, but has the information
+    # it needs written into the function body.
 
     # === Parameters ==============================
 
-    # Re-create the Feature Space object:
-    SPACEFILE <- "../../dat/aaFeatureSpace.4.0.Rds"
+    # Feature Space object:
+    SPACEFILE <- "dat/aaFeatureSpace.4.1.Rds"
     if (! file.exists(SPACEFILE)) {
       GHurl  <- paste0("https://raw.githubusercontent.com/hyginn/CSB195/main/",
-                         "aaFeatureSpace.4.0.Rds")
+                         SPACEFILE)
         download.file(url = GHurl, destfile = SPACEFILE, mode = "wb")
     }
+
+    # Recreate the Feature Space
+    AASPACE <- readRDS(SPACEFILE)
 
     # Stop codon distance:
     # The distance of an amino acid to a stop codon is STOPDIST times the
     # maximum distance in the distance matrix.
     STOPDIST <- 1.5
-
-    # Recreate the Feature Space
-    AASPACE <- readRDS(SPACEFILE)
 
     # Compute a 21 x 21 matrix of Euclidian distances between any pair of vectors
     # in AASPACE.
@@ -639,16 +1029,30 @@ are only interested in the result.
 
     # Define a function to return the pairwise distance between two points
     # in the distance space
+
+    #  The  function takes as its input two amino acid
+    #  one-letter symbols and returns the Euclidian distance between
+    #  the two vectors in the feature space defined in SPACEFILE.
+    
+    #  Parameters:
+    #    a1, a1: two letters from "ACDEFGHIKLMNPQRSTVWY*"
+    #  Value:  distance between a1, a2
+
     myFun <- function(a1, a2) {
       return(AADMAT[a1, a2])
     }
+    
+    # attach the matrix and alphabet as parameters so we can inspect them
     attr(myFun, "AADMAT") <- AADMAT
     attr(myFun, "alphabet") <- rownames(AADMAT)
 
-    return(myFun)  # return the function
+    return(myFun)  # Return the function. This is the key move. This wraps up
+                   # the function's environment (i.e. the work space we just
+                   # created for it with the SPACEFILE) into the constructor
+                   # function's output.
   }
 
-  aaSim <- aaSimConstructor()   # Define the function aaSim()
+  aaSim <- aaSimConstructor()   # Define the function aaSim() so we can use it.
   rm(aaSimConstructor)          # The constructor function is no longer needed
 ```
 
@@ -656,20 +1060,21 @@ are only interested in the result.
 
 ```{r}
   # Our similarities induce a METRIC space
-  aaSim("Q", "Q") #  IDENTITY: d(x,x) == 0: x == y
-  any(attr(aaSim, "AADMAT") < 0)  # FALSE: POSITIVITY
+  aaSim("Q", "Q") #  IDENTITY: d(x,y) == 0: x == y
+  any(attr(aaSim, "AADMAT") < 0)  # FALSE; POSITIVITY: no d(x,y) < 0
   aaSim("F", "I") #  Similar amino acids: distance is small.
   aaSim("Q", "F") #  Dissimilar amino acids: distance is large.
   aaSim("F", "Q") #  SYMMETRY: d(x, y) == d(y, x)
-  aaSim("Q", "*") #  Distance between any amino acid and a stopncodon is large.
+  aaSim("Q", "*") #  Distance between any amino acid and a stop codon is large.
   aaSim("*", "*") #  Two stop codons: distance is zero.
   
-  aaSim("G", "C")
+  aaSim("G", "C") 
   aaSim("C", "W")
   aaSim("G", "W")
   aaSim("G", "C") + aaSim("C", "W") <= aaSim("G", "W") # TRIANGLE INEQUALITY
   
 ```
+
 
 ### Distinct Amino Acids
 
@@ -680,8 +1085,9 @@ pseudocode:
 ```
 For each amino acid
   For each of the 19 other amino acids
-    Compute the distance of the amino acid pair
+    Accumulate the distance of the amino acid pair
   Compute the mean
+Sort the results and show them
 ```
 
 ```{r}
@@ -690,19 +1096,17 @@ For each amino acid
 
   #> For each amino acid
   for (thisA in aaLabels) {
+    #>   For each of the 19 other amino acids
     for (otherA in aaLabels) {
-      #>   For each of the 19 other amino acids
-      if (thisA == otherA) {
-        next
-      }
-      #>     Sum the distance of the amino acid pair
+      #>     Add the distance between the pair to the other distances
       mySims[thisA] <- mySims[thisA] + aaSim(thisA, otherA)
     }
     #>   Compute the mean
-    mySims[thisA] <- mySims[thisA] / 19
+    mySims[thisA] <- mySims[thisA] / 20
   }
 
-  (mySims <- sort(mySims) ) # sort the vector and show the results
+  mySims <- sort(mySims)                             # sort the vector 
+  cat(sprintf("\t%s: %5.2f\n", names(mySims), mySims)) # show the results
 ```
 
 The most "distinct" amino acid is "R" (arginine), the most average amino
@@ -714,7 +1118,7 @@ Now plot this:
   barplot(mySims,
           main = "Amino Acid Similarity",
           ylab = "Mean pairwise distances in feature space (AU)",
-          ylim = c(0.0, 10),
+          ylim = c(0.0, 30),
           col = AACOLS[names(mySims)],
           cex.names = 0.5)
 ```

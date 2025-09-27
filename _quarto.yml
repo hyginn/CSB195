@@ -1,14 +1,10 @@
 project:
   type: default
   output-dir: out
-
-execute:
-  working-directory: project   # force working dir to project root
+  execute-dir: project   # force working dir to project root
 
 format:
   html:
     toc: true
     number-sections: true
     code-fold: false
-
-version: "root-config"
