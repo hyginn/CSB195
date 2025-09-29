@@ -1,0 +1,527 @@
+---
+title: "Introducing Quarto"
+subtitle: "Setup, markup, workflow, elements, and R code"
+author: "Boris Steipe"
+date: last-modified       # This keyword is evaluated when  the document is rendered.
+version: "v 1.0"
+mood: "🤔"                # We can define arbitrary elements that we can then use in the document
+
+format:
+  html:
+    toc: true
+    number-sections: true
+    code-fold: false
+    include-in-header:    # this provides a mecahnism to inject css and cs directly from the YAML block of this script
+      - text: |           # 1. css elements
+          <style>
+            .version-info {
+              font-size: 70%;
+              color: #BBBBBB;
+              margin-top: -10px;
+            }
+            /* Style for an AI prompt box */
+            .ai-prompt-box {
+                /* Define variables on the container so they are accessible by both
+                the box and its pseudo-elements. Scope is the element in which they
+                are defined, plus all its descendants. */
+              --border-color: #e0e0e0;
+              --box-bg-color: #f7f7f7; 
+              /* Define a content variable that is instantiated with the value with which
+              this element is called in the actual source below. This too exists for this
+              scope, and all descendants. */
+              --prompt-text: attr(data-prompt);
+              position: relative;
+              border: 1px solid var(--border-color); /* use the variable */
+              padding: 1.5em;
+              margin-top: 2em;
+              position: relative;
+              border-radius: 5px;
+              background-color: var(--box-bg-color);  /* use the variable */
+            }
+            .ai-prompt-box::before { /* adds a label to the tab */
+              content: var(--prompt-text); /* The label for the box */
+              position: absolute;
+              top: -1.3em; /* Move it up above the box */
+              left: 1em;
+              padding: 0 0.5em;
+              border-top: 1px solid var(--border-color);
+              border-left: 1px solid var(--border-color);
+              border-right: 1px solid var(--border-color);
+              background-color: var(--box-bg-color);
+              border-radius: 5px;
+              font-weight: bold;
+              color: #555555;
+              font-size: 0.9em;
+            }
+            /* Style for the button */
+            .copy-button {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background-color: #e9ecef;
+                border: 1px solid #ced4da;
+                color: #495057;
+                padding: 3px 8px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 0.8em;
+                opacity: 0.8;
+            }
+            .copy-button:hover {
+                opacity: 1;
+                background-color: #dee2e6;
+            }
+          </style>
+      - text: |           # 2. JavaScript
+          <script>
+            function copyContent(targetId) {
+                const contentElement = document.getElementById(targetId);
+                const textToCopy = contentElement.innerText;
+                const copyButton = contentElement.querySelector('.copy-button');
+                const originalContent = copyButton.innerHTML;
+
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        // Success feedback
+                        copyButton.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                        
+                        // Revert button text after 1.5 seconds
+                        setTimeout(() => {
+                            copyButton.innerHTML = originalContent;
+                        }, 1500);
+                    })
+                    .catch(err => {
+                        console.error('Could not copy text: ', err);
+                    });
+            }
+          </script>
+          
+# Bibliography data below here
+# Set the citation style to Chicago Author-Date
+csl: https://www.zotero.org/styles/chicago-author-date
+
+# Add a list of references. They will be formatted below a header "# References"
+# that you provide somewhere in the text, if they are cited somewhere in 
+# your document.
+references:
+  - id: taylor1986
+    type: article-journal
+    author:
+      - family: Taylor
+        given: William Ramsay
+    issued:
+      date-parts:
+        - [1986]
+    title: "The Classification of Amino Acid Conservation"
+    container-title: Journal of Theoretical Biology
+    volume: 119
+    issue: 2
+    page: 205-218
+    DOI: 10.1016/S0022-5193(86)80075-3
+
+---
+
+<!--
+HTML formatted comments like this do not appear in the output. This can be used to include (hidden) document metadata with the source. For example, I use this for listing version information.
+-->
+
+::: version-info
+<!-- HTML divs are "fenced" with three colons. This particular div uses code to mix static text with variables that I defined in the YAML block at the top of the document. -->
+Version {{< meta version >}}, last updated {{< meta date >}}. {{< meta mood >}}
+:::
+
+<!-- 
+
+versions:
+  1.0 - First in-class version for CSB195: 2025-09. 
+        -  Basic markup and document elements
+        -  bibliography
+        -  a copy-box to demonstrate passing data between the YAML header
+           and the document itself, using css and javascript; and 
+        -  an interactive plot coded to specifications by CoPilot-GPT5
+-->
+
+This Quarto document integrates metadata, styling, and R code. Its basic content is written with a simple text markup language called ["Markdown"](https://www.markdownguide.org/). But when _rendering_ the document it uses the **Quarto** engine to configure the process, the `knitr::` R package to execute code and collect the results into an intermediate markdown document, and the **Pandoc** document converter, to create the output as HTML (or .docx, or .pdf, or ...). This is a sane philosophy for technical documentation: keep everything in one placee, and build derivatives - like reports, reference documents, or presentations - from the authoritative source, whenever needed. This guarantees that different views of the same contents do not go out of sync.
+
+In summary:
+
+1. You author and edit the Quarto document on your local machine, using RStudio.
+1. The many options you might want to set are defined in the YAML block at the top of the document.
+1. When you click the render button, **Quarto** starts up and checks for a `_quarto.yml` configuration file in the top-most directory of the project, then its child directories, down the path to the directory that contains the source file. All configuartions are applied successively and overwrite configurations that were set earlier. Finally the configurations in the YAML block of the source file itself are applied.
+1. Next, **Quarto** invokes the R package `knitr::` to run the R code chunks, and to collect the results. Data is cached, and images (plots) are stored in an output asset folder (often named `_files`, or a cache folder)..
+1. Then `knitr::` creates an intermediate markdown version of the document, which embeds the plots as images, creates tables, handles the citations and references correctly etc.
+1. **Quarto** hands this intermediate file off to **Pandoc**, which renders it into the requested output format, and places the result, for example an HTML file together with its image assets, into the requested output directory. This can then be opened by the browser, or another document reader, or screen projection software - as the case may be.
+
+
+# Basic _Markdown_ markup
+
+::: {.ai-prompt-box data-prompt="AI Prompt" #prompt-content-1}
+
+Can you explain to me what a ".qmd" document is and why it is useful?
+
+<button class="copy-button" onclick="copyContent('prompt-content-1')">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+:::
+
+
+Writing the content itself is straightforward. Markdown is designed to be easily readable even in its raw format. The simple syntax uses common keyboard symbols to indicate structure and emphasis. The four most essential elements you will use are **Headings** for structure, **Emphasis** for bold and italics, **Lists** for organized points, and the simple use of **backticks** to format code and variables inline. Markdown handles paragraphs automatically—just separate blocks of text with a blank line. For complex elements where Markdown syntax is limited, such as detailed tables, Quarto allows you to insert raw <code>HTML</code> (or $\LaTeX{}$) <!-- Note: the $ signs designate this part as Latex-formatted text, which should be type-set as a mathematical formula through the Latex engine. --> directly into your document, giving you complete control over the final presentation.
+
+
+::: {.ai-prompt-box data-prompt="AI Prompt" #prompt-content-4}
+
+What exactly is HTML, and how is it written, and what is Latex? And why is Latex often used? And how do I use it in my quarto document?
+
+<button class="copy-button" onclick="copyContent('prompt-content-4')">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+:::
+
+
+**Tables** deserve special mention. While markdown contains conventions to create tables, these are not really simpler than HTML syntax. Thus there is no real advantage of markdown over HTML table syntax, which is more expressive, versatile, and general. Generally, all a table needs is a pair of`<table> ... </table>` tags, enclosing a pair of `<tr> ... </tr>` table row tags, containing in each row the same number of `<td> ... </td>` table data (cell) tags (or a pair of `<th> ... </th>` table header cell tags in the first row).  Like this:
+
+<table>
+  <tr>
+    <th>To create this ...</th>
+    <th>Type this ...</th>
+  </rh>
+  <tr>
+    <td>**Document sections (Headings)**</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Main Section Title</td>
+    <td>`# My Title ...`</td>
+  </tr>
+  <tr>
+    <td>Subsection Title</td>
+    <td>`## My Subsection ...`</td>
+  </tr>
+  <tr>
+    <td>Sub-subection Title</td>
+    <td>`### My Subsubsection ...`</td>
+  </tr>
+  <tr>
+    <td>**Text emphasis**</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>_Italic text_</td>
+    <td>`_Italic text_`</td>
+  </tr>
+  <tr>
+    <td>**Bold text**</td>
+    <td>`**Bold text**`</td>
+  </tr>
+  <tr>
+    <td>**Lists**</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>* Bullet Point</td>
+    <td>`* Bullet Point`</td>
+  </tr>
+  <tr>
+    <td>
+1. Numbered list
+1. another list item
+1. and one more
+    </td>
+    <td>
+`1.` ` Numbered list`<br />
+`1.` ` another list item`<br />
+`1.` ` and one more`<br/>
+    </td>
+  </tr>
+  <tr>
+    <td>Inline `code` ignores markup</td>
+    <td>``Inline `code` ignores markup``</td>
+  </tr>
+</table>
+
+
+There is always more to learn, a popular reference these days appears to be the [Markdown Guide](https://www.markdownguide.org/basic-syntax/).
+
+
+# Advanced markup
+
+I have written a few advanced HTML/Javascript examples into this document to demonstrate how variables can move from the YAML header block at the top into the rendered document. Spend some time with the code to understand:
+
+1. How the version and date string works at the top; and
+1. How the "AI-prompt" box works, that appears here from time to time, powered by css to format its appearance, and a bit of Javascript to create a button that copies its contents to your clipboard.
+
+
+# Running R-code
+
+R-code is _fenced_ in triple backticks, and can be _run_ in the IDE's R-interpreter. Running the code works much like running any R script, except that the document maintains its own "workspace", and thus does not overwrite your variables that you have set outside the workspace. That said, there is still a subtle catch: when the interpreter "runs" a `.qmd` document, the working directory is not necessarily the same as the one you are currently using.
+
+
+```{r}
+
+# This returns the working directory at the time this code was executed
+# during rendering. It might no be what you expect, since the
+# mechanism that renders this document uses the directory in which
+# the document exists as its working directory. I have placed a
+# directive to use the top level directory of the project into a
+# quarto configuration file "_quato.yml". Getting the process to work
+# in a predictable location is essential if you read or write any
+# data from a document that is meant to be portable, i.e. you can't
+# just hardcode the paths.
+getwd() 
+```
+
+```{r}
+# If the rendering process is reading and interpreting the
+# directives in ./_quarto.yml then this lists the files in
+# the subdirectory ./dat/, not ./src/qmd/dat/ (where ./src/qmd/dat is )
+list.files("dat")
+```
+
+
+Let's try doing something slightly fancy: a plot of relationships between amino acids the way biochemists traditionally define them. ^[This gives me an opportunity to demo the use of citations and references in a quarto document. (By the way: this is a footnote).] To the best of my knowledge, the first use of a Venn diagram for amino acid categories was written up in a paper by Willie Taylor, in the Department of Crystallography in Birkbeck College, London [@taylor1986, 209].
+
+::: {.ai-prompt-box data-prompt="AI Prompt" #prompt-content-2}
+
+Can you explain to me how references and citations work in a quarto document? I also need to know when to put references in my document's YAML header, and when to use a separate .bib file.
+
+<button class="copy-button" onclick="copyContent('prompt-content-2')">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+:::
+
+On with our plot. Here is the prompt I used to get the R-code chunk below.^[I tried this first with Gemini, but could not get it to work out of the box. I then used Microsoft CoPilot-GPT5, got broken code, pasted the error message, and got working code that however misunderstood my informally stated intent. So I rewrote my prompt in a more implementation-oriented, directed way ... and got the plot that is included here, which is pretty much what I thought I wanted.] 
+
+::: {.ai-prompt-box data-prompt="AI Prompt" #prompt-content-3}
+
+I would like to include a slightly fancy plot in my quarto document. It should display the relationships between the amino acids in one-letter code, once they automatically align themselves according to their category memberships. I hope that this will turn out looking something like Willie Taylor's Venn diagram in his 1986 J Theor. Biol. paper. I think a force-directed layout should work nicely for that. Basically, the number of shared category memberships between a pair should define how much each pair is attracted to each other in the resulting diagram.
+
+It would be great if we can get some interactivity too, being able to drag individual amino-acids and re-relax the network after repositioning.
+
+The R chunk itself should be hidden in the HTML rendered output, but the plot itself should be displayed, and have an informative image caption. Let's set those options in the modern quarto "#|" style. The amino acid positions should be labelled with one-letter codes letters, and they should use the following colours:
+
+c(G = "#B9C2CD", P = "#D4CF82", C = "#F1DD38", A = "#D2DF40", 
+  V = "#B4E149", I = "#96E351", L = "#78E65A", M = "#6DCB6E", F = "#63B182", 
+  W = "#599797", Y = "#4F7CAB", H = "#4562BF", R = "#3B48D4", K = "#5F6BD8", 
+  Q = "#838FDC", N = "#A8B3E0", T = "#AA90BA", S = "#AD6D95", D = "#B04B70", 
+  E = "#B3294B")
+
+... and the categories are defined like so:
+list(tiny = c("G", "A", "C", "S"), small = c("G", "A", "C", "S", 
+"T", "D", "N", "P", "V"), aliphatic = c("I", "L", "V"), aromatic = c("F", 
+"Y", "W", "H"), hydrophobic = c("I", "L", "V", "M", "A", "G", 
+"C", "T", "F", "Y", "W", "H"), positive = c("K", "H", "R"), negative = c("D", 
+"E"), charged = c("D", "E", "K", "H", "R"), polar = c("D", "E", 
+"K", "H", "R", "Q", "N", "S", "C", "T", "Y", "W"))
+
+If we need special packages, they should be installed conditional to the output of a call to requireNamespace(), and this should be a portable document, so we should neither produce nor consume external data. I think the visNetwork:: package might be helpful ... but you are free to suggest whatever you feel works best. Perhaps keep the things to base-R if possible, e.g. we can use "|>" if we need pipes.
+
+Also, please make sure the output is properly displayed as a code-block, and the UI does not interpret the code as markdown ...
+
+Are the instructions clear?  Or do you need further information? Or do you think you can write the chunk based on that?
+
+<button class="copy-button" onclick="copyContent('prompt-content-3')">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+:::
+
+Note that we asked to set a flag on the chunk to hide its code (cf. "`echo: false`" below), and just display the plot itself. You can examine the code in the original `.qmd` document.
+
+
+```{r}
+#| label: aa_force
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Interactive force‑directed layout of the 20 amino acids. Edge attraction (and width) scales with the number of shared classical property categories (after Taylor, J. Theor. Biol., 1986). Drag nodes to re‑relax the layout. Node colors are as specified; hover for category memberships."
+#| out-width: 100%
+
+# ---- Setup ----
+set.seed(123)
+
+# Conditional installation: interactive first, static fallback otherwise
+pkg_needed <- c("visNetwork", "igraph")
+for (p in pkg_needed) {
+  if (!requireNamespace(p, quietly = TRUE)) {
+    try({
+      install.packages(p, dependencies = TRUE)
+    }, silent = TRUE)
+  }
+}
+
+# ---- Data: colors and categories ----
+aa_colors <- c(
+  G = "#B9C2CD", P = "#D4CF82", C = "#F1DD38", A = "#D2DF40",
+  V = "#B4E149", I = "#96E351", L = "#78E65A", M = "#6DCB6E", F = "#63B182",
+  W = "#599797", Y = "#4F7CAB", H = "#4562BF", R = "#3B48D4", K = "#5F6BD8",
+  Q = "#838FDC", N = "#A8B3E0", T = "#AA90BA", S = "#AD6D95", D = "#B04B70",
+  E = "#B3294B"
+)
+
+categories <- list(
+  tiny       = c("G", "A", "C", "S"),
+  small      = c("G", "A", "C", "S", "T", "D", "N", "P", "V"),
+  aliphatic  = c("I", "L", "V"),
+  aromatic   = c("F", "Y", "W", "H"),
+  hydrophobic= c("I", "L", "V", "M", "A", "G", "C", "T", "F", "Y", "W", "H"),
+  positive   = c("K", "H", "R"),
+  negative   = c("D", "E"),
+  charged    = c("D", "E", "K", "H", "R"),
+  polar      = c("D", "E", "K", "H", "R", "Q", "N", "S", "C", "T", "Y", "W")
+)
+
+aas <- names(aa_colors)
+
+# Build membership map: for each AA, which categories it belongs to?
+aa2cats <- setNames(vector("list", length(aas)), aas)
+for (cat_name in names(categories)) {
+  for (a in categories[[cat_name]]) {
+    aa2cats[[a]] <- c(aa2cats[[a]], cat_name)
+  }
+}
+aa2cats <- lapply(aa2cats, unique)
+
+# ---- Build nodes ----
+nodes <- data.frame(
+  id    = aas,
+  label = aas,
+  color = unname(aa_colors[aas]),
+  stringsAsFactors = FALSE
+)
+# Hover tooltips for nodes (HTML allowed by vis.js)
+nodes$title <- vapply(
+  nodes$id,
+  function(a) {
+    paste0(
+      "<b>", a, "</b><br/>Categories: ",
+      paste(aa2cats[[a]], collapse = ", ")
+    )
+  },
+  FUN.VALUE = character(1)
+)
+# Constant size looks tidy; you can map degree if you wish
+nodes$size <- 28
+
+# ---- Build weighted edges by shared category count ----
+pairs <- t(combn(aas, 2))
+shared_counts <- apply(
+  pairs, 1,
+  function(p) length(intersect(aa2cats[[p[1]]], aa2cats[[p[2]]]))
+)
+keep <- shared_counts > 0
+pairs <- pairs[keep, , drop = FALSE]
+shared_counts <- shared_counts[keep]
+
+# Edge "value" controls width in visNetwork; "length" acts like spring length.
+# Larger weight => stronger attraction and shorter spring.
+scale_length <- function(w) {
+  # A gentle inverse curve to prevent over-collapsing at high weights
+  round(380 / (w ^ 0.9))
+}
+
+edges <- data.frame(
+  from   = pairs[, 1],
+  to     = pairs[, 2],
+  value  = shared_counts,              # for edge width scaling
+  width  = shared_counts,              # explicit width mapping
+  length = scale_length(shared_counts),
+  stringsAsFactors = FALSE
+)
+
+# Edge tooltips list shared categories
+edges$title <- mapply(
+  function(f, t, w) {
+    sh <- intersect(aa2cats[[f]], aa2cats[[t]])
+    paste0(
+      "<b>", f, " \u2194 ", t, "</b><br/>Shared categories (", w, "): ",
+      paste(sh, collapse = ", ")
+    )
+  },
+  edges$from, edges$to, edges$value,
+  SIMPLIFY = TRUE, USE.NAMES = FALSE
+)
+
+# ---- Plot: prefer visNetwork (interactive), fallback to igraph (static) ----
+if (requireNamespace("visNetwork", quietly = TRUE)) {
+  visNetwork::visNetwork(nodes, edges, width = "100%", height = "650px") |>
+    visNetwork::visEdges(
+      smooth = FALSE,
+      color = list(color = "#B8B8B8", highlight = "#D81B60"),
+      scaling = list(min = 1, max = 6)
+    ) |>
+    visNetwork::visNodes(
+      shape = "dot",
+      borderWidth = 2,
+      shadow = list(enabled = TRUE, size = 10),
+      font = list(size = 28, face = "monospace", color = "#111111")
+    ) |>
+    visNetwork::visPhysics(
+      solver = "forceAtlas2Based",
+      forceAtlas2Based = list(
+        gravitationalConstant = -60,
+        centralGravity = 0.01,
+        springLength = 150,
+        springConstant = 0.055,
+        avoidOverlap = 0.6
+      ),
+      minVelocity = 0.75,
+      stabilization = list(enabled = TRUE, iterations = 180)
+    ) |>
+    visNetwork::visInteraction(
+      dragNodes = TRUE, hover = TRUE, tooltipDelay = 100,
+      navigationButtons = TRUE, zoomView = TRUE
+    ) |>
+    visNetwork::visOptions(
+      highlightNearest = list(enabled = TRUE, degree = 1, hover = TRUE),
+      nodesIdSelection = TRUE
+    ) |>
+    visNetwork::visExport(type = "png", name = "aa-force-layout", label = "Save image")
+  
+} else if (requireNamespace("igraph", quietly = TRUE)) {
+  # Static fallback (no interactivity)
+  igraph::igraph_options(plot.layout = NULL)
+  g <- igraph::graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
+  lay <- igraph::layout_with_fr(g, weights = igraph::E(g)$value)
+  op <- par(mar = c(0, 0, 2.5, 0))
+  on.exit(par(op), add = TRUE)
+  plot(
+    g,
+    layout = lay,
+    vertex.label = igraph::V(g)$label,
+    vertex.color = igraph::V(g)$color,
+    vertex.frame.color = "#333333",
+    vertex.size = 18,
+    vertex.label.family = "mono",
+    vertex.label.cex = 1.1,
+    edge.width = igraph::E(g)$value,
+    edge.color = "#B8B8B8",
+    main = "Amino acids (static fallback): FR layout by shared category count"
+  )
+} else {
+  # Last-resort message if neither package is available/installed
+  plot.new()
+  title("Unable to render plot: 'visNetwork' or 'igraph' is required.")
+  mtext("Please install one of these packages and re-knit.", side = 3, line = 0.5)
+}
+```
+
+That is all for now.
+
+# References
+
+
+<!-- I ALWAYS include an "end" tag of some sort with all my documents,
+     to ensure that copy/paste is complete. -->
+
+<!-- [END] -->  
+
+
+
+
+
+
+
+
