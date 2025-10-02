@@ -1,9 +1,7 @@
 project:
   type: default
-  output-dir: out
+  output-dir: docs
   execute-dir: project   # force working dir to project root
-  render:
-    output-path: out     # force html and files directly into ./out/
 
 format:
   html:
