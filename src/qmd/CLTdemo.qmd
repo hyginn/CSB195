@@ -36,7 +36,8 @@ This Quarto document demonstrates a document that is rendered to html in the `./
 1. The RStudio project root directory contains a configuration file: `./_quarto.yml` - it contains a line:<br/>
 `  output-dir: docs`<br/>This causes the rendered file `CLTdemo.html` and a folder containing the images and other assets to be placed into subdirectories of `./docs/`.
 1. We render the quarto document, commit the changes in the `./docs/` directory, and push everything to our GitHub repository.
-1. Github recognizes that a `./docs/` directory exists, finds the `.html` files it contains, and makes them accessible under the URL `https://myAccount.github.io/myRepository/my/subdirectory/CLTdemo.html`.
+1. When you do this for the first time, you need to trigger the creation of your "site" through your repository's **Settings**. Access them from your main repository page, find the **Pages** heading in the left-hand menu, make sure thet the **Build and deployment** is set to "Deploy from a branch", in the **Branch** menu select "main", and select "/docs" as the folder. Then click **Save**. It may take a minute or two until your `.html` is available.
+1. GitHub finds the `.html` files your `/docs` directory contains, and makes them accessible under the URL `https://myAccount.github.io/myRepository/my/subdirectory/CLTdemo.html`.
 
 Let's create the file.
 
@@ -100,8 +101,7 @@ hist(x[x>xi & x<xa], breaks = brk, col = "#FF00AA33", add=TRUE)
 # Note: for display we clip the values to lie between the bounds we are
 #       considering for our histogram: x[x>xi & x<xa]. If we don't
 #       do that, sooner or later a value would stray outside the bounds
-#       and hist() would choke on that. My, my.
-
+#       and hist() would throw a tantrum. My, my.
 
 
 # We repeat this with 200 perturbations ...
