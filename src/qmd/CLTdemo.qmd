@@ -1,0 +1,176 @@
+---
+title: "CLT Demo"
+subtitle: "The Central Limit Theorem in Action"
+author: "Boris Steipe"
+date: last-modified      
+version: "v 1.0"
+format:
+  html:
+    toc: true
+    number-sections: true
+    code-fold: false
+    include-in-header:
+      text:  |
+        <style>
+          .version-info {
+            font-size: 70%;
+            color: #BBBBBB;
+            margin-top: -10px;
+          }
+        </style>
+---
+
+::: version-info
+Version {{< meta version >}}, last updated {{< meta date >}}.
+:::
+
+<!-- 
+
+versions:
+  1.0 - Basic, first posted version
+-->
+
+This Quarto document demonstrates a document that is rendered to html in the `./docs` subdirectory, wherupon it becomes visible as a static webpage in `github.io`. To achieve this:
+
+1. You author and edit a Quarto document on your local machine, in our course these are kept in `./src/qmd` in your project directory.
+1. The RStudio project root directory contains a configuration file: `./_quarto.yml` - it contains a line:<br/>
+`  output-dir: docs`<br/>This causes the rendered file `CLTdemo.html` and a folder containing the images and other assets to be placed into subdirectories of `./docs/`.
+1. We render the quarto document, commit the changes in the `./docs/` directory, and push everything to our GitHub repository.
+1. Github recognizes that a `./docs/` directory exists, finds the `.html` files it contains, and makes them accessible under the URL `https://myAccount.github.io/myRepository/my/subdirectory/CLTdemo.html`.
+
+Let's create the file.
+
+## The Central Limit Theorem (CLT)
+
+Normal distributions occur everywhere in nature. Exactly why has only been proven in 1901, by Aleksandr Lyapunov who stated the CLT clearly and proved its justification:  
+
+Let $X_1, X_2, \dots, X_n$ denote a statistical sample of size $n$ from a population with expected value (average) $\mu$ and finite positive variance $\sigma^2$, and let $\bar{X}_{n}$ denote the sample mean (which is itself a random variable). Then:
+
+$$
+(\bar{X}_n - \mu)\sqrt{n} \;\;\xrightarrow{d}\;\; \mathcal{N}(0, \sigma^2)
+\quad \text{as } n \to \infty.
+$$
+
+
+
+::: {.callout-note}
+**Intuition**  
+This means: If we take many independent observations from the same population, then average them, the distribution of those averages will look more and more like a _bell curve_ - or "Gaussian Distribution" - as the sample size grows — no matter what the original population looked like (as long as it has a finite variance).
+:::
+
+One way to arrive at this, is through the accumulation of small errors, or fluctuations, the result of many interactions with a constantly changing context.
+
+
+## Modelling the CLT by random fluctuations
+
+Here is an example. We draw 5,000 samples from a uniform distribution, using the R function `runif()`, and plot that as a histogram. The values are uniformly distributed between 0 and 1, and the histogram bars all reach approximately the same height.
+
+Then we add small fluctuations to each of the original values - something positive or negative, less than 5% ..., and since positive and negative perturbations are equally likely, they average out to about zero, when you look at the entire population. But that does not mean the original values all stay in place. If I do that 100 times, the histogram of the result starts getting peaked at ~0.5, and starts spreading out at the sides. I can repeat this, 200 times, 500 time, 1000 time more - every time plotting a new histogram, and as a result, the histogram approximates a normal distribution.
+
+(Technically I am convoluting my uniform distribution with Gaussian noise.)
+
+Here it is in code:
+
+```{r}
+#| cache: TRUE
+
+set.seed(271828)
+
+n <- 5000                     # number of points
+x <- runif(n)                 # initial set of points: uniform distribution
+xa <-   4                     # boundaries for the histogram: positive ...
+xi <- -xa                     # ... and negative
+brk <- seq(xi, xa, len=101)   # histogram bin limits
+
+hist(x, 
+     breaks = brk,
+     col = "lightgray",
+     main = "From uniform to normal via accumulated perturbations",
+     xlab = "",
+     ylab = "F",
+     xlim = c(xi, xa),
+     ylim = c(0, 500))
+
+# Now add our perturbations: 100 random values, uniformly distributed
+# between -0.05 and 0.05 added to each number in x. These are vectorized
+# operations in R - they are fast. Then we overlay the new histogram.
+x <- x + rowSums(matrix(runif(n*100, -0.05, 0.05), nrow=n))
+hist(x[x>xi & x<xa], breaks = brk, col = "#FF00AA33", add=TRUE)
+
+# Note: for display we clip the values to lie between the bounds we are
+#       considering for our histogram: x[x>xi & x<xa]. If we don't
+#       do that, sooner or later a value would stray outside the bounds
+#       and hist() would choke on that. My, my.
+
+
+
+# We repeat this with 200 perturbations ...
+x <- x + rowSums(matrix(runif(n*200, -0.05, 0.05), nrow=n))
+hist(x[x>xi & x<xa], breaks = brk, col = "#FF009944", add=TRUE)
+
+# ... 500 ...
+x <- x + rowSums(matrix(runif(n*500, -0.05, 0.05), nrow=n))
+hist(x[x>xi & x<xa], breaks = brk, col = "#FF005555", add=TRUE)
+
+# ... and 1,000. That's our final histogram.
+x <- x + rowSums(matrix(runif(n*1000, -0.05, 0.05), nrow=n))
+hist(x[x>xi & x<xa], breaks = brk, col = "#FF001166", add=TRUE)
+```
+
+As you can see, the perturbations cause the distribution to become rounded, with a peak at the mean of the original distribution: at 0.5.  However these are the "same" 5,000 points we started with, we just added a few random positive and negative numbers to each of them.
+
+
+## Normal Distribution and Perturbations
+
+Are the 5,000 values now normally distributed?
+
+```{r}
+
+# assign the hist() output to myH, so we can get at the values with which
+# the plot was constructed.
+myH <- hist(x[x>xi & x<xa], breaks = brk, col = "#FF001166",
+            freq = FALSE,
+            main = "Histogram of Perturbed Values",
+            xlab = "", ylab = "F",
+            xlim = c(xi, xa))
+
+points(myH$mids,  # using the histogram-bin midpoints as the x-values of
+                  # our curve, and computing the y-values with dnorm()
+       dnorm(myH$mids, mean = mean(x), sd = sd(x)),
+       col = "#AA0000",
+       type = "l",
+       lwd = 2)
+```
+
+The `points()` function overlays points over a previous plot, the parameter
+`type = "l"` connects the points with line segments. The function `dnorm()`
+evaluates a normal distribution of the form 
+
+$$
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}
+       \exp\!\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)
+$$
+... where $\mu$ is the mean of our perturbed values, and $\sigma$ is their standard deviation. Note that the curve is defined by these two numbers only, the 5,000 individual values that determine the heights of the histogram bars do not matter - this is not a curve fit. It turns out, that the actual points are correctly described by the mathematical relationship, without any further assumptions.
+
+Francis Galton expressed this beautifully:
+
+> I know of scarcely anything so apt to impress the imagination as the wonderful form of cosmic order expressed by the "Law of Frequency of Error". The law would have been personified by the Greeks and deified, if they had known of it. It reigns with serenity and in complete self-effacement, amidst the wildest confusion. The huger the mob, and the greater the apparent anarchy, the more perfect is its sway. **It is the supreme law of Unreason**. Whenever a large sample of chaotic elements are taken in hand and marshalled in the order of their magnitude, an unsuspected and most beautiful form of regularity proves to have been latent all along.
+
+<small>Galton, Francis (1889). [_Natural Inheritance_](https://galton.org/books/natural-inheritance/index.html) p.66. (emphasis mine).</small>
+
+<small>This quote, and other historical details can be found on the [CLTs Wikipedia page](https://en.wikipedia.org/wiki/Central_limit_theorem).</small>
+
+
+
+
+That is all.
+
+<!-- [END] -->  
+
+
+
+
+
+
+
+
