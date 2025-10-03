@@ -1,8 +1,15 @@
 .DS_Store
 .Rproj.user
-.Rhistory
 .RData
 .Ruserdata
-./out/
-./dev/
+
+# NEVER commit history, to avoid leaking passwords etc.
+.Rhistory
+
+# to ignore quarto assets that were added by rendering from ./src/qmd
+/out/src/
+
+# to ignore contents of a staging folder
+/dev/
+
 /.quarto/
