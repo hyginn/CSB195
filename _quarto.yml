@@ -1,6 +1,6 @@
 project:
   type: default
-  output-dir: docs
+  output-dir: out
   execute-dir: project   # force working dir to project root
 
 format:
