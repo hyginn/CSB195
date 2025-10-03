@@ -166,15 +166,15 @@ window.Quarto = {
 versions:
   1.0 - Basic, first posted version
 -->
-<p>This Quarto document demonstrates a document that is rendered to html in the <code>./docs</code> subdirectory, whereupon it becomes visible as a static webpage in <code>github.io</code>. To achieve this:</p>
+<p>This Quarto document demonstrates a document that is rendered to html in the <code>./docs</code> subdirectory, whereupon it becomes visible as a static webpage in the “site” that is associated with your GitHub repository - on <code>github.io</code>. To achieve this:</p>
 <ol type="1">
-<li>You author and edit a Quarto document on your local machine, in our course these are kept in <code>./src/qmd</code> in your project directory.</li>
-<li>The RStudio project root directory contains a configuration file: <code>./_quarto.yml</code> - it contains a line:<br> <code>output-dir: docs</code><br>This causes the rendered file <code>CLTdemo.html</code> and a folder containing the images and other assets to be placed into subdirectories of <code>./docs/</code>.</li>
-<li>We render the quarto document, commit the changes in the <code>./docs/</code> directory, and push everything to our GitHub repository.</li>
-<li>When you do this for the first time, you need to trigger the creation of your “site” through your repository’s <strong>Settings</strong>. Access them from your main repository page, find the <strong>Pages</strong> heading in the left-hand menu, make sure thet the <strong>Build and deployment</strong> is set to “Deploy from a branch”, in the <strong>Branch</strong> menu select “main”, and select “/docs” as the folder. Then click <strong>Save</strong>. It may take a minute or two until your <code>.html</code> is available.</li>
-<li>GitHub finds the <code>.html</code> files your <code>/docs</code> directory contains, and makes them accessible under the URL <code>https://myAccount.github.io/myRepository/my/subdirectory/CLTdemo.html</code>.</li>
+<li>Let’s assume your name is <em>Kronecker</em>, you are working on a GitHub repository called <code>poiema</code>, and you author and edit a Quarto document called <code>IntegerCatechism.qmd</code>. However, you don’t keep it in the usual location <code>./src/qmd</code>, but you place it into the <code>./docs</code> directory of your project, to publish it.</li>
+<li>The <code>./docs/</code> directory contains a configuration file: <code>./docs/_quarto.yml</code> which contains a line:<br> <code>output-dir: .</code><br> This overrides the default configuration (which renders into <code>./out</code>) and directs Quarto to render your <code>IntegerCatechism.html</code> file and a folder containing its images and other assets into the <code>./docs/</code> directory.</li>
+<li>After rendering, you <em>commit</em> all changes in the <code>./docs/</code> directory to <em>git</em>, and push everything to your GitHub repository.</li>
+<li>When you do this for the first time, you need to trigger the creation of your “site” through your repository’s <strong>Settings</strong>. Access them from your main repository page, find the <strong>Pages</strong> heading in the left-hand menu, make sure that the <strong>Build and deployment</strong> is set to “Deploy from a branch”, in the <strong>Branch</strong> menu select “main”, and select “/docs” as the folder. Then click <strong>Save</strong>. It may take a minute or two until your <code>.html</code> is available. This setting is recorded, you only need to do this once.</li>
+<li>GitHub finds the <code>.html</code> files contained in your repository’s <code>/docs</code> and its subdirectories, and makes them accessible. In your case, this would be the URL <code>https://kronecker.github.io/poiema/IntegerCatechism.html</code>.</li>
 </ol>
-<p>Let’s create the file.</p>
+<p>This is the process I followed here.</p>
 <section id="the-central-limit-theorem-clt" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="the-central-limit-theorem-clt"><span class="header-section-number">1</span> The Central Limit Theorem (CLT)</h2>
 <p>Normal distributions occur everywhere in nature. Exactly why has only been proven in 1901, by Aleksandr Lyapunov who stated the CLT clearly and proved its justification:</p>

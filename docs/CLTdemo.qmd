@@ -29,16 +29,17 @@ versions:
   1.0 - Basic, first posted version
 -->
 
-This Quarto document demonstrates a document that is rendered to html in the `./docs` subdirectory, whereupon it becomes visible as a static webpage in `github.io`. To achieve this:
+This Quarto document demonstrates a document that is rendered to html in the `./docs` subdirectory, whereupon it becomes visible as a static webpage in the "site" that is associated with your GitHub repository - on `github.io`. To achieve this:
 
-1. You author and edit a Quarto document on your local machine, in our course these are kept in `./src/qmd` in your project directory.
-1. The RStudio project root directory contains a configuration file: `./_quarto.yml` - it contains a line:<br/>
-`  output-dir: docs`<br/>This causes the rendered file `CLTdemo.html` and a folder containing the images and other assets to be placed into subdirectories of `./docs/`.
-1. We render the quarto document, commit the changes in the `./docs/` directory, and push everything to our GitHub repository.
-1. When you do this for the first time, you need to trigger the creation of your "site" through your repository's **Settings**. Access them from your main repository page, find the **Pages** heading in the left-hand menu, make sure thet the **Build and deployment** is set to "Deploy from a branch", in the **Branch** menu select "main", and select "/docs" as the folder. Then click **Save**. It may take a minute or two until your `.html` is available.
-1. GitHub finds the `.html` files your `/docs` directory contains, and makes them accessible under the URL `https://myAccount.github.io/myRepository/my/subdirectory/CLTdemo.html`.
+1. Let's assume your name is _Kronecker_, you are working on a GitHub repository called `poiema`, and you author and edit a Quarto document called  `IntegerCatechism.qmd`. However, you don't keep it in the usual location `./src/qmd`, but you place it into the `./docs` directory of your project, to publish it.
+1. The `./docs/` directory contains a configuration file: `./docs/_quarto.yml` which contains a line:<br/>
+`  output-dir: .`<br/>
+This overrides the default configuration (which renders into `./out`) and directs Quarto to render your `IntegerCatechism.html` file and a folder containing its images and other assets into the `./docs/` directory.
+1. After rendering, you _commit_ all changes in the `./docs/` directory to _git_, and push everything to your GitHub repository.
+1. When you do this for the first time, you need to trigger the creation of your "site" through your repository's **Settings**. Access them from your main repository page, find the **Pages** heading in the left-hand menu, make sure that the **Build and deployment** is set to "Deploy from a branch", in the **Branch** menu select "main", and select "/docs" as the folder. Then click **Save**. It may take a minute or two until your `.html` is available. This setting is recorded, you only need to do this once.
+1. GitHub finds the `.html` files contained in your repository's `/docs` and its subdirectories, and makes them accessible. In your case, this would be the URL `https://kronecker.github.io/poiema/IntegerCatechism.html`.
 
-Let's create the file.
+This is the process I followed here.
 
 ## The Central Limit Theorem (CLT)
 
