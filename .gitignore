@@ -5,11 +5,15 @@
 
 # NEVER commit history, to avoid leaking passwords etc.
 .Rhistory
+.python_history
 
-# to ignore quarto assets that were added by rendering from ./src/qmd
+# Ignore quarto assets that were added by rendering from ./src/qmd
 /out/src/
 
-# to ignore contents of a staging folder
+# Ignore Quarto's cache directories, which are only for fast local rendering
+**/*_cache/
+
+# Ignore contents of a staging folder
 /dev/
 
 /.quarto/
