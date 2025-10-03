@@ -25,12 +25,11 @@ Version {{< meta version >}}, last updated {{< meta date >}}.
 :::
 
 <!-- 
-
 versions:
   1.0 - Basic, first posted version
 -->
 
-This Quarto document demonstrates a document that is rendered to html in the `./docs` subdirectory, wherupon it becomes visible as a static webpage in `github.io`. To achieve this:
+This Quarto document demonstrates a document that is rendered to html in the `./docs` subdirectory, whereupon it becomes visible as a static webpage in `github.io`. To achieve this:
 
 1. You author and edit a Quarto document on your local machine, in our course these are kept in `./src/qmd` in your project directory.
 1. The RStudio project root directory contains a configuration file: `./_quarto.yml` - it contains a line:<br/>
@@ -66,7 +65,7 @@ One way to arrive at this, is through the accumulation of small errors, or fluct
 
 Here is an example. We draw 5,000 samples from a uniform distribution, using the R function `runif()`, and plot that as a histogram. The values are uniformly distributed between 0 and 1, and the histogram bars all reach approximately the same height.
 
-Then we add small fluctuations to each of the original values - something positive or negative, less than 5% ..., and since positive and negative perturbations are equally likely, they average out to about zero, when you look at the entire population. But that does not mean the original values all stay in place. If I do that 100 times, the histogram of the result starts getting peaked at ~0.5, and starts spreading out at the sides. I can repeat this, 200 times, 500 time, 1000 time more - every time plotting a new histogram, and as a result, the histogram approximates a normal distribution.
+Then we add small fluctuations to each of the original values - something positive or negative, less than 5% ..., and since positive and negative perturbations are equally likely, they average out to about zero, when you look at the entire population. But that does not mean the original values all stay in place. If I do that 100 times, the histogram of the result starts getting peaked at ~0.5, and starts spreading out at the sides. I can repeat this, 200 times, 500 time, 1000 time more - every time plotting a new histogram (overlaid with slightly different colors, for clarity), and as a result, the histogram begins to approximate a normal distribution.
 
 (Technically I am convoluting my uniform distribution with Gaussian noise.)
 
