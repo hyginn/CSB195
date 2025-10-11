@@ -3,6 +3,9 @@ project:
   output-dir: out
   execute-dir: project   # force working dir to project root
 
+filters:
+  - _quarto.lua
+
 format:
   html:
     toc: true
