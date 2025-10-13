@@ -1,6 +1,6 @@
 project:
   type: default
-  output-dir: out
+#  output-dir: out
   execute-dir: project   # force working dir to project root
 
 filters:
