@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Boris Steipe">
+<meta name="dcterms.date" content="2025-10-13">
+
+<title>Random Genetic Codes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="randomGC_files/libs/clipboard/clipboard.min.js"></script>
+<script src="randomGC_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="randomGC_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="randomGC_files/libs/quarto-html/popper.min.js"></script>
+<script src="randomGC_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="randomGC_files/libs/quarto-html/anchor.min.js"></script>
+<link href="randomGC_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="randomGC_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="randomGC_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="randomGC_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="randomGC_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="randomGC_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="randomGC_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<style>
+  h1 {
+    margin-block: 2em; /* Greater vertical separation from surrounding text */
+  }
+  .version-info {
+    font-size: 70%;
+    color: #BBBBBB;
+    margin-top: -10px;
+  }
+  /* Style for an box with copy function*/
+  .copyBox {
+    --border-color: #e0e0e0;
+    --box-bg-color: #f7f7f7;
+    --prompt-text: attr(data-prompt);
+    position: relative;
+    border: 1px solid var(--border-color);
+    padding: 1.5em;
+    margin-top: 2em;
+    position: relative;
+    border-radius: 5px;
+    background-color: var(--box-bg-color);
+  }
+  .copyBox pre {
+    font-family: sans-serif;
+    white-space: pre-wrap;     /* keeps line breaks but allows wrapping */
+  }
+  .copyBox::before { /* adds a label to the tab */
+    content: attr(label); /* The label for the box */
+    position: absolute;
+    top: -1.3em; /* Move it up above the box */
+    left: 1em;
+    padding: 0 0.5em;
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    background-color: var(--box-bg-color);
+    border-radius: 5px;
+    font-weight: bold;
+    color: #555555;
+    font-size: 0.9em;
+  }
+  /* Style for the button */
+  .copyButton {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #e9ecef;
+      border: 1px solid #ced4da;
+      color: #495057;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8em;
+      opacity: 0.8;
+  }
+  .copyButton:hover {
+      opacity: 1;
+      background-color: #d8dcf4;
+  }
+  .summaryBox {
+    background-color: #f7f9fc;
+    /* border-left: 5px solid #007bff; */
+    padding: 1.5em; /* Internal spacing */
+    margin-block: 2em; /* Good vertical separation from surrounding text */
+    border-radius: 5px; /* Slightly rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  }
+  .summaryBox-title {
+    color: #007bff; /* Match the title color to the border color */
+    border-bottom: 1px solid #dee2e6; /* Light line under the title */
+    padding-bottom: 0.5em;
+    margin-top: 0; /* Remove top margin for tighter integration */
+    font-size: 1.25em;
+  }
+  .notabene {
+      font-size: 0.8em;
+  }
+</style>
+<script>
+function copyContent(btn) {
+  const box  = btn.closest('.copyBox');
+  const body = box?.querySelector('pre');
+  const text = body ? body.textContent : '';
+  const original = btn.innerHTML;
+
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = original; }, 1500);
+  }).catch(err => console.error('Could not copy text:', err));
+}
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#is-the-genetic-code-the-best-it-can-be" id="toc-is-the-genetic-code-the-best-it-can-be" class="nav-link active" data-scroll-target="#is-the-genetic-code-the-best-it-can-be"><span class="header-section-number">1</span> Is the Genetic Code the Best It Can Be?</a>
+  <ul class="collapse">
+  <li><a href="#preparations" id="toc-preparations" class="nav-link" data-scroll-target="#preparations"><span class="header-section-number">1.1</span> Preparations</a>
+  <ul class="collapse">
+  <li><a href="#the-function-aasim" id="toc-the-function-aasim" class="nav-link" data-scroll-target="#the-function-aasim"><span class="header-section-number">1.1.1</span> The Function <code>aaSim()</code></a></li>
+  <li><a href="#the-standard-genetic-code" id="toc-the-standard-genetic-code" class="nav-link" data-scroll-target="#the-standard-genetic-code"><span class="header-section-number">1.1.2</span> The Standard Genetic Code</a></li>
+  <li><a href="#a-codon-neighbourhood-generator" id="toc-a-codon-neighbourhood-generator" class="nav-link" data-scroll-target="#a-codon-neighbourhood-generator"><span class="header-section-number">1.1.3</span> A Codon Neighbourhood Generator</a></li>
+  <li><a href="#evaluating-the-sgc" id="toc-evaluating-the-sgc" class="nav-link" data-scroll-target="#evaluating-the-sgc"><span class="header-section-number">1.1.4</span> Evaluating the SGC</a></li>
+  <li><a href="#speedup-by-hoisting" id="toc-speedup-by-hoisting" class="nav-link" data-scroll-target="#speedup-by-hoisting"><span class="header-section-number">1.1.5</span> Speedup by Hoisting</a></li>
+  <li><a href="#speedup-by-precomputation" id="toc-speedup-by-precomputation" class="nav-link" data-scroll-target="#speedup-by-precomputation"><span class="header-section-number">1.1.6</span> Speedup by Precomputation</a></li>
+  <li><a href="#speedup-by-vectorization" id="toc-speedup-by-vectorization" class="nav-link" data-scroll-target="#speedup-by-vectorization"><span class="header-section-number">1.1.7</span> Speedup by Vectorization</a></li>
+  <li><a href="#speedup-by-symmetry" id="toc-speedup-by-symmetry" class="nav-link" data-scroll-target="#speedup-by-symmetry"><span class="header-section-number">1.1.8</span> Speedup by Symmetry</a></li>
+  <li><a href="#benchmarking" id="toc-benchmarking" class="nav-link" data-scroll-target="#benchmarking"><span class="header-section-number">1.1.9</span> Benchmarking</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#wrapping-up-the-evaluation-function" id="toc-wrapping-up-the-evaluation-function" class="nav-link" data-scroll-target="#wrapping-up-the-evaluation-function"><span class="header-section-number">2</span> Wrapping up the evaluation function</a></li>
+  <li><a href="#random-codes" id="toc-random-codes" class="nav-link" data-scroll-target="#random-codes"><span class="header-section-number">3</span> Random Codes</a>
+  <ul class="collapse">
+  <li><a href="#shuffling-the-sgc-around" id="toc-shuffling-the-sgc-around" class="nav-link" data-scroll-target="#shuffling-the-sgc-around"><span class="header-section-number">3.1</span> Shuffling the SGC around</a></li>
+  <li><a href="#an-almost-fully-random-code" id="toc-an-almost-fully-random-code" class="nav-link" data-scroll-target="#an-almost-fully-random-code"><span class="header-section-number">3.2</span> An (almost) fully random code</a></li>
+  <li><a href="#a-maximum-entropy-code" id="toc-a-maximum-entropy-code" class="nav-link" data-scroll-target="#a-maximum-entropy-code"><span class="header-section-number">3.3</span> A Maximum Entropy Code</a></li>
+  </ul></li>
+  <li><a href="#random-code-quality-distributions" id="toc-random-code-quality-distributions" class="nav-link" data-scroll-target="#random-code-quality-distributions"><span class="header-section-number">4</span> Random Code Quality Distributions</a>
+  <ul class="collapse">
+  <li><a href="#small-digression-on-pseudo-randomness" id="toc-small-digression-on-pseudo-randomness" class="nav-link" data-scroll-target="#small-digression-on-pseudo-randomness"><span class="header-section-number">4.0.1</span> Small digression on (pseudo) randomness</a></li>
+  </ul></li>
+  <li><a href="#the-improbable-sgc" id="toc-the-improbable-sgc" class="nav-link" data-scroll-target="#the-improbable-sgc"><span class="header-section-number">5</span> The Improbable SGC</a>
+  <ul class="collapse">
+  <li><a href="#improbability-revisited." id="toc-improbability-revisited." class="nav-link" data-scroll-target="#improbability-revisited."><span class="header-section-number">5.1</span> Improbability revisited.</a></li>
+  </ul></li>
+  <li><a href="#summing-it-up" id="toc-summing-it-up" class="nav-link" data-scroll-target="#summing-it-up"><span class="header-section-number">6</span> Summing it up</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">7</span> References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Random Genetic Codes</h1>
+<p class="subtitle lead">What do random genetic codes tell us about the Standard Genetic Code?</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Boris Steipe </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 13, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="version-info">
+<p>Version v 1.0, last updated October 13, 2025.</p>
+</div>
+<!-- 
+versions:
+  1.0 - First version as a sample solution for the CSB195 assignment: 2025-09. 
+-->
+<!--
+NOTE: This file implements a custom "copyBox" element using a "sidecar" filter written in the Lua programming language. (A "sidecar" provides a main-service with support, thus keeping the main service focused on its primary job. It is an example of the "Separation of Concerns" design philosophy.)
+
+Here is how this works: Quarto uses Pandoc to convert documents. Pandoc can use Lua scripts (called "filters"), to modify the document as it is being rendered. We add such a Lua sidecar next to the .qmd source. Its job is to:
+
+- Detect special fenced code blocks in the source (marked with a class like "copyBox").
+- Replace those blocks with custom HTML that includes:
+    * A styled container (the box).
+    * A label.
+    * A "copy" button, wired to a JavaScript function.
+    * The original text inside <pre>...</pre> tags that prevent it from being interpreted as code, even if it contains code-like text.
+
+This keeps authoring copy box elements maximally simple.
+
+A number of elements need to collaborate for this:
+
+The YAML header of this .qmd file must:
+1. Activate the Lua filter;
+2. Inject CSS for styling the box (fonts, background color, border, etc.);
+3. Inject JavaScript for the actual "copy"-button functionality.
+
+Example YAML-block contents:
+
+   filters:
+     - <path-to-sidecar-script>.lua
+     - <path-to-another-sidecar-script>.lua
+...
+
+format:
+  html:
+    include-in-header:
+      - text: |
+          <style> ...CSS rules... </style>
+      - text: |
+          <script> ...JS copy logic... </script>
+
+The Lua file defines:
+- A function that runs on each CodeBlock in the document.
+- If the block has the class "copyBox":
+    * Read attributes passed in the code-block header, like "label"
+    * Output a <div> with the label, and the copy button, 
+    * Protect the text from interpretation by enclosing it in  <pre> tags.
+    * Close the div.
+
+To keep things unified, this code is included in the file _quarto.lua that I  place into the project root directory, so it applies to all quarto documents in the project. (This is not a reserved name, any other name would work, and you can have "local" scripts that override it if needed.)
+
+The actual .qmd source now only needs simple fenced code blocks for prompts:
+```{.copyBox label="AI Prompt"}
+Your text goes here. It will be copied exactly as written.
+```
+
+Nb. getting documents like this to work requires to write code 
+- in R or python, 
+- possibly with regular expressions, which have their own syntax,
+- using structured data read from text, csv, or JSON files,
+- using Markdown, 
+- often adding LaTeX, to format mathematical formulas,
+- using BibTeX for references,
+- inserting Quarto shortcodes (Pandoc interpolation),
+- adding HTML,
+- writing YAML configuration blocks,
+- that use CSS for styling of elements,
+- and Javascript to make them interactive, and 
+- Lua filters to add to the rendering logic.
+Such mixed language development practically requires a competent AI
+helper to navigate.
+
+-->
+<div class="summaryBox">
+<div class="summaryBox-title">
+<p>Roadmap</p>
+</div>
+<p><em>In this document</em>, we develop the outlines of a rigorous computational experiment to determine what the Standard Genetic Code (SGC) is optimized for - if anything. We noticed that synonymous codons and codons for <em>similar</em> amino acids often are codon-neighbors. This structure of the genetic code would cause the most frequent type of mutation found in biology (single-base-pair changes), to be more likely to result in silent- or conservative missense mutations, rather than non-conservative or even nonsense mutations. Such a code would be <em>structurally</em> robust to mutations.</p>
+<p><em>We first introduce a “Quality Score”</em> for a genetic code, based on the biophysical similarity of the amino acids it places in neighbouring positions (using our <code>aaSim()</code> function), and we compute a benchmark value for the SGC.</p>
+<p><em>Next we discuss speed.</em> We examine various strategies to make our evaluations run faster. Even though this does not change the results, understanding these issues helps us understand <em>why</em> code was written in a certain way.</p>
+<p><em>Models of random codes follow.</em> There are different ways we can create “random” genetic codes, each with their own biological interpretation. We write code that shuffles the natural set of amino acids, code that creates a fully random code, and code that smooths out the unequal frequencies of amino acids.</p>
+<p><em>We run the Experiment</em>. We compare tens of thousands of random codes to the SGC’s benchmark.</p>
+<p><em>Finally, we analyse the results.</em> Producing the numbers is only the first step. We have to discuss what the numbers mean. We do this by considering different mathematical models that could describe the results, so we can express the difference as a probability. <strong>That probability is the result of our experiment.</strong></p>
+<p><em>The Conclusion (So Far):</em> The SGC is a dramatic anomaly! It is far, far better at minimizing mutational damage than any of the random codes tested. The probability of getting a code as good as the SGC purely by chance is astronomically small. But this does not only mean that the code is structurally robust against mutations. It also entails that such robustness determined its evolution in the first place.</p>
+<hr>
+<div class="notabene">
+<p><em>Note:</em> try to resist the impulse to skip over the code in this document. In a document like this, the code forms part of the narrative and improving your code-literacy is one of the document’s objectives. The code is presented, not hidden away, so you can understand what is happening. There are no hidden resources, all of it is there for you to run at home. If the code seems hard to understand, you can always ask your AI to explain (at a high level) the what and why (or you can ask my to write better comments).</p>
+<p>Some information about the structure of the <code>.qmd</code> is hidden away in <code>&lt;!-- HTML comments --&gt;</code> that don’t get rendered. You can look at the actual source learn to more about the css and Javascript behind some of the styling and the interactivity I use here. That is also not just infrastructure, but part of the teaching.</p>
+</div>
+</div>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain "point mutation", "conservative and nonconservative" mutation, "missense", and "nonsense" mutation for me in non-technical terms?
+</pre>
+</div>
+<section id="is-the-genetic-code-the-best-it-can-be" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Is the Genetic Code the Best It Can Be?</h1>
+<p>This seems to be an ill-posed question at first, without specifiying <em>for what</em>.</p>
+<p>But we can actually devise a strategy to answer the question. To evaluate the <em>quality</em> of the Standard Genetic Code (SGC), we need to define a measure of some property that we can apply to the SGC, and to randomly generated alternatives. If we find the SGC to lie outside the range of what we could reasonably expect for a random structure, we can conclude that this property - or something that has the same effect on the code’s structure - must have shaped the generation of the code. But the generation of the code is determined by its purpose! And therefore, the difference between the SGC and random codes defines both: what the SGC is <em>good for</em>, and <em>how good</em> it actually is in that respect.</p>
+<p>We discussed that the structure of the SGC suggests that identical codons, and codons for similar amino acids are often codon-neighbours. This would be expected, if the purpose of the code is to make conservative point-mutations more likely than non-conservative mutations. We can define a computational experiment by defining a quality measure, applying it to the SGC and comparing it to the result for many random codes.</p>
+<pre><code>    For each of 10,000 trials
+      Create a random genetic code
+      For each of its 64 codons
+        For each of its nine codon neighbours
+          Compute the similarity between the two encoded amino acids
+          Add the value to a sum: "quality"
+      Record the result
+    Evaluate the distribution of results
+</code></pre>
+<section id="preparations" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="preparations"><span class="header-section-number">1.1</span> Preparations</h2>
+<section id="the-function-aasim" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="the-function-aasim"><span class="header-section-number">1.1.1</span> The Function <code>aaSim()</code></h3>
+<p>We have developed <code>aaSim()</code> previously as a function that takes as input a pair of amino acids, and returns a value that we derived from a Principal Components Analysis of a large number of amino acid property scales. We stored it in the <code>./dat</code> directory and can load it from there.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the function</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>aaSim <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"./dat/aaSim.4.1.Rds"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># test it</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(<span class="st">"A"</span>, <span class="st">"Q"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19.46133</code></pre>
+</div>
+</div>
+<p>Internally, <code>aaSim()</code> works by looking up the pre-computed value for the amino acid pair in a table. Such lookups are fast.</p>
+</section>
+<section id="the-standard-genetic-code" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="the-standard-genetic-code"><span class="header-section-number">1.1.2</span> The Standard Genetic Code</h3>
+<p>One authoritative resource for the SGC is the <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?chapter=cgencodes">collection of genetic codes</a> held at the US National Center for Biotechnology Information (NCBI).</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Many genetic codes have more than one start-codon. How does initiation of translation work in principle, and what is the difference when alternative start-codons are used. Also: if the start codon that is used is e.g. `TTG`, does the tranlated sequence starts with `L`? I have a basic grasp of molecular biology, but you need to define technical terms, if you could. Thanks!
+</pre>
+</div>
+<p>We use our own version of the SGC table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the standard genetic code</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>SGC <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"./dat/SGC.csv"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Name each row of the table by its codon.</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(SGC) <span class="ot">&lt;-</span> SGC<span class="sc">$</span>Codon</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the two columns we need, drop all others.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>SGC <span class="ot">&lt;-</span> SGC[ , <span class="fu">c</span>(<span class="st">"Codon"</span>, <span class="st">"A"</span>)]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Row names and column nnames allow us to access elements of the table quickly:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>SGC[<span class="st">"ATG"</span>, <span class="st">"A"</span> ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "M"</code></pre>
+</div>
+</div>
+</section>
+<section id="a-codon-neighbourhood-generator" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="a-codon-neighbourhood-generator"><span class="header-section-number">1.1.3</span> A Codon Neighbourhood Generator</h3>
+<p>To construct a codon’s nine neighbours, we could either create the 3 * 3 possible codons that are different from the original, or we create all 3 * 4 possible codons, and remove the three original ones. Thrift or trim. The result is the same. The <em>trim</em>-option is a bit more clear to write:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>neighs <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">A =</span> <span class="fu">c</span>(<span class="st">"A"</span>,<span class="st">"C"</span>,<span class="st">"G"</span>,<span class="st">"T"</span>)) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># generate all 12 codons, then remove the three that are identical to x</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  y   <span class="ot">&lt;-</span> <span class="fu">rep</span>(x, <span class="dv">12</span>)                    <span class="co"># make twelve copies of the input codon</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  pos <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">each =</span> <span class="dv">4</span>)            <span class="co"># repeat the numbers 1:3 four times</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">substring</span>(y, pos, pos) <span class="ot">&lt;-</span> <span class="fu">rep</span>(A, <span class="dv">3</span>)  <span class="co"># replace each of the nucleotides in turn</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">#   with one of letter from the alphabet</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y[y <span class="sc">!=</span> x])                    <span class="co"># return the result without the three</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">#   codons in which a nucleotide was</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                                       <span class="co">#   replaced with the same one</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Example</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">neighs</span>(<span class="st">"ATG"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "CTG" "GTG" "TTG" "AAG" "ACG" "AGG" "ATA" "ATC" "ATT"</code></pre>
+</div>
+</div>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>I am looking at "codon-neighbours" in the Standard Genetic Code, but I have also heard the word "Hamming-distance 1" being used. What is that?
+</pre>
+</div>
+</section>
+<section id="evaluating-the-sgc" class="level3" data-number="1.1.4">
+<h3 data-number="1.1.4" class="anchored" data-anchor-id="evaluating-the-sgc"><span class="header-section-number">1.1.4</span> Evaluating the SGC</h3>
+<p>With this we can run an evaluation. It could be simply written in code, but I will put this into a function, so it is easy to re-use later:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>evalGC_looped <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># evaluate a Genetic Code</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># GC:  a table with 64 rows, each row named by a codon, and 2 columns "Codons"</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#      and "A"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Value: the sum of all 64 * 9 distances of the amino acids encoded by a codon</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#        and all its neighbours</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Conditions: - the function aaSim() must exist in the work space, it returns </span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#               a single number for a pair of input amino acids.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#             - the function neighs() must exist in the work space, it returns</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#               the nine single-change neighbours for an input codon</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  sumDist <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>) {</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    codon1 <span class="ot">&lt;-</span> GC[i, <span class="st">"Codon"</span>]                <span class="co"># choose the i-th codon</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    neighbours <span class="ot">&lt;-</span> <span class="fu">neighs</span>(codon1)            <span class="co"># create its 9 neighbours</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>) {</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      codon2 <span class="ot">&lt;-</span> neighbours[j]               <span class="co"># choose the j-th neighbour</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      aa1 <span class="ot">&lt;-</span> GC[codon1, <span class="st">"A"</span>]                <span class="co"># translate the first codon</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>      aa2 <span class="ot">&lt;-</span> GC[codon2, <span class="st">"A"</span>]                <span class="co"># translate the second codon</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>      sumDist <span class="ot">&lt;-</span> sumDist <span class="sc">+</span> <span class="fu">aaSim</span>(aa1, aa2)  <span class="co"># compute the distance and sum</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(sumDist)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC_looped</span>(SGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>This number is our rock-solid benchmark. No matter in what order we compute the pair distances, if we evaluate the nine neighbours of all 64 codons, we must get that number.</p>
+<p>We could use this code as-is for our evaluation. Running 1,000 evaluations takes about 7.8 seconds on my computer. That’s absolutely sufficient for evaluating the SGC once. It’s a bit tedious for evaluating 10,000 or even 100,000 alternatives. But it is too slow if we are aiming to do optimization runs. However we can speed this up considerably.</p>
+<p>Note: the remainder of this section deals with code speedup. Usually AI code is already written with efficiency in mind. But you should still know about the general strategies.</p>
+</section>
+<section id="speedup-by-hoisting" class="level3" data-number="1.1.5">
+<h3 data-number="1.1.5" class="anchored" data-anchor-id="speedup-by-hoisting"><span class="header-section-number">1.1.5</span> Speedup by Hoisting</h3>
+<p>One strategy we can use is called <em>hoisting</em>. We translate <code>aa1</code> and <code>aa2</code> next to each other in the “inner” loop. But <code>aa1</code> never changes there, we translate it 9 times in vain. Of the 18 translations we do for each of the 64 codons, only 10 are necessary. The change is trivial: we just raise <code>aa1 &lt;- GC[codon1, "A"]</code> out of the inner loop to the outer loop. This is called <em>hoisting</em>. <strong>Inside a loop, compute only those values that depend on the loop index.</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>evalGC_hoisted <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># evaluate a Genetic Code</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  sumDist <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>) {</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    codon1 <span class="ot">&lt;-</span> GC[i, <span class="st">"Codon"</span>] </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    aa1 <span class="ot">&lt;-</span> GC[codon1, <span class="st">"A"</span>]    <span class="co"># &lt;&lt;&lt; this line was "hoisted" from the inner loop</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    neighbours <span class="ot">&lt;-</span> <span class="fu">neighs</span>(codon1)            </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>) {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      codon2 <span class="ot">&lt;-</span> neighbours[j]               </span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>      aa2 <span class="ot">&lt;-</span> GC[codon2, <span class="st">"A"</span>]                <span class="co"># translate the second codon</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      sumDist <span class="ot">&lt;-</span> sumDist <span class="sc">+</span> <span class="fu">aaSim</span>(aa1, aa2)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(sumDist)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC_hoisted</span>(SGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>On my computer, this brings down the computation time for 1,000 runs from 7.8 seconds to 5.1 seconds - that is <strong>one third less</strong> time, which is pretty good for such a minimal change.</p>
+</section>
+<section id="speedup-by-precomputation" class="level3" data-number="1.1.6">
+<h3 data-number="1.1.6" class="anchored" data-anchor-id="speedup-by-precomputation"><span class="header-section-number">1.1.6</span> Speedup by Precomputation</h3>
+<p>Another strategy we can use is precomputation. We don’t have to create our list of neighbours every time we evaluate a new code, because we always have the same nine neighbours for a codon. Only the translation changes, not the codons themselves. So we can create a matrix of neighbours once, and then use it for all future evaluations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a matrix of 64 * 10 empty strings. </span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>allNeigh <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">character</span>(<span class="dv">64</span> <span class="sc">*</span> <span class="dv">10</span>), <span class="at">nrow =</span> <span class="dv">64</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fill the matrix with each codon in column 1 and its its </span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 9 neighbours in columns 2:10 </span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>) {</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  codon <span class="ot">&lt;-</span> SGC[i, <span class="st">"Codon"</span>]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  allNeigh[i, <span class="dv">1</span>] <span class="ot">&lt;-</span> codon</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  allNeigh[i, <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="fu">neighs</span>(codon)  <span class="co"># write the neighbours into the matrix</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>evalGC_precomputed <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># evaluate a Genetic Code</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  sumDist <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>) {</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    codon1 <span class="ot">&lt;-</span> allNeigh[i, <span class="dv">1</span>] </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    aa1 <span class="ot">&lt;-</span> GC[codon1, <span class="st">"A"</span>]                  </span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>      codon2 <span class="ot">&lt;-</span> allNeigh[i, j]              <span class="co"># fetch the second codon from GC</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>      aa2 <span class="ot">&lt;-</span> GC[codon2, <span class="st">"A"</span>]                <span class="co"># translate the second codon</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>      sumDist <span class="ot">&lt;-</span> sumDist <span class="sc">+</span> <span class="fu">aaSim</span>(aa1, aa2)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(sumDist)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC_precomputed</span>(SGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>This time the speedup is not so dramatic, we go from 5.1 to 4.7 seconds per 1,000 evaluations which is about 8% faster than before.</p>
+</section>
+<section id="speedup-by-vectorization" class="level3" data-number="1.1.7">
+<h3 data-number="1.1.7" class="anchored" data-anchor-id="speedup-by-vectorization"><span class="header-section-number">1.1.7</span> Speedup by Vectorization</h3>
+<p>Many of R’s functions are “vectorized”, that means we don’t need to call them with single values, but we can call them with whole vectors of values at once. This does not change the number of elementary operations, but it allows to perform them in the speedy internals of the programming language, with much less overhead. And that often results in remarkable speedup. I have written the function <code>aaSim()</code> to take advantage of this code-pattern. Consider:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(<span class="st">"G"</span>, <span class="st">"W"</span>)   <span class="co"># Three separate calls to aaSim() with single valued inputs </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 35.95717</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(<span class="st">"V"</span>, <span class="st">"S"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 21.32164</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(<span class="st">"H"</span>, <span class="st">"K"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20.07675</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>vA1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"G"</span>, <span class="st">"V"</span>, <span class="st">"H"</span>) <span class="co"># Concate the inputs into two vectors</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>vA2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"W"</span>, <span class="st">"S"</span>, <span class="st">"K"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(vA1, vA2)   <span class="co"># One call with the two vectors returns the same results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 35.95717 21.32164 20.07675</code></pre>
+</div>
+</div>
+<p>To implement this, we create two vectors. The first holds our first codon, nine times each. The second holds our nine neighbours. We can do this speedily using the <code>rep()</code> function, or slowly but clearly, in a loop. It’s really the same. The loop is easier to understand, but if your AI chooses to do this, it will almost certainly use the <code>rep()</code> function or something similar …</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>vCod <span class="ot">&lt;-</span> <span class="fu">rep</span>(allNeigh[<span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>, <span class="dv">1</span>], <span class="dv">1</span>, <span class="at">each =</span> <span class="dv">9</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>vNei <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(allNeigh[<span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>, <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>]))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>vCod[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>]  <span class="co"># limiting to the first 18 elements, just for brevity ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "AAA" "AAA" "AAA" "AAA" "AAA" "AAA" "AAA" "AAA" "AAA" "AAC" "AAC" "AAC"
+[13] "AAC" "AAC" "AAC" "AAC" "AAC" "AAC"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>vNei[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "CAA" "GAA" "TAA" "ACA" "AGA" "ATA" "AAC" "AAG" "AAT" "CAC" "GAC" "TAC"
+[13] "ACC" "AGC" "ATC" "AAA" "AAG" "AAT"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can use these vectors directly to translate. Remember that our rownames</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># are the same as the codons, so we can use the codon vector to access the</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># translation:</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>SGC[vCod[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>], <span class="st">"A"</span>]  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "K" "K" "K" "K" "K" "K" "K" "K" "K" "N" "N" "N" "N" "N" "N" "N" "N" "N"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>SGC[vNei[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>], <span class="st">"A"</span>]  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Q" "E" "*" "T" "R" "I" "N" "K" "N" "H" "D" "Y" "T" "S" "I" "K" "K" "N"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And we can use the vectors directly to look up the distances:</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">aaSim</span>(SGC[vCod[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>], <span class="st">"A"</span>], SGC[vNei[<span class="dv">1</span><span class="sc">:</span><span class="dv">18</span>], <span class="st">"A"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 12.38127 15.01799 53.93576 20.60967 16.47191 34.22776 17.42096  0.00000
+ [9] 17.42096 14.91353 11.93885 22.55022 13.26116 10.77641 28.61601 17.42096
+[17] 17.42096  0.00000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the zeros that appear for each of the identities, and note that four of</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># these values are the same (N, K) pairs and have the same result.</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># In fact, with this we don't need to loop at all anymore: a single expression</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># will do it all!</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">aaSim</span>(SGC[vCod, <span class="st">"A"</span>], SGC[vNei, <span class="st">"A"</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>Mind you - we are doing exactly the same computations, but much of it now happens “under the hood”, hopefully with a speedup.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The entire evluation is now done in a single expression</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>evalGC_vectorized <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(<span class="fu">aaSim</span>(GC[vCod, <span class="st">"A"</span>], GC[vNei, <span class="st">"A"</span>])))</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC_vectorized</span>(SGC) <span class="co"># has to give the same result</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>This time the speedup is dramatic: 1,000 evaluations now run in 0.2 seconds, i.e.&nbsp;they take only 5 % of the time they took previously, a 20-fold speedup, and a 33-fold speedup over our looped version.</p>
+</section>
+<section id="speedup-by-symmetry" class="level3" data-number="1.1.8">
+<h3 data-number="1.1.8" class="anchored" data-anchor-id="speedup-by-symmetry"><span class="header-section-number">1.1.8</span> Speedup by Symmetry</h3>
+<p>There is one more type of speedup we can consider: symmetry. Each codon has nine neighbours, but each of the nine neighbours has the codon itself as its neighbour! And since <code>aaSim(X, Y)</code> is the same as <code>aaSim(Y, X)</code> we really only have to compute each unique relationship once, and then multiply the result by two. Let’s see how much that gains us.</p>
+<p>First, let’s see how many unique codon pairs we actually have: we make a copy of our neighbor vectors, and then we rearrange them in lexical order. Since, lexically speaking, AAA &lt; TTT we can swap the pair (TTT, AAA) to (AAA, TTT), and recognize the two identical pairs (AAA, TTT - original), and (AAA, TTT - swapped)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>vCod_u <span class="ot">&lt;-</span> vCod                 <span class="co"># Make a copy</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>vNei_u <span class="ot">&lt;-</span> vNei</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(vCod_u)) {</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (vCod_u[i] <span class="sc">&gt;</span> vNei_u[i]) { <span class="co"># If lexically ordered from large to small ...</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    tmp <span class="ot">&lt;-</span> vCod_u[i]           <span class="co"># ... swap the two ...</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    vCod_u[i] <span class="ot">&lt;-</span> vNei_u[i]</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    vNei_u[i] <span class="ot">&lt;-</span> tmp           <span class="co"># ... and they're order small to large instead.</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a single vector of "keys", to identify duplicates. This just pastes</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># together the two codons, with a colon between them.</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>vKeys <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s:%s"</span>, vCod_u, vNei_u)</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(vKeys)) <span class="co"># Which is indeed half of the 576 originals</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 288</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We remove the duplicated pairs from the codon vectors, and confirm that this</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># allows us to get the same result when we evaluate the SGC:</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>sel <span class="ot">&lt;-</span> <span class="sc">!</span> <span class="fu">duplicated</span>(vKeys)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>vCod_u <span class="ot">&lt;-</span> vCod_u[sel]</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>vNei_u <span class="ot">&lt;-</span> vNei_u[sel]</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>evalGC_symmetrized <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="dv">2</span><span class="sc">*</span> <span class="fu">sum</span>(<span class="fu">aaSim</span>(GC[vCod_u, <span class="st">"A"</span>], GC[vNei_u, <span class="st">"A"</span>])))</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC_symmetrized</span>(SGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>Half the look up, same result. Is it faster? Yes, we are going from 0.177 seconds per 1,000 evaluations to 0.157 seconds, a further speedup of a bit over 10 %, or 50-times faster than the original.</p>
+</section>
+<section id="benchmarking" class="level3" data-number="1.1.9">
+<h3 data-number="1.1.9" class="anchored" data-anchor-id="benchmarking"><span class="header-section-number">1.1.9</span> Benchmarking</h3>
+<p>Let’s properly “benchmark” the performance and compare the results.</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain to me - at a novice level - what it means to benchmark functions for comparison, and how this is different from "profiling"?
+</pre>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>myBenchmarks <span class="ot">&lt;-</span> microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evalGC_looped</span>(SGC),</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evalGC_hoisted</span>(SGC),</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evalGC_precomputed</span>(SGC),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evalGC_vectorized</span>(SGC),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evalGC_symmetrized</span>(SGC),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">1000</span>L,  <span class="co"># Number of repetitions</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">"ms"</span>     <span class="co"># Results summarized in microseconds</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="co"># use kableExtra::kable() for a well-formatted table of results:</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>kableExtra<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">summary</span>(myBenchmarks), </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">2</span>, </span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">caption =</span> <span class="st">"Benchmark summary: execution times in milliseconds (ms). Columns show min, lower quartile (lq), mean, median, upper quartile (uq), and max times across neval function calls."</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>),</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"left"</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">column_spec</span>(<span class="dv">1</span>, <span class="at">extra_css =</span> <span class="st">"font-family: monospace; padding-right: 20px;"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">row_spec</span>(<span class="dv">0</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">extra_css =</span> <span class="st">"border-bottom: 2px solid black;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
+<caption>Benchmark summary: execution times in milliseconds (ms). Columns show min, lower quartile (lq), mean, median, upper quartile (uq), and max times across neval function calls.</caption>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; border-bottom: 2px solid black;">expr</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">min</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">lq</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">mean</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">median</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">uq</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">max</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; border-bottom: 2px solid black;">neval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-family: monospace; padding-right: 20px;">evalGC_looped(SGC)</td>
+<td style="text-align: right;">6.68</td>
+<td style="text-align: right;">6.96</td>
+<td style="text-align: right;">7.85</td>
+<td style="text-align: right;">7.09</td>
+<td style="text-align: right;">7.29</td>
+<td style="text-align: right;">128.60</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-family: monospace; padding-right: 20px;">evalGC_hoisted(SGC)</td>
+<td style="text-align: right;">4.24</td>
+<td style="text-align: right;">4.42</td>
+<td style="text-align: right;">4.95</td>
+<td style="text-align: right;">4.50</td>
+<td style="text-align: right;">4.64</td>
+<td style="text-align: right;">79.79</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-family: monospace; padding-right: 20px;">evalGC_precomputed(SGC)</td>
+<td style="text-align: right;">3.91</td>
+<td style="text-align: right;">4.08</td>
+<td style="text-align: right;">4.47</td>
+<td style="text-align: right;">4.16</td>
+<td style="text-align: right;">4.27</td>
+<td style="text-align: right;">34.82</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-family: monospace; padding-right: 20px;">evalGC_vectorized(SGC)</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">2.71</td>
+<td style="text-align: right;">1000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-family: monospace; padding-right: 20px;">evalGC_symmetrized(SGC)</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">1000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># display the distributions of times as a "violin plot"</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">autoplot</span>(myBenchmarks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note that the time-axis uses a logarithmic scale. The important results are the <em>median</em> times, because some results are affected by language-internal additional tasks that happen to come up from time to time. The detailed results confirms that our fastest version is almost a hundred times faster than our initial, deliberate, step-by-step code. There are trade-offs however: the deliberate step-by-step version may be easier to understand, easier to validate with confidence, and easier to debug, since the steps can be individually verified. In fact, I had to give up on ChatGPT-5’s attempts to get his vectorized version to work correctly, and write it by hand instead. It’s easy to lose track of what exactly needs to happen with each vector and table, and the results may be <strong>plausible</strong>, but still <strong>incorrect</strong> - which is the worst possible outcome! That’s why the first benchmark number is so crucial for this little project.</p>
+<p>There is one large field of speedup developments we have not mentioned: speedup by better algorithm. For example, instead of computing all those codes explicitly, perhaps we could come up with a way to predict their statistical properties from first principles. That would be an algorithmic speedup.</p>
+</section>
+</section>
+</section>
+<section id="wrapping-up-the-evaluation-function" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Wrapping up the evaluation function</h1>
+<p>For robustness and portability, I wrap up the evaluation function as a “closure”. This way I can guarantee that accidental changes to the codon table or the neighbour vectors in my global workspace do not contaminate the function.</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain to me - at a novice level - what a closure is in R, how to create one with a factory pattern, why this is useful, and how this compares to python code patterns?
+</pre>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This is a bit technical code, that reproduces what we developed more</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Explecitly above ...</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>evalGCfactory <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># precompute the codon and neigbor vectors</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a matrix of 64 * 10 empty strings. </span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  vN <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">character</span>(<span class="dv">64</span> <span class="sc">*</span> <span class="dv">10</span>), <span class="at">nrow =</span> <span class="dv">64</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>) {</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    codon <span class="ot">&lt;-</span> SGC[i, <span class="st">"Codon"</span>]</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    vN[i, <span class="dv">1</span>] <span class="ot">&lt;-</span> codon</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    vN[i, <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="fu">neighs</span>(codon)  <span class="co"># write the neighbours into the matrix</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  vC <span class="ot">&lt;-</span> <span class="fu">rep</span>(vN[<span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>, <span class="dv">1</span>], <span class="dv">1</span>, <span class="at">each =</span> <span class="dv">9</span>)</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  vN <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(vN[<span class="dv">1</span><span class="sc">:</span><span class="dv">64</span>, <span class="dv">2</span><span class="sc">:</span><span class="dv">10</span>]))</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(vC)) {  <span class="co"># Order pairs lexically ...</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (vC[i] <span class="sc">&gt;</span> vN[i]) { </span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>      tmp <span class="ot">&lt;-</span> vC[i]          </span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>      vC[i] <span class="ot">&lt;-</span> vN[i]</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>      vN[i] <span class="ot">&lt;-</span> tmp</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>  vK <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">"%s:%s"</span>, vC, vN)</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>  sel <span class="ot">&lt;-</span> <span class="sc">!</span> <span class="fu">duplicated</span>(vK)    <span class="co"># Identify duplicate pairs ...</span></span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>  vC <span class="ot">&lt;-</span> vC[sel]              <span class="co"># and remove</span></span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>  vN <span class="ot">&lt;-</span> vN[sel]</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>  myF <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>    a1 <span class="ot">&lt;-</span> GC[vC, <span class="st">"A"</span>]</span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>    a2 <span class="ot">&lt;-</span> GC[vN, <span class="st">"A"</span>]</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">sum</span>(<span class="fu">aaSim</span>(a1, a2) <span class="sc">*</span> <span class="dv">2</span>))</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(myF)</span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a>evalGC <span class="ot">&lt;-</span> <span class="fu">evalGCfactory</span>()</span>
+<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(evalGCfactory)</span>
+<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-38"><a href="#cb42-38" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC</span>(SGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9856.116</code></pre>
+</div>
+</div>
+<p>Execution times for this closure are within 0.3% of our previous fastest version.</p>
+<p><strong>Why this matters.</strong> If we run large computational experiments, we need fast code. Our AI coding assistants will normally try to write efficient code. But as you saw above, doing that correctly takes a good <strong>global</strong> understanding of your data, a detailed understanding of your functions, and careful bookkeeping to weave this together correctly. This is hard for a transformer-based language model. You’ll need to encourage the AI to write some very simple benchmarks first, with verifiable intermediate steps, to be able to catch and fix errors that lead to results that look plausible, but are wrong. Those are the worst.</p>
+</section>
+<section id="random-codes" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Random Codes</h1>
+<p>The next big task is to build a randomizer function - or several such functions, if we want to evaluate how sensitive our results are to the precise mode of randomization.</p>
+<p>Each way of randomizing carries with it a different biological interpretation. Ultimately, we would like to test randomizations that respect the underlying biophysics, but are not tied to the existing stucture of the SGC. The distinction may not be easy to make however. Take for example “wobble bases” - are those the <strong>result</strong> of limitations in how precisely tRNA anticodons can pair with the mRNA codons, that influenced how the code evolved in its early days? Or did the structure of the code arise for different reasons, and then <strong>cause</strong> a relaxed requirement for third-nucleotide pairing?</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain the "wobble base" hypothesis to me? Why has it been proposed as being important? Would such wobble be the result of a certain structure of the genetic code? Or did it cause that structure?
+</pre>
+</div>
+<section id="shuffling-the-sgc-around" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="shuffling-the-sgc-around"><span class="header-section-number">3.1</span> Shuffling the SGC around</h2>
+<p>A simple but conceptually “clean” randomizer can be implemented by shuffling the mapping of codons to amino acids. This shuffling permutation is often used when we want to remove the effect of any ordering of elements, but leave the elements’ frequencies unchanged. The R function <code>sample()</code> is the workhorse of discrete random choices in R.</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain the R function sample() to me at a novice level? Like: what it is useful for, how is it called, what are its parameters and such?
+</pre>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>shuffleGC <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># shuffle the amino acid column (column "A") of a genetic code </span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  GC[ , <span class="st">"A"</span>] <span class="ot">&lt;-</span> <span class="fu">sample</span>(GC[ , <span class="st">"A"</span>])</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(GC)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">table</span>(<span class="fu">shuffleGC</span>(SGC)<span class="sc">$</span>A),<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+L R S A G P T V * I C D E F H K N Q Y M W 
+6 6 6 4 4 4 4 4 3 3 2 2 2 2 2 2 2 2 2 1 1 </code></pre>
+</div>
+</div>
+<p>Crucially, if we merely shuffle the amino acids, all their frequencies stay the same, i.e we still have six leucine, three stop codons, 1 methionine etc.</p>
+</section>
+<section id="an-almost-fully-random-code" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="an-almost-fully-random-code"><span class="header-section-number">3.2</span> An (almost) fully random code</h2>
+<p>We can compare this to almost fully random codes: we encode all 20 amino acids (plus stop) exactly once, then randomly assign letters to the remaining 43 slots, and then shuffle.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>randomGC <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># a fully random genetic code, with 20 amino acids and a stop codon</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  alphabet <span class="ot">&lt;-</span> <span class="fu">attr</span>(aaSim, <span class="st">"alphabet"</span>)  <span class="co"># use the alphabet that is packaged with</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                                       <span class="co"># the aaSim() function as an attribute</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">c</span>(alphabet, <span class="fu">sample</span>(alphabet, <span class="dv">43</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  GC[ , <span class="st">"A"</span>] <span class="ot">&lt;-</span> <span class="fu">sample</span>(x)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(GC)</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">table</span>(<span class="fu">randomGC</span>(SGC)<span class="sc">$</span>A),<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+E K N W D L T A C F H R V G M P * I Q S Y 
+7 6 5 5 4 4 4 3 3 3 3 3 3 2 2 2 1 1 1 1 1 </code></pre>
+</div>
+</div>
+</section>
+<section id="a-maximum-entropy-code" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="a-maximum-entropy-code"><span class="header-section-number">3.3</span> A Maximum Entropy Code</h2>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Can you explain to someone with little background in mathematics what Shannon's information theory is about, and how "entropy" and "information" is understood there? What should I do to distribute an alphabet of 20 amino acids plus "*" stop, to 64 codons in a way that maximizes entropy, and what would the biological implications of such a code be?
+</pre>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>maxEntGC <span class="ot">&lt;-</span> <span class="cf">function</span>(GC) {</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># a genetic code that has maximal Shannon entropy: 3 * 21 states + "T"</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  alphabet <span class="ot">&lt;-</span> <span class="fu">attr</span>(aaSim, <span class="st">"alphabet"</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(alphabet, <span class="dv">3</span>), <span class="st">"T"</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  GC[ , <span class="st">"A"</span>] <span class="ot">&lt;-</span> <span class="fu">sample</span>(x)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(GC)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">table</span>(<span class="fu">maxEntGC</span>(SGC)<span class="sc">$</span>A),<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+T * A C D E F G H I K L M N P Q R S V W Y 
+4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </code></pre>
+</div>
+</div>
+<p>Nb. Shannon entropy is easy to compute: The general formula is</p>
+<p><span class="math display">\[
+H = -\sum_{i=1}^{n} p_i \log_2 p_i
+\]</span></p>
+<p>where <span class="math inline">\(p_i\)</span> is the true probability of observing symbol <span class="math inline">\(i\)</span>.<br>
+In practice, when working with finite-length samples (like our 64 codons), we estimate <span class="math inline">\(p_i\)</span> using relative frequencies <span class="math inline">\(f_i\)</span>, so the empirical entropy <span class="math inline">\(\hat{H}\)</span> becomes:</p>
+<p><span class="math display">\[
+\hat{H} = -\sum_{i=1}^{n} f_i \log_2 f_i
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>H <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  freq <span class="ot">&lt;-</span> <span class="fu">table</span>(x) <span class="sc">/</span> <span class="fu">length</span>(x)  <span class="co"># Relative frequencies</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span><span class="fu">sum</span>(freq <span class="sc">*</span> <span class="fu">log2</span>(freq)))       <span class="co"># Shannon entropy in bits</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="fu">H</span>(<span class="fu">c</span>(<span class="fu">attr</span>(aaSim, <span class="st">"alphabet"</span>), <span class="fu">rep</span>(<span class="st">"*"</span>, <span class="dv">43</span>))) <span class="co"># minimum possible</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.246641</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">H</span>(SGC<span class="sc">$</span>A)                                    <span class="co"># SGC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.218139</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">H</span>(<span class="fu">randomGC</span>(SGC)<span class="sc">$</span>A)                          <span class="co"># Fully random</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.211287</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">H</span>(<span class="fu">maxEntGC</span>(SGC)<span class="sc">$</span>A)                          <span class="co"># Maximum entropy</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.389098</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="random-code-quality-distributions" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Random Code Quality Distributions</h1>
+<p>With all these preliminary considerations out of the way, we can run our actual experiments:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>qMaxE <span class="ot">&lt;-</span> <span class="fu">numeric</span>(N)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>qShuf <span class="ot">&lt;-</span> <span class="fu">numeric</span>(N)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>qRand <span class="ot">&lt;-</span> <span class="fu">numeric</span>(N)</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>tStart <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) {</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(i); qMaxE[i] <span class="ot">&lt;-</span> <span class="fu">evalGC</span>(<span class="fu">maxEntGC</span>(SGC))</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(i); qShuf[i] <span class="ot">&lt;-</span> <span class="fu">evalGC</span>(<span class="fu">shuffleGC</span>(SGC))</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(i); qRand[i] <span class="ot">&lt;-</span> <span class="fu">evalGC</span>(<span class="fu">randomGC</span>(SGC))</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>tEnd <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="fu">difftime</span>(tEnd, tStart)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time difference of 3.000217 secs</code></pre>
+</div>
+</div>
+<p>This takes just a few seconds.</p>
+<p>Let’s compare the distributions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># summaries</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(qMaxE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  12709   13628   13791   13785   13951   14557 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(qShuf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  12476   13466   13640   13636   13813   14538 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(qRand)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  11456   13137   13689   13734   14279   17482 </code></pre>
+</div>
+</div>
+<p>Distributions are often compared with “boxplots” - they are a sort of graphical shorthand for the <code>summary()</code> function:</p>
+<div class="copyBox" label="AI Prompt">
+  <button class="copyButton" type="button" aria-label="Copy" onclick="copyContent(this)">
+  <i class="bi bi-clipboard"></i>
+</button>
+
+  <pre>Could you be so kind and explain boxplots in R, and how they are different or similar to the summary() function?
+</pre>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create boxplot</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  colM <span class="ot">&lt;-</span> <span class="st">"#7700EE66"</span></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  colS <span class="ot">&lt;-</span> <span class="st">"#BB00AA66"</span></span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  colR <span class="ot">&lt;-</span> <span class="st">"#FF006666"</span></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(<span class="fu">cbind</span>(qMaxE, qShuf, qRand),</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">names =</span> <span class="fu">c</span>(<span class="st">"maxEntGC()"</span>, <span class="st">"shuffleGC()"</span>, <span class="st">"randomGC()"</span>),</span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(colM, colS, colR),</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Evaluation of Random Genetic Codes"</span>,</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Randomization Function"</span>,</span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Quality Score"</span>)</span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"maxEntGC()"</span>, <span class="st">"shuffleGC()"</span>, <span class="st">"randomGC()"</span>),</span>
+<span id="cb66-15"><a href="#cb66-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(colM, colS, colR),</span>
+<span id="cb66-16"><a href="#cb66-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Function"</span>)</span>
+<span id="cb66-17"><a href="#cb66-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>But the most informative plot is usually a histogram, typically with overlays …</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Histograms</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>xi <span class="ot">&lt;-</span> <span class="dv">11000</span>; xa <span class="ot">&lt;-</span> <span class="dv">17000</span></span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>brk <span class="ot">&lt;-</span> <span class="fu">seq</span>(xi, xa, <span class="at">length=</span><span class="dv">101</span>)</span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hist</span>(qMaxE[qMaxE <span class="sc">&gt;</span> xi <span class="sc">&amp;</span> qMaxE <span class="sc">&lt;</span> xa],</span>
+<span id="cb67-10"><a href="#cb67-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">breaks =</span> brk,</span>
+<span id="cb67-11"><a href="#cb67-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> colM,</span>
+<span id="cb67-12"><a href="#cb67-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="st">"Genetic Code Randomization"</span>,</span>
+<span id="cb67-13"><a href="#cb67-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Quality Score"</span>,</span>
+<span id="cb67-14"><a href="#cb67-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb67-15"><a href="#cb67-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">9000</span>, <span class="dv">17000</span>),</span>
+<span id="cb67-16"><a href="#cb67-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">xaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb67-17"><a href="#cb67-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">1</span>, <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">9000</span>, <span class="dv">17000</span>, <span class="at">by =</span> <span class="dv">2000</span>))  <span class="co"># custom ticks</span></span>
+<span id="cb67-18"><a href="#cb67-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-19"><a href="#cb67-19" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(qShuf[qShuf <span class="sc">&gt;</span> xi <span class="sc">&amp;</span> qShuf <span class="sc">&lt;</span> xa],</span>
+<span id="cb67-20"><a href="#cb67-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> brk,</span>
+<span id="cb67-21"><a href="#cb67-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> colS,</span>
+<span id="cb67-22"><a href="#cb67-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb67-23"><a href="#cb67-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-24"><a href="#cb67-24" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(qRand[qRand <span class="sc">&gt;</span> xi <span class="sc">&amp;</span> qRand <span class="sc">&lt;</span> xa],</span>
+<span id="cb67-25"><a href="#cb67-25" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> brk,</span>
+<span id="cb67-26"><a href="#cb67-26" aria-hidden="true" tabindex="-1"></a>               <span class="at">col =</span> colR,</span>
+<span id="cb67-27"><a href="#cb67-27" aria-hidden="true" tabindex="-1"></a>               <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb67-28"><a href="#cb67-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-29"><a href="#cb67-29" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>,</span>
+<span id="cb67-30"><a href="#cb67-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"maxEntGC()"</span>, <span class="st">"shuffleGC()"</span>, <span class="st">"randomGC()"</span>),</span>
+<span id="cb67-31"><a href="#cb67-31" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(colM, colS, colR),</span>
+<span id="cb67-32"><a href="#cb67-32" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Function"</span>)</span>
+<span id="cb67-33"><a href="#cb67-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-34"><a href="#cb67-34" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">evalGC</span>(SGC), <span class="at">col =</span> <span class="st">"#00AA99"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb67-35"><a href="#cb67-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-36"><a href="#cb67-36" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"SGC"</span>, <span class="at">side =</span> <span class="dv">1</span>, <span class="at">at =</span> <span class="fu">evalGC</span>(SGC), <span class="at">line =</span> <span class="fl">0.5</span>)</span>
+<span id="cb67-37"><a href="#cb67-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-38"><a href="#cb67-38" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>None of the three distributions come close to the SGC. The closest is the fully random distribution … because of it’s higher spread overall. Does this even create “biological” distributions? Let’s look at the best result.</p>
+<p>Can we recreate the “best” random distribution?</p>
+<section id="small-digression-on-pseudo-randomness" class="level3" data-number="4.0.1">
+<h3 data-number="4.0.1" class="anchored" data-anchor-id="small-digression-on-pseudo-randomness"><span class="header-section-number">4.0.1</span> Small digression on (pseudo) randomness</h3>
+<p>You might have noticed the small expression <code>set.seed(i)</code> that I used when computing the random scores. Or maybe you didn’t - it’s been a long document to get here … Anyway: R (or python) does not and cannot create random numbers. That’s because it runs on a deterministic computer. What we do instead is create <em>pseudo random numbers</em>: we run an algorithm that produces sequences of numbers that statistical tests cannot distinguish from random sequences. But the cool thing is, if we know what state the RNG (Random Number Generator) was in when it produced the sequence, we can create the <strong>exact same sequence again</strong>. And the function <code>set.seed()</code> allows us to define the state of the RNG. Here’s an example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">57</span>)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">49</span>, <span class="dv">6</span>))  <span class="co"># We know that the chance of guessing 6 of 49 numbers ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11 17 19 36 40 46</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>                       <span class="co"># ... is regrettably quite small.</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">49</span>, <span class="dv">6</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  6 25 31 35 41 48</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">49</span>, <span class="dv">6</span>))  <span class="co"># They are all so different!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  8 14 15 16 27 32</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">57</span>)           <span class="co"># Except ...</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">49</span>, <span class="dv">6</span>))  <span class="co"># ... ??? didn't we just see this before ???</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11 17 19 36 40 46</code></pre>
+</div>
+</div>
+<p>So here’s the thing: if I <strong>know</strong> the seed that was used to initialize the RNG, I can recreate any random sequence that it produced from there on out. And in the case of our random genetic codes, I <strong>know</strong> the seed, … because I set it to be the same as the loop index! So here’s how I can use that.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(qRand)                   <span class="co"># Best quality score of a random genetic code.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11455.57</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>(iBest <span class="ot">&lt;-</span> <span class="fu">which.min</span>(qRand))  <span class="co"># What is the index where it was created?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9734</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(iBest)              <span class="co"># Set the RNG seed to that number ...</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>bestRandGC <span class="ot">&lt;-</span> <span class="fu">randomGC</span>(SGC)  <span class="co"># ... and create the same genetic code again.</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGC</span>(bestRandGC)           <span class="co"># Verify that it gives us the same score, even</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11455.57</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>                             <span class="co"># though it's creation is totally "random". Magic.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>… and what does this code look like?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">GCtable</span>(bestRandGC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TTT V  TCT H  TAT T  TGT A  
+TTC T  TCC T  TAC G  TGC V  
+TTA L  TCA T  TAA V  TGA I  
+TTG S  TCG N  TAG Q  TGG P  
+
+CTT A  CCT M  CAT D  CGT I  
+CTC T  CCC A  CAC E  CGC Y  
+CTA A  CCA V  CAA L  CGA M  
+CTG C  CCG P  CAG P  CGG T  
+
+ATT K  ACT M  AAT E  AGT K  
+ATC S  ACC N  AAC K  AGC R  
+ATA D  ACA D  AAA S  AGA W  
+ATG N  ACG A  AAG Q  AGG K  
+
+GTT *  GCT T  GAT Y  GGT T  
+GTC C  GCC K  GAC C  GGC M  
+GTA M  GCA W  GAA S  GGA C  
+GTG G  GCG H  GAG F  GGG N  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">table</span>(bestRandGC<span class="sc">$</span>A), <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+T A K M C N S V D P E G H I L Q W Y * F R 
+8 5 5 5 4 4 4 4 3 3 2 2 2 2 2 2 2 2 1 1 1 </code></pre>
+</div>
+</div>
+<p>We find a large abundance of T, which is on average the least dissimilar amino acid. The characteristically different amino acids, like I and R are much reduced in frequency, from 6 to 1 and 2. They have been replaced by more “bland” choices: apparently K and M appear suitable. And there is only a single stop codon.</p>
+<p>Let’s stay with our shuffled codes instead. And ask: can we estimate the probability of getting somethig as good as the SGC by random chance?</p>
+</section>
+</section>
+<section id="the-improbable-sgc" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> The Improbable SGC</h1>
+<p>Let’s get a larger sample of random shuffled codes for a smoother histogram. Our code is fast and that’s not hard to do:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>tStart <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fl">1e5</span>              <span class="co"># one hundred thousand random codes to be evaluated.</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>qShuf <span class="ot">&lt;-</span> <span class="fu">numeric</span>(N)</span>
+<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) {</span>
+<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(i)</span>
+<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>  qShuf[i] <span class="ot">&lt;-</span> <span class="fu">evalGC</span>(<span class="fu">shuffleGC</span>(SGC))</span>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>tEnd <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a><span class="fu">difftime</span>(tEnd, tStart) <span class="co"># Time difference of around ten seconds or so</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time difference of 9.837614 secs</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(qShuf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  12461   13475   13648   13639   13813   14641 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(qShuf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 250.9507</code></pre>
+</div>
+</div>
+<p>We can plot a histogram (again), and since this looks pretty much normally distributed, we can overlay the histogram with an actual normal distribution curve, with the same mean and standard deviation as our results …</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>brk <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(qShuf), <span class="fu">max</span>(qShuf), <span class="at">len=</span><span class="dv">101</span>)   <span class="co"># histogram bin limits</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>colS <span class="ot">&lt;-</span> <span class="st">"#BB00AA66"</span></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>  myH <span class="ot">&lt;-</span> <span class="fu">hist</span>(qShuf, </span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">breaks =</span> brk, </span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">col =</span> colS, <span class="at">border =</span> colS,</span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">freq =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">main =</span> <span class="st">"Shuffled Genetic Codes"</span>,</span>
+<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlab =</span> <span class="st">"quality"</span>, <span class="at">ylab =</span> <span class="st">"F"</span>,</span>
+<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">9000</span>, <span class="dv">15000</span>),</span>
+<span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">xaxt =</span> <span class="st">"n"</span>)</span>
+<span id="cb93-14"><a href="#cb93-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb93-15"><a href="#cb93-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">1</span>, <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">9000</span>, <span class="dv">15000</span>, <span class="at">by =</span> <span class="dv">2000</span>))  <span class="co"># custom ticks</span></span>
+<span id="cb93-16"><a href="#cb93-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb93-17"><a href="#cb93-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(myH<span class="sc">$</span>mids, <span class="co"># using the histogram-bin midpoints as the x-values of</span></span>
+<span id="cb93-18"><a href="#cb93-18" aria-hidden="true" tabindex="-1"></a>                   <span class="co"># our curve, and computing the corrsponding y-values</span></span>
+<span id="cb93-19"><a href="#cb93-19" aria-hidden="true" tabindex="-1"></a>                   <span class="co"># with the dnorm() function:</span></span>
+<span id="cb93-20"><a href="#cb93-20" aria-hidden="true" tabindex="-1"></a>         <span class="fu">dnorm</span>(myH<span class="sc">$</span>mids, <span class="at">mean =</span> <span class="fu">mean</span>(qShuf), <span class="at">sd =</span> <span class="fu">sd</span>(qShuf)),</span>
+<span id="cb93-21"><a href="#cb93-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"#AA0000"</span>,</span>
+<span id="cb93-22"><a href="#cb93-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb93-23"><a href="#cb93-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb93-24"><a href="#cb93-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># the value for the SGC</span></span>
+<span id="cb93-25"><a href="#cb93-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> <span class="fu">evalGC</span>(SGC), <span class="at">col =</span> <span class="st">"#00AA99"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb93-26"><a href="#cb93-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb93-27"><a href="#cb93-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># label below the axis</span></span>
+<span id="cb93-28"><a href="#cb93-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtext</span>(<span class="st">"SGC"</span>, <span class="at">side =</span> <span class="dv">1</span>, <span class="at">at =</span> <span class="fu">evalGC</span>(SGC), <span class="at">line =</span> <span class="fl">0.5</span>)</span>
+<span id="cb93-29"><a href="#cb93-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb93-30"><a href="#cb93-30" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The SGC appears pretty far off. If this is indeed underlyingly a normal distribution, we can estimate how far off it is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="fu">evalGC</span>(SGC), <span class="at">mean =</span> <span class="fu">mean</span>(qShuf), <span class="at">sd =</span> <span class="fu">sd</span>(qShuf)) <span class="co"># [1] 7.028299e-53</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7.028299e-53</code></pre>
+</div>
+</div>
+<p>That number is so fantastically improbable that achieving this quality from what amounts to a series of lucky coin flips is completely out of the question. But estimating this number makes the assumption that the distribution we generated is a normal distribution. Is this really correct?</p>
+<section id="improbability-revisited." class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="improbability-revisited."><span class="header-section-number">5.1</span> Improbability revisited.</h2>
+<p>Let’s have a closer look at the histogram:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>  myH <span class="ot">&lt;-</span> <span class="fu">hist</span>(qShuf, </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">breaks =</span> brk, </span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">col =</span> colS, <span class="at">border =</span> colS,</span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">freq =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">main =</span> <span class="st">"Shuffled Genetic Codes"</span>,</span>
+<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlab =</span> <span class="st">"quality"</span>, <span class="at">ylab =</span> <span class="st">"F"</span>,</span>
+<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlim =</span> <span class="fu">c</span>(<span class="fu">min</span>(qShuf), <span class="fu">max</span>(qShuf)))</span>
+<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(myH<span class="sc">$</span>mids, <span class="co"># using the histogram-bin midpoints as the x-values of</span></span>
+<span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a>                   <span class="co"># our curve, and computing the corrsponding y-values</span></span>
+<span id="cb96-13"><a href="#cb96-13" aria-hidden="true" tabindex="-1"></a>                   <span class="co"># with the dnorm() function:</span></span>
+<span id="cb96-14"><a href="#cb96-14" aria-hidden="true" tabindex="-1"></a>         <span class="fu">dnorm</span>(myH<span class="sc">$</span>mids, <span class="at">mean =</span> <span class="fu">mean</span>(qShuf), <span class="at">sd =</span> <span class="fu">sd</span>(qShuf)),</span>
+<span id="cb96-15"><a href="#cb96-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"#000000"</span>,</span>
+<span id="cb96-16"><a href="#cb96-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb96-17"><a href="#cb96-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb96-18"><a href="#cb96-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb96-19"><a href="#cb96-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see that there is <em>just a little bit</em> of extra density over on the lft side of the curve, <em>just a little bit</em> of shift around the mean, <em>just a little bit</em> of depletion on the right side. It’s not much, but it appears systematic. If the observed values are slightly heavy-tailed on the left, that would cause us to underestimate the probability of the SGC. This kind of shift is something we would expect if the distribution at the high-end is close to a boundary that cannot be crossed - i.e.&nbsp;something if something like a worst possible code appeared near the right-hand boundary. Let’s see if we can get a better fit for such a case. We enter the realm of curve-fitting functions to data: we attempt to fit a <em>skew-normal-distribution</em> <span class="citation" data-cites="azzalini2014">(<a href="#ref-azzalini2014" role="doc-biblioref">Azzalini and Capitanio 2014, 32–33</a>)</span>.</p>
+<p><span class="math display">\[
+   f(x;\,\xi,\omega,\alpha)
+   = \frac{2}{\omega}\,
+   \phi\!\left(\frac{x-\xi}{\omega}\right)
+   \Phi\!\left(\alpha\,\frac{x-\xi}{\omega}\right),
+\]</span> where <span class="math inline">\(\phi(\cdot)\)</span> and <span class="math inline">\(\Phi(\cdot)\)</span> denote the standard normal PDF and CDF, respectively, and <span class="math inline">\(\xi \in \mathbb{R},\quad\omega &gt; 0,\quad\alpha \in \mathbb{R}.\)</span></p>
+<p>When <span class="math inline">\(\alpha = 0, f(x;\,\xi,\omega,0) = \frac{2}{\omega}\, \phi\!\left(\frac{x-\xi}{\omega}\right)= \mathcal{N}(\xi,\omega^2)\)</span> - i.e the standard normal distribution with mean <span class="math inline">\(\xi\)</span> and standard deviation <span class="math inline">\(\omega\)</span>.</p>
+<p>The skew-normal distribution is a close relative of the normal distribution, but it allows the two sides to have slightly different shapes. It is used when data are roughly symmetric yet show a small tendency for one tail to be heavier—such as biological measurements that cannot exceed a practical limit or that cluster near an optimum. Mathematically, the skew-normal adds a skewness parameter that gently tilts the normal curve to the left or right without changing its overall smoothness. This makes it ideal when the central-limit “many small causes” argument still holds, but some boundary or constraint distorts one tail.</p>
+<p>This is a good “parsimonious” choice if we don’t have a specific mechanistic model for the asymmetry; the skewness parameter is really just an empirical adjustment. But it’s just one extra parameter. Let’s see if it gives us a better fit.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>fit_sn <span class="ot">&lt;-</span> sn<span class="sc">::</span><span class="fu">selm</span>(qShuf <span class="sc">~</span> <span class="dv">1</span>)   <span class="co">#  location–scale–skew fit</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(fit_sn))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Length  Class   Mode 
+     1   selm     S4 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Overlay</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  myH <span class="ot">&lt;-</span> <span class="fu">hist</span>(qShuf, </span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">breaks =</span> brk, </span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">col =</span> colS, <span class="at">border =</span> colS,</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">freq =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">main =</span> <span class="st">"Shuffled Genetic Codes"</span>,</span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlab =</span> <span class="st">"quality"</span>, <span class="at">ylab =</span> <span class="st">"F"</span>,</span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">xlim =</span> <span class="fu">c</span>(<span class="fu">min</span>(qShuf), <span class="fu">max</span>(qShuf)))</span>
+<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(myH<span class="sc">$</span>mids, <span class="co"># normal distributiona</span></span>
+<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>         <span class="fu">dnorm</span>(myH<span class="sc">$</span>mids, <span class="at">mean =</span> <span class="fu">mean</span>(qShuf), <span class="at">sd =</span> <span class="fu">sd</span>(qShuf)),</span>
+<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="st">"#000000"</span>,</span>
+<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">"l"</span>,</span>
+<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot our fit</span></span>
+<span id="cb99-18"><a href="#cb99-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(myH<span class="sc">$</span>mids,</span>
+<span id="cb99-19"><a href="#cb99-19" aria-hidden="true" tabindex="-1"></a>         sn<span class="sc">::</span><span class="fu">dsn</span>(myH<span class="sc">$</span>mids,</span>
+<span id="cb99-20"><a href="#cb99-20" aria-hidden="true" tabindex="-1"></a>                 <span class="at">xi    =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"xi"</span>],</span>
+<span id="cb99-21"><a href="#cb99-21" aria-hidden="true" tabindex="-1"></a>                 <span class="at">omega =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"omega"</span>],</span>
+<span id="cb99-22"><a href="#cb99-22" aria-hidden="true" tabindex="-1"></a>                 <span class="at">alpha =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"alpha"</span>]),</span>
+<span id="cb99-23"><a href="#cb99-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">col =</span> <span class="st">"#0055FF"</span>,</span>
+<span id="cb99-24"><a href="#cb99-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">typ =</span> <span class="st">"l"</span>,</span>
+<span id="cb99-25"><a href="#cb99-25" aria-hidden="true" tabindex="-1"></a>             <span class="at">lwd =</span> <span class="dv">1</span>)</span>
+<span id="cb99-26"><a href="#cb99-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-27"><a href="#cb99-27" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="randomGC_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Indeed, this skewed distribution is a better fit. And this allows us to re-evaluate the p-value:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probability of the SGC "quality" given the skew-normal distribution with the</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters we just fit:</span></span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>sn<span class="sc">::</span><span class="fu">psn</span>(<span class="fu">evalGC</span>(SGC),</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">xi    =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"xi"</span>],</span>
+<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">omega =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"omega"</span>],</span>
+<span id="cb100-6"><a href="#cb100-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fu">coef</span>(fit_sn, <span class="st">"dp"</span>)[<span class="st">"alpha"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.012722e-35</code></pre>
+</div>
+</div>
+<p>… which is still astronomically small, but many, many orders of magnitude larger than the previous estimate. The bottom line here is: probability estimates that are very far in the tails of distributions can be quite misleading if one does not actually have a detailed mechanistic model. But we can certainly agree that the probability of randomly coming up with the SGC is too small to matter.</p>
+</section>
+</section>
+<section id="summing-it-up" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Summing it up</h1>
+<p>We developed fast and validated code to compute a quality score for genetic codes, and we developed some alternative methods to generate “random” codes. Comparing the quality of our random codes with the SGC tells us:</p>
+<ol type="1">
+<li>The structure of the SGC is <strong>not random</strong> under our metric of neighbouring amino acid similarity.</li>
+<li>The only alternative explanation that appears reasonable is that the structure of the SGC <strong>has evolved</strong> under selective pressure.</li>
+<li>That selective pressure was either a <strong>requirement for robustness</strong> to point mutations, or another requirement that is strongly <strong>correlated with robustness</strong> <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. Because for anything else our measure would just give results that are random relative to the “real” driving force.</li>
+</ol>
+<p>What remains, is to see if an “evolutionary” process could more easily find “good” codes.</p>
+</section>
+<section id="references" class="level1" data-number="7">
+
+<!-- [END] -->
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">7 References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-azzalini2014" class="csl-entry" role="listitem">
+Azzalini, Adelchi, and Antonella Capitanio. 2014. <em>The Skew-Normal and Related Families</em>. Cambridge University Press.
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>A driving force that might look very similar to biophysical similarity could be <em>smoothing the evolutionary landscape</em> , i.e.&nbsp;to have mutations make benign changes to the amino acid sequence. We would need a different measure of “similarity” to evaluate this. For example we could use natural protein sequences to considering the likelihood that mutations are accepted in related proteins. We might perhaps take mutations in two positions of a codon into account …<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
