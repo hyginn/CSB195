@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Elementary Cellular Automaton (Vanilla JS)</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app" class="container">
+<aside class="sidebar">
+<h1>ECA Lab</h1>
+
+
+<section class="block">
+<label for="ruleInput">Wolfram Code (0–255)</label>
+<input id="ruleInput" type="number" min="0" max="255" value="169" />
+</section>
+
+
+<section class="block">
+<div class="row">
+<div class="col">
+<label for="widthInput">Width</label>
+<input id="widthInput" type="number" min="3" step="1" value="101" />
+</div>
+<div class="col">
+<label for="heightInput">Height</label>
+<input id="heightInput" type="number" min="1" step="1" value="400" />
+</div>
+</div>
+<label class="checkbox">
+<input id="periodicCheckbox" type="checkbox" checked />
+Periodic boundary
+</label>
+</section>
+
+
+<section class="block">
+<label for="initialTextarea">Initial State (0/1, whitespace ok)</label>
+<textarea id="initialTextarea" rows="4" placeholder="e.g. 0000001000000 or 1 0 0 1 1 0 ..."></textarea>
+<div class="row tight">
+<button id="btnRandomize" title="Replace initial state with random bits of current width">Randomize</button>
+<button id="btnReset">Reset</button>
+</div>
+</section>
+
+
+<section class="block">
+  <h2>Rule & Colors</h2>
+  <p class="hint">8-wide layout: each column shows neighborhood → output → hex → swatch.</p>
+  <div id="ruleGrid" class="rule-grid"></div>
+</section>
+
+
+
+
+<section class="block">
+<div class="row tight">
+<button id="btnRun">Run</button>
+<button id="btnPause">Pause</button>
+<button id="btnStep">Step</button>
+<button id="btnRender">Render</button>
+</div>
+<div class="row tight">
+<button id="btnExportJSON">Export JSON</button>
+<button id="btnExportCSV">Export CSV</button>
+</div>
+</section>
+
+
+<footer class="footer">Pure Vanilla JS • No dependencies</footer>
+</aside>
+
+
+<main class="main">
+<canvas id="automatonCanvas"></canvas>
+</main>
+</div>
+
+
+<script src="js/ca.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

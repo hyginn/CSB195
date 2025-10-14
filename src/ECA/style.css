@@ -1,0 +1,44 @@
+/* ----- style.css ----- */
+/* Minimal, readable, print-friendly aesthetics. */
+:root {
+--bg: #ffffff;
+--fg: #111111;
+--muted: #777;
+--border: #e5e7eb;
+--accent: #0ea5e9;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+.container { display: grid; grid-template-columns: 640px 1fr; min-height: 100vh; }
+.sidebar { border-right: 1px solid var(--border); padding: 16px 14px; }
+.main { padding: 12px; overflow: auto; }
+
+
+h1 { margin: 0 0 12px; font-size: 18px; }
+h2 { margin: 6px 0 8px; font-size: 14px; font-weight: 600; }
+label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+input[type="number"], input[type="text"], textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
+textarea { resize: vertical; }
+.checkbox { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--fg); }
+.block { margin-bottom: 14px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row.tight { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
+.col {}
+button { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: #f8fafc; cursor: pointer; font: inherit; }
+button:hover { border-color: var(--accent); }
+.footer { margin-top: 10px; font-size: 11px; color: var(--muted); }
+
+
+.rule-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.rulecol { border: 1px solid var(--border); border-radius: 6px; padding: 6px;
+           display: grid; grid-template-rows: auto auto auto auto; gap: 6px; align-items: start; }
+.rulecol .pattern-big { font-size: 16px; font-weight: 700; text-align: center; letter-spacing: 2px; }
+.rulecol .out-big { font-size: 16px; font-weight: 700; text-align: center; border: 1px solid var(--border);
+                    border-radius: 4px; padding: 2px 0; cursor: pointer; }
+.rulecol .out-big.live { background: #e0f2fe; border-color: #93c5fd; }
+.rulecol .hex-small { font-size: 11px; font-family: inherit; padding: 4px 6px; }
+.rulecol .swatch { width: 100%; height: 18px; border: 1px solid var(--border); border-radius: 4px; }
+
+
+#automatonCanvas { border: 1px solid var(--border); display: block; max-width: 100%; height: auto; }
+
