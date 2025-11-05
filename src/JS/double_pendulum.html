@@ -10,25 +10,25 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #1a1a2e;
             color: #eee;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1800px;
             margin: 0 auto;
         }
-        
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
             color: #F085C5;
         }
-        
+
         .controls {
             background: #16213e;
             padding: 15px;
@@ -39,7 +39,7 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        
+
         button {
             background: #F085C5;
             border: none;
@@ -50,51 +50,51 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        
+
         button:hover {
             background: #d06ba8;
         }
-        
+
         button:disabled {
             background: #555;
             cursor: not-allowed;
         }
-        
+
         .speed-control {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         input[type="range"] {
             width: 150px;
         }
-        
+
         .visualization {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 60px;
             gap: 20px;
             margin-bottom: 20px;
         }
-        
+
         .canvas-container {
             background: #16213e;
             border-radius: 8px;
             padding: 15px;
         }
-        
+
         .canvas-container h3 {
             margin-bottom: 10px;
             color: #9CA7EB;
         }
-        
+
         canvas {
             display: block;
             width: 100%;
             background: #0f1620;
             border-radius: 5px;
         }
-        
+
         .plot-controls {
             margin-top: 10px;
             display: flex;
@@ -102,13 +102,13 @@
             gap: 10px;
             font-size: 14px;
         }
-        
+
         .plot-controls label {
             display: flex;
             align-items: center;
             gap: 5px;
         }
-        
+
         .plot-controls select {
             background: #0f1620;
             color: #eee;
@@ -116,18 +116,18 @@
             padding: 5px;
             border-radius: 3px;
         }
-        
+
         .code-section {
             background: #16213e;
             border-radius: 8px;
             padding: 15px;
         }
-        
+
         .code-section h3 {
             margin-bottom: 10px;
             color: #9CA7EB;
         }
-        
+
         textarea {
             width: 100%;
             height: 300px;
@@ -140,13 +140,13 @@
             font-size: 14px;
             resize: vertical;
         }
-        
+
         .code-buttons {
             margin-top: 10px;
             display: flex;
             gap: 10px;
         }
-        
+
         .error-message {
             background: #cc3333;
             color: white;
@@ -155,11 +155,11 @@
             margin-top: 10px;
             display: none;
         }
-        
+
         input[type="checkbox"] {
             cursor: pointer;
         }
-        
+
         .chaos-meter-container {
             background: #16213e;
             border-radius: 8px;
@@ -168,7 +168,7 @@
             flex-direction: column;
             align-items: center;
         }
-        
+
         .chaos-meter-container h3 {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
@@ -177,7 +177,7 @@
             margin-bottom: 15px;
             letter-spacing: 2px;
         }
-        
+
         .chaos-meter {
             width: 30px;
             height: 400px;
@@ -187,7 +187,7 @@
             border: 2px solid #333;
             overflow: hidden;
         }
-        
+
         .chaos-meter-background {
             position: absolute;
             bottom: 0;
@@ -195,7 +195,7 @@
             right: 0;
             height: 100%;
         }
-        
+
         .chaos-meter-fill {
             position: absolute;
             top: 0;
@@ -204,7 +204,7 @@
             background: #000;
             transition: height 0.1s ease-out;
         }
-        
+
         .chaos-meter-segments {
             position: absolute;
             top: 0;
@@ -214,12 +214,12 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .chaos-segment {
             flex: 1;
             border-bottom: 2px solid #0f1620;
         }
-        
+
         .chaos-value {
             margin-top: 10px;
             font-size: 12px;
@@ -230,7 +230,7 @@
 <body>
     <div class="container">
         <h1>Interactive Double Pendulum Simulator</h1>
-        
+
         <div class="controls">
             <button id="playPauseBtn">Play</button>
             <button id="resetBtn">Reset</button>
@@ -243,13 +243,13 @@
                 <span>Time: <span id="timeDisplay">0.00</span>s</span>
             </div>
         </div>
-        
+
         <div class="visualization">
             <div class="canvas-container">
                 <h3>Pendulum Animation</h3>
                 <canvas id="pendulumCanvas" width="400" height="400"></canvas>
             </div>
-            
+
             <div class="canvas-container">
                 <h3>Time Series</h3>
                 <canvas id="timeCanvas" width="400" height="400"></canvas>
@@ -260,12 +260,12 @@
                     <label><input type="checkbox" id="showOm2"> ω₂</label>
                 </div>
             </div>
-            
+
             <div class="canvas-container">
                 <h3>Phase Space</h3>
                 <canvas id="phaseCanvas" width="400" height="400"></canvas>
                 <div class="plot-controls">
-                    <label>X: 
+                    <label>X:
                         <select id="phaseX">
                             <option value="th1" selected>θ₁</option>
                             <option value="om1">ω₁</option>
@@ -273,7 +273,7 @@
                             <option value="om2">ω₂</option>
                         </select>
                     </label>
-                    <label>Y: 
+                    <label>Y:
                         <select id="phaseY">
                             <option value="th1">θ₁</option>
                             <option value="om1">ω₁</option>
@@ -283,7 +283,7 @@
                     </label>
                 </div>
             </div>
-            
+
             <div class="chaos-meter-container">
                 <h3>CHAOS</h3>
                 <div class="chaos-meter">
@@ -315,7 +315,7 @@
                 <div class="chaos-value" id="chaosValue">0.0</div>
             </div>
         </div>
-        
+
         <div class="code-section">
             <h3>Editable Parameters</h3>
             <textarea id="codeEditor">// Physical Parameters
@@ -325,13 +325,13 @@ const L2 = 0.9;  // Length of second pendulum (m)
 const m2 = 1.9;  // Mass of second pendulum (kg)
 
 // Initial Conditions (angles in degrees)
-const th1_deg = 193;  // Initial angle of first pendulum
+const th1_deg = 10;   // Initial angle of first pendulum
 const om1 = 0;        // Initial angular velocity of first pendulum (rad/s)
-const th2_deg = 163;  // Initial angle of second pendulum
+const th2_deg = 20;   // Initial angle of second pendulum
 const om2 = 0;        // Initial angular velocity of second pendulum (rad/s)
 
 // Integration method ('verlet' or 'rk4')
-const integrator = 'verlet';  // 'verlet' is faster, 'rk4' is more accurate
+const integrator = 'rk4';  // 'verlet' is faster, 'rk4' is more accurate
 
 // Damping (0 = no damping, 0.001 = slight damping)
 const damping = 0;    // Friction coefficient
@@ -355,7 +355,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
 
     <script>
         const DEFAULT_CODE = document.getElementById('codeEditor').value;
-        
+
         // Magma colormap from matplotlib
         const magmaColors = [
             '#000004', '#07061c', '#150e38', '#29115a', '#3f0f72',
@@ -363,7 +363,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             '#c03a76', '#d6456c', '#e85362', '#f4695c', '#fa815f',
             '#fd9b6b', '#feb47b', '#fecd90', '#fde5a7', '#fcfdbf'
         ];
-        
+
         let state = {
             th1: 0, om1: 0, th2: 0, om2: 0,
             time: 0,
@@ -374,21 +374,21 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             },
             chaosHistory: []
         };
-        
+
         let params = {};
-        
+
         const g = 9.81;
         const dt = 0.016;
         const maxHistoryPoints = 10000;
         const chaosWindowSize = 100;
-        
+
         const pendulumCanvas = document.getElementById('pendulumCanvas');
         const timeCanvas = document.getElementById('timeCanvas');
         const phaseCanvas = document.getElementById('phaseCanvas');
         const pendulumCtx = pendulumCanvas.getContext('2d');
         const timeCtx = timeCanvas.getContext('2d');
         const phaseCtx = phaseCanvas.getContext('2d');
-        
+
         const playPauseBtn = document.getElementById('playPauseBtn');
         const resetBtn = document.getElementById('resetBtn');
         const speedSlider = document.getElementById('speedSlider');
@@ -397,11 +397,11 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
         const runCodeBtn = document.getElementById('runCodeBtn');
         const resetCodeBtn = document.getElementById('resetCodeBtn');
         const errorMessage = document.getElementById('errorMessage');
-        
+
         parseAndApplyCode();
         resetSimulation();
         initializeChaosMeter();
-        
+
         playPauseBtn.addEventListener('click', togglePlayPause);
         resetBtn.addEventListener('click', resetSimulation);
         speedSlider.addEventListener('input', (e) => {
@@ -413,50 +413,50 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             document.getElementById('codeEditor').value = DEFAULT_CODE;
             parseAndApplyCode();
         });
-        
+
         ['showTh1', 'showOm1', 'showTh2', 'showOm2'].forEach(id => {
             document.getElementById(id).addEventListener('change', drawTimePlot);
         });
-        
+
         document.getElementById('phaseX').addEventListener('change', drawPhasePlot);
         document.getElementById('phaseY').addEventListener('change', drawPhasePlot);
-        
+
         function deg2rad(deg) {
             return (deg / 180) * Math.PI;
         }
-        
+
         function wrapAngle(angle) {
             // Wrap angle to [-π, π]
             while (angle > Math.PI) angle -= 2 * Math.PI;
             while (angle < -Math.PI) angle += 2 * Math.PI;
             return angle;
         }
-        
+
         function initializeChaosMeter() {
             // Create gradient strings for the magma colormap
             const gradientStops = magmaColors.map((color, i) => {
                 const percent = (i / (magmaColors.length - 1)) * 100;
                 return `${color} ${percent}%`;
             }).join(', ');
-            
+
             const background = document.querySelector('.chaos-meter-background');
             background.style.background = `linear-gradient(to top, ${gradientStops})`;
         }
-        
+
         function parseAndApplyCode() {
             try {
                 errorMessage.style.display = 'none';
                 const code = document.getElementById('codeEditor').value;
-                
+
                 const lines = code.split('\n');
                 const tempParams = {};
-                
+
                 lines.forEach(line => {
                     const match = line.match(/const\s+(\w+)\s*=\s*(.+?);/);
                     if (match) {
                         const varName = match[1];
                         const varValue = match[2].trim();
-                        
+
                         try {
                             if (varValue.startsWith("'") || varValue.startsWith('"')) {
                                 tempParams[varName] = varValue.slice(1, -1);
@@ -468,7 +468,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                         }
                     }
                 });
-                
+
                 params = {
                     L1: tempParams.L1,
                     m1: tempParams.m1,
@@ -489,14 +489,14 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                     trailLength: tempParams.trailLength,
                     phaseTrailLength: Math.min(tempParams.phaseTrailLength || 500, maxHistoryPoints)
                 };
-                
+
                 resetSimulation();
             } catch (error) {
                 errorMessage.textContent = 'Error: ' + error.message;
                 errorMessage.style.display = 'block';
             }
         }
-        
+
         function togglePlayPause() {
             state.isRunning = !state.isRunning;
             playPauseBtn.textContent = state.isRunning ? 'Pause' : 'Play';
@@ -504,7 +504,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 requestAnimationFrame(animate);
             }
         }
-        
+
         function resetSimulation() {
             state.th1 = deg2rad(params.th1_deg);
             state.om1 = params.om1;
@@ -523,66 +523,66 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             updateChaosMeter(0);
             drawAll();
         }
-        
+
         function derivatives(th1, om1, th2, om2) {
             const dth1 = om1;
-            
+
             let dom1 = -g * (2 * params.m1 + params.m2) * Math.sin(th1);
             dom1 -= g * params.m2 * Math.sin(th1 - 2 * th2);
             dom1 -= 2 * params.m2 * om2 * om2 * params.L2 * Math.sin(th1 - th2);
             dom1 -= params.m2 * om1 * om1 * params.L1 * Math.sin(2 * (th1 - th2));
             dom1 /= params.L1 * (2 * params.m1 + params.m2 - params.m2 * Math.cos(2 * (th1 - th2)));
-            
+
             const dth3 = om2;
-            
+
             let dom2 = (params.m1 + params.m2) * om1 * om1 * params.L1;
             dom2 += g * (params.m1 + params.m2) * Math.cos(th1);
             dom2 += params.m2 * om2 * om2 * params.L2 * Math.cos(th1 - th2);
             dom2 *= 2 * Math.sin(th1 - th2);
             dom2 /= params.L2 * (2 * params.m1 + params.m2 - params.m2 * Math.cos(2 * (th1 - th2)));
-            
+
             return { dth1, dom1, dth3, dom2 };
         }
-        
+
         function velocityVerletStep() {
             const effectiveDt = dt * state.speed;
-            
+
             const d1 = derivatives(state.th1, state.om1, state.th2, state.om2);
-            
+
             state.chaosHistory.push(Math.abs(d1.dom1) + Math.abs(d1.dom2));
             if (state.chaosHistory.length > chaosWindowSize) {
                 state.chaosHistory.shift();
             }
-            
+
             const om1_half = state.om1 + 0.5 * effectiveDt * d1.dom1;
             const om2_half = state.om2 + 0.5 * effectiveDt * d1.dom2;
-            
+
             state.th1 += effectiveDt * om1_half;
             state.th2 += effectiveDt * om2_half;
-            
+
             // Wrap angles to [-π, π]
             state.th1 = wrapAngle(state.th1);
             state.th2 = wrapAngle(state.th2);
-            
+
             const d2 = derivatives(state.th1, om1_half, state.th2, om2_half);
-            
+
             state.om1 = om1_half + 0.5 * effectiveDt * d2.dom1;
             state.om2 = om2_half + 0.5 * effectiveDt * d2.dom2;
-            
+
             // Apply damping (opposes motion) or anti-damping (enhances motion)
             if (params.damping !== 0) {
                 state.om1 -= Math.sign(state.om1) * params.damping * effectiveDt;
                 state.om2 -= Math.sign(state.om2) * params.damping * effectiveDt;
             }
-            
+
             state.time += effectiveDt;
-            
+
             state.history.th1.push(state.th1);
             state.history.om1.push(state.om1);
             state.history.th2.push(state.th2);
             state.history.om2.push(state.om2);
             state.history.time.push(state.time);
-            
+
             if (state.history.time.length > maxHistoryPoints) {
                 state.history.th1.shift();
                 state.history.om1.shift();
@@ -591,18 +591,18 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 state.history.time.shift();
             }
         }
-        
+
         function rk4Step() {
             const effectiveDt = dt * state.speed;
-            
+
             // k1
             const k1 = derivatives(state.th1, state.om1, state.th2, state.om2);
-            
+
             state.chaosHistory.push(Math.abs(k1.dom1) + Math.abs(k1.dom2));
             if (state.chaosHistory.length > chaosWindowSize) {
                 state.chaosHistory.shift();
             }
-            
+
             // k2
             const k2 = derivatives(
                 state.th1 + 0.5 * effectiveDt * k1.dth1,
@@ -610,7 +610,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 state.th2 + 0.5 * effectiveDt * k1.dth3,
                 state.om2 + 0.5 * effectiveDt * k1.dom2
             );
-            
+
             // k3
             const k3 = derivatives(
                 state.th1 + 0.5 * effectiveDt * k2.dth1,
@@ -618,7 +618,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 state.th2 + 0.5 * effectiveDt * k2.dth3,
                 state.om2 + 0.5 * effectiveDt * k2.dom2
             );
-            
+
             // k4
             const k4 = derivatives(
                 state.th1 + effectiveDt * k3.dth1,
@@ -626,31 +626,31 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 state.th2 + effectiveDt * k3.dth3,
                 state.om2 + effectiveDt * k3.dom2
             );
-            
+
             // Update state using weighted average
             state.th1 += effectiveDt * (k1.dth1 + 2*k2.dth1 + 2*k3.dth1 + k4.dth1) / 6;
             state.om1 += effectiveDt * (k1.dom1 + 2*k2.dom1 + 2*k3.dom1 + k4.dom1) / 6;
             state.th2 += effectiveDt * (k1.dth3 + 2*k2.dth3 + 2*k3.dth3 + k4.dth3) / 6;
             state.om2 += effectiveDt * (k1.dom2 + 2*k2.dom2 + 2*k3.dom2 + k4.dom2) / 6;
-            
+
             // Wrap angles to [-π, π]
             state.th1 = wrapAngle(state.th1);
             state.th2 = wrapAngle(state.th2);
-            
+
             // Apply damping (opposes motion) or anti-damping (enhances motion)
             if (params.damping !== 0) {
                 state.om1 -= Math.sign(state.om1) * params.damping * effectiveDt;
                 state.om2 -= Math.sign(state.om2) * params.damping * effectiveDt;
             }
-            
+
             state.time += effectiveDt;
-            
+
             state.history.th1.push(state.th1);
             state.history.om1.push(state.om1);
             state.history.th2.push(state.th2);
             state.history.om2.push(state.om2);
             state.history.time.push(state.time);
-            
+
             if (state.history.time.length > maxHistoryPoints) {
                 state.history.th1.shift();
                 state.history.om1.shift();
@@ -659,7 +659,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 state.history.time.shift();
             }
         }
-        
+
         function integrateStep() {
             if (params.integrator === 'rk4') {
                 rk4Step();
@@ -667,17 +667,17 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 velocityVerletStep();
             }
         }
-        
+
         function calculateChaos() {
             if (state.chaosHistory.length < 10) return 0;
-            
+
             const mean = state.chaosHistory.reduce((a, b) => a + b, 0) / state.chaosHistory.length;
             const variance = state.chaosHistory.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / state.chaosHistory.length;
             const stdDev = Math.sqrt(variance);
-            
+
             return Math.min(stdDev / 50, 1.0);
         }
-        
+
         function updateChaosMeter(chaos) {
             const fill = document.getElementById('chaosMeterFill');
             const value = document.getElementById('chaosValue');
@@ -686,27 +686,27 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             fill.style.height = ((1 - chaos) * 100) + '%';
             value.textContent = chaos.toFixed(2);
         }
-        
+
         function animate() {
             if (!state.isRunning) return;
-            
+
             integrateStep();
             timeDisplay.textContent = state.time.toFixed(2);
-            
+
             const chaos = calculateChaos();
             updateChaosMeter(chaos);
-            
+
             drawAll();
-            
+
             requestAnimationFrame(animate);
         }
-        
+
         function drawAll() {
             drawPendulum();
             drawTimePlot();
             drawPhasePlot();
         }
-        
+
         function drawPendulum() {
             const ctx = pendulumCtx;
             const width = pendulumCanvas.width;
@@ -714,15 +714,15 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             const centerX = width / 2;
             const centerY = height / 2;
             const scale = Math.min(width, height) / (2.2 * (params.L1 + params.L2));
-            
+
             ctx.fillStyle = '#0f1620';
             ctx.fillRect(0, 0, width, height);
-            
+
             const x1 = centerX + scale * params.L1 * Math.sin(state.th1);
             const y1 = centerY + scale * params.L1 * Math.cos(state.th1);
             const x2 = x1 + scale * params.L2 * Math.sin(state.th2);
             const y2 = y1 + scale * params.L2 * Math.cos(state.th2);
-            
+
             const trailLen = Math.min(params.trailLength, state.history.time.length);
             if (trailLen > 1) {
                 ctx.strokeStyle = params.th2Color;
@@ -745,7 +745,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 ctx.stroke();
                 ctx.globalAlpha = 1.0;
             }
-            
+
             ctx.strokeStyle = '#888';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -753,23 +753,23 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             ctx.lineTo(x1, y1);
             ctx.lineTo(x2, y2);
             ctx.stroke();
-            
+
             ctx.fillStyle = '#666';
             ctx.beginPath();
             ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
             ctx.fill();
-            
+
             ctx.fillStyle = params.th1Color;
             ctx.beginPath();
             ctx.arc(x1, y1, 8 + params.m1 * 3, 0, 2 * Math.PI);
             ctx.fill();
-            
+
             ctx.fillStyle = params.th2Color;
             ctx.beginPath();
             ctx.arc(x2, y2, 8 + params.m2 * 3, 0, 2 * Math.PI);
             ctx.fill();
         }
-        
+
         function drawTimePlot() {
             const ctx = timeCtx;
             const width = timeCanvas.width;
@@ -777,19 +777,19 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             const padding = 40;
             const plotWidth = width - 2 * padding;
             const plotHeight = height - 2 * padding;
-            
+
             ctx.fillStyle = '#0f1620';
             ctx.fillRect(0, 0, width, height);
-            
+
             if (state.history.time.length < 2) return;
-            
+
             const show = {
                 th1: document.getElementById('showTh1').checked,
                 om1: document.getElementById('showOm1').checked,
                 th2: document.getElementById('showTh2').checked,
                 om2: document.getElementById('showOm2').checked
             };
-            
+
             let yMin = Infinity, yMax = -Infinity;
             ['th1', 'om1', 'th2', 'om2'].forEach(key => {
                 if (show[key]) {
@@ -798,12 +798,12 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                     yMax = Math.max(yMax, ...vals);
                 }
             });
-            
+
             if (yMin === Infinity) return;
-            
+
             const yRange = yMax - yMin || 1;
             const timeRange = state.history.time[state.history.time.length - 1] - state.history.time[0] || 1;
-            
+
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -811,7 +811,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             ctx.lineTo(padding, height - padding);
             ctx.lineTo(width - padding, height - padding);
             ctx.stroke();
-            
+
             ctx.fillStyle = '#aaa';
             ctx.font = '12px sans-serif';
             ctx.textAlign = 'center';
@@ -821,29 +821,29 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             ctx.rotate(-Math.PI / 2);
             ctx.fillText('Value', 0, 0);
             ctx.restore();
-            
+
             const colors = {
                 th1: params.th1Color,
                 om1: params.om1Color,
                 th2: params.th2Color,
                 om2: params.om2Color
             };
-            
+
             ['th1', 'om1', 'th2', 'om2'].forEach(key => {
                 if (!show[key]) return;
-                
+
                 const vals = state.history[key];
                 const times = state.history.time;
-                
+
                 ctx.strokeStyle = colors[key];
                 ctx.lineWidth = params.traceWidth;
                 ctx.beginPath();
-                
+
                 let pathStarted = false;
                 for (let i = 0; i < vals.length; i++) {
                     const x = padding + (times[i] - times[0]) / timeRange * plotWidth;
                     const y = height - padding - (vals[i] - yMin) / yRange * plotHeight;
-                    
+
                     // Check for wrap-around discontinuity
                     if (i > 0 && Math.abs(vals[i] - vals[i-1]) > Math.PI) {
                         // Discontinuity detected - end current path and start new one
@@ -865,7 +865,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 if (pathStarted) {
                     ctx.stroke();
                 }
-                
+
                 const lastX = width - padding;
                 const lastY = height - padding - (vals[vals.length - 1] - yMin) / yRange * plotHeight;
                 ctx.fillStyle = colors[key];
@@ -874,7 +874,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 ctx.fill();
             });
         }
-        
+
         function drawPhasePlot() {
             const ctx = phaseCtx;
             const width = phaseCanvas.width;
@@ -882,25 +882,25 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             const padding = 40;
             const plotWidth = width - 2 * padding;
             const plotHeight = height - 2 * padding;
-            
+
             ctx.fillStyle = '#0f1620';
             ctx.fillRect(0, 0, width, height);
-            
+
             if (state.history.time.length < 2) return;
-            
+
             const xVar = document.getElementById('phaseX').value;
             const yVar = document.getElementById('phaseY').value;
-            
+
             const xVals = state.history[xVar];
             const yVals = state.history[yVar];
-            
+
             const startIdx = Math.max(0, xVals.length - params.phaseTrailLength);
             const xValsPlot = xVals.slice(startIdx);
             const yValsPlot = yVals.slice(startIdx);
-            
+
             // Determine ranges: fixed for theta, auto for omega
             let xMin, xMax, yMin, yMax;
-            
+
             if (xVar === 'th1' || xVar === 'th2') {
                 xMin = -Math.PI;
                 xMax = Math.PI;
@@ -908,7 +908,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 xMin = Math.min(...xValsPlot);
                 xMax = Math.max(...xValsPlot);
             }
-            
+
             if (yVar === 'th1' || yVar === 'th2') {
                 yMin = -Math.PI;
                 yMax = Math.PI;
@@ -916,10 +916,10 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
                 yMin = Math.min(...yValsPlot);
                 yMax = Math.max(...yValsPlot);
             }
-            
+
             const xRange = xMax - xMin || 1;
             const yRange = yMax - yMin || 1;
-            
+
             ctx.strokeStyle = '#555';
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -927,7 +927,7 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             ctx.lineTo(padding, height - padding);
             ctx.lineTo(width - padding, height - padding);
             ctx.stroke();
-            
+
             ctx.fillStyle = '#aaa';
             ctx.font = '12px sans-serif';
             ctx.textAlign = 'center';
@@ -940,41 +940,41 @@ const phaseTrailLength = 500;  // Number of points in phase space trail</textare
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(labels[yVar], 0, 0);
             ctx.restore();
-            
+
             const n = xValsPlot.length;
-            
+
             // Draw trajectory with color gradient and handle discontinuities
             let pathStarted = false;
             for (let i = 1; i < n; i++) {
                 // Check for wrap-around discontinuity in either variable
                 const xJump = Math.abs(xValsPlot[i] - xValsPlot[i-1]) > Math.PI;
                 const yJump = Math.abs(yValsPlot[i] - yValsPlot[i-1]) > Math.PI;
-                
+
                 if (xJump || yJump) {
                     // Discontinuity detected - start new path
                     pathStarted = false;
                     continue;
                 }
-                
+
                 const t = i / n;
                 const r = Math.floor(109 + t * (201 - 109));
                 const g = Math.floor(124 + t * (103 - 124));
                 const b = Math.floor(138 + t * (114 - 138));
-                
+
                 ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
                 ctx.lineWidth = params.phaseWidth;
                 ctx.beginPath();
-                
+
                 const x1 = padding + (xValsPlot[i-1] - xMin) / xRange * plotWidth;
                 const y1 = height - padding - (yValsPlot[i-1] - yMin) / yRange * plotHeight;
                 const x2 = padding + (xValsPlot[i] - xMin) / xRange * plotWidth;
                 const y2 = height - padding - (yValsPlot[i] - yMin) / yRange * plotHeight;
-                
+
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.stroke();
             }
-            
+
             const lastX = padding + (xValsPlot[n-1] - xMin) / xRange * plotWidth;
             const lastY = height - padding - (yValsPlot[n-1] - yMin) / yRange * plotHeight;
             ctx.fillStyle = '#c96772';
